@@ -63,6 +63,8 @@ class MainActivity : AppCompatActivity() {
             }
 
             if (intent != null) {
+                // KIRIM EMAIL KE ACTIVITY BERIKUTNYA
+                intent.putExtra("USER_EMAIL", email)
                 startActivity(intent)
                 finish()
             } else {
@@ -71,7 +73,6 @@ class MainActivity : AppCompatActivity() {
         } else {
             Toast.makeText(this, "Email atau Password Salah!", Toast.LENGTH_SHORT).show()
         }
-
         cursor.close()
     }
 }
