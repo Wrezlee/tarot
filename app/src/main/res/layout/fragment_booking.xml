@@ -80,6 +80,76 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            app:cardBackgroundColor="#FFFFFF"
+            app:cardCornerRadius="16dp"
+            app:strokeColor="#E1AFD1"
+            app:strokeWidth="1dp">
+            <LinearLayout android:padding="16dp" android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content">
+                <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="3 Kartu (1 Pertanyaan)" android:textColor="#7469B6" android:textStyle="bold" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Rp10.000" android:textColor="#7469B6" android:textStyle="bold" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            app:cardBackgroundColor="#E1AFD1"
+            app:cardCornerRadius="16dp">
+            <LinearLayout android:padding="16dp" android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content">
+                <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="9 Kartu (Deep + Oracle)" android:textColor="#7469B6" android:textStyle="bold" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Rp50.000" android:textColor="#7469B6" android:textStyle="bold" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="Palm Reading"
+            android:textColor="#7469B6"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            app:cardBackgroundColor="#FFFFFF"
+            app:cardCornerRadius="16dp"
+            app:strokeColor="#E1AFD1"
+            app:strokeWidth="1dp">
+            <LinearLayout android:padding="16dp" android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content">
+                <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Analisis Telapak Tangan" android:textColor="#7469B6" android:textStyle="bold" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Rp40.000" android:textColor="#7469B6" android:textStyle="bold" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="Interactive Session"
+            android:textColor="#7469B6"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            app:cardBackgroundColor="#AD88C6"
+            app:cardCornerRadius="16dp">
+            <LinearLayout android:padding="16dp" android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content">
+                <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Interaktif Call (30 Menit)" android:textColor="#FFE6E6" android:textStyle="bold" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Rp90.000" android:textColor="#FFE6E6" android:textStyle="bold" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnCaraOrder"
             android:layout_width="match_parent"
