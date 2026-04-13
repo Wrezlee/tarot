@@ -13,16 +13,14 @@
         android:orientation="vertical"
         android:padding="24dp">
 
-        <ImageView
-            android:layout_width="180dp"
-            android:layout_height="150dp"
-            android:layout_marginTop="48dp"
-            app:srcCompat="@drawable/meow" />
+        <View
+            android:id="@+id/view"
+            android:layout_width="match_parent"
+            android:layout_height="50dp" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
             android:fontFamily="serif"
             android:text="MYSTIC PROFILE"
             android:textColor="#7469B6"
@@ -31,25 +29,25 @@
 
         <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/imgAvatar"
-            android:layout_width="120dp"
-            android:layout_height="120dp"
-            android:layout_marginTop="32dp"
+            android:layout_width="110dp"
+            android:layout_height="110dp"
+            android:layout_marginTop="24dp"
             android:padding="4dp"
             android:scaleType="centerCrop"
-            android:src="@drawable/meow"
+            android:src="@drawable/von"
             app:shapeAppearanceOverlay="@style/CircleAppearance"
             app:strokeColor="#7469B6"
-            app:strokeWidth="3dp" />
+            app:strokeWidth="2dp" />
 
         <TextView
             android:id="@+id/tvProfileName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="12dp"
             android:fontFamily="serif"
             android:text="Nama Pengguna"
             android:textColor="#251819"
-            android:textSize="24sp"
+            android:textSize="22sp"
             android:textStyle="bold" />
 
         <TextView
@@ -64,7 +62,7 @@
             android:id="@+id/tvProfileRole"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="8dp"
             android:background="@drawable/bg_status_rounded"
             android:backgroundTint="#F3E5F5"
             android:paddingHorizontal="12dp"
@@ -74,17 +72,89 @@
             android:textSize="10sp"
             android:textStyle="bold" />
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:orientation="horizontal"
+            android:weightSum="2">
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_weight="1"
+                app:cardBackgroundColor="#FFFFFF"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp"
+                app:strokeColor="#E1AFD1"
+                app:strokeWidth="1dp">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+                    <TextView
+                        android:id="@+id/tvTotalReadings"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:textColor="#7469B6"
+                        android:textSize="20sp"
+                        android:textStyle="bold" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Rituals Done"
+                        android:textColor="#AD88C6"
+                        android:textSize="10sp" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                app:cardBackgroundColor="#FFFFFF"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp"
+                app:strokeColor="#E1AFD1"
+                app:strokeWidth="1dp">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+                    <TextView
+                        android:id="@+id/tvTestimonialsCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:textColor="#7469B6"
+                        android:textSize="20sp"
+                        android:textStyle="bold" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Testimonials"
+                        android:textColor="#AD88C6"
+                        android:textSize="10sp" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+        </LinearLayout>
+
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnEditProfile"
             style="@style/Widget.Material3.Button.TonalButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="24dp"
             android:text="Edit Profile"
             android:textSize="11sp"
             app:cornerRadius="20dp"
-            app:icon="@drawable/ic_edit"
-            app:iconSize="16dp"
             app:strokeColor="#AD88C6"
             app:strokeWidth="1dp" />
 
@@ -92,9 +162,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="start"
-            android:layout_marginTop="40dp"
+            android:layout_marginTop="32dp"
             android:letterSpacing="0.1"
-            android:text="ACCOUNT JOURNEY"
+            android:text="JEJAK SPIRITUAL"
             android:textColor="#AD88C6"
             android:textSize="11sp"
             android:textStyle="bold" />
@@ -103,52 +173,79 @@
             android:id="@+id/btnHistory"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="12dp"
             app:cardBackgroundColor="#FFFFFF"
             app:cardCornerRadius="16dp"
-            app:cardElevation="2dp"
-            app:strokeWidth="0dp">
-
+            app:cardElevation="0dp"
+            app:strokeColor="#E1AFD1"
+            app:strokeWidth="1dp">
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
                 android:padding="16dp">
-
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_history"
-                    app:tint="#7469B6" />
-
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="📜" android:textSize="18sp"/>
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
                     android:layout_weight="1"
                     android:orientation="vertical">
-
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Reading History"
+                        android:text="Riwayat Ramalan"
                         android:textColor="#251819"
                         android:textStyle="bold" />
-
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Recall previous cosmic insights"
+                        android:text="Baca ulang petunjuk semesta sebelumnya"
                         android:textColor="#80251819"
                         android:textSize="11sp" />
                 </LinearLayout>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="→" android:textColor="#AD88C6" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
 
-                <ImageView
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
-                    android:src="@drawable/ic_arrow_right"
-                    app:tint="#AD88C6" />
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/btnTestimony"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            app:cardBackgroundColor="#FFFFFF"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="0dp"
+            app:strokeColor="#E1AFD1"
+            app:strokeWidth="1dp">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="16dp">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="✨" android:textSize="18sp"/>
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Bagikan Keajaiban"
+                        android:textColor="#251819"
+                        android:textStyle="bold" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Tulis testimoni untuk Reader"
+                        android:textColor="#80251819"
+                        android:textSize="11sp" />
+                </LinearLayout>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="→" android:textColor="#AD88C6" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
@@ -157,15 +254,13 @@
             style="@style/Widget.Material3.Button.TextButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="40dp"
-            android:text="End Current Session"
-            android:textColor="#D32F2F"
-            app:icon="@drawable/ic_logout"
-            app:iconTint="#D32F2F" />
+            android:layout_marginTop="32dp"
+            android:text="Akhiri Sesi Meditasi"
+            android:textColor="#D32F2F" />
 
         <View
             android:layout_width="match_parent"
-            android:layout_height="100dp" />
+            android:layout_height="40dp" />
 
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

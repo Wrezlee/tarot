@@ -1,14 +1,104 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#FFE6E6"
+    android:fillViewport="true">
 
-    <TextView
-        android:id="@+id/textView3"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="reader"
-        tools:layout_editor_absoluteX="176dp"
-        tools:layout_editor_absoluteY="301dp" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <TextView
+            android:id="@+id/tvReaderGreeting"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="serif"
+            android:text="Selamat Datang,\nMadame Seraphina"
+            android:textColor="#7469B6"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            app:cardBackgroundColor="#7469B6"
+            app:cardCornerRadius="24dp"
+            app:cardElevation="4dp">
+            <RelativeLayout android:padding="20dp" android:layout_width="match_parent" android:layout_height="wrap_content">
+                <LinearLayout android:orientation="vertical" android:layout_width="wrap_content" android:layout_height="wrap_content">
+                    <TextView android:text="CURRENT STATUS" android:textSize="10sp" android:textColor="#E1AFD1" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                    <TextView android:text="Online &amp; Active" android:textSize="18sp" android:textColor="#FFFFFF" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                </LinearLayout>
+                <com.google.android.material.materialswitch.MaterialSwitch
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:checked="true" />
+            </RelativeLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:text="Reading Queue (Antrean)"
+            android:textColor="#7469B6"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            app:cardBackgroundColor="#FFFFFF"
+            app:cardCornerRadius="20dp"
+            app:strokeColor="#E1AFD1"
+            app:strokeWidth="1dp">
+            <LinearLayout android:padding="16dp" android:orientation="vertical" android:layout_width="match_parent" android:layout_height="wrap_content">
+                <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content">
+                    <TextView android:text="Fateema Az Zahra" android:textColor="#7469B6" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                    <TextView android:layout_alignParentEnd="true" android:text="10:45 AM" android:textSize="11sp" android:textColor="#AD88C6" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                </RelativeLayout>
+                <TextView android:layout_marginTop="4dp" android:text="Paket: 9 Kartu (Deep Reading)" android:textSize="12sp" android:textColor="#AD88C6" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnAccept1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:text="Mulai Ramalan"
+                    app:cornerRadius="12dp"
+                    app:backgroundTint="#7469B6" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.button.MaterialButton
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="32dp"
+            android:text="Lihat Riwayat Sesi"
+            android:textColor="#7469B6"
+            app:strokeColor="#AD88C6"
+            app:cornerRadius="16dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnLogoutReader"
+            style="@style/Widget.Material3.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="24dp"
+            android:text="End Reader Session"
+            android:textColor="#D32F2F" />
+
+        <View android:layout_width="match_parent" android:layout_height="40dp" />
+
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>
