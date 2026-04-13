@@ -12,19 +12,34 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Tarot">
 
-        <activity android:name=".AdminActivity"></activity>
-        <activity android:name=".ReaderActivity"></activity>
-        <activity android:name=".CustomerActivity"></activity>
-
         <activity
-            android:name=".MainActivity"
+            android:name=".SplashActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-    </application>
 
+        <activity
+            android:name=".MainActivity"
+            android:exported="false" />
+
+        <activity android:name=".AdminActivity" />
+        <activity android:name=".ReaderActivity" />
+        <activity android:name=".CustomerActivity" />
+        <activity android:name=".HistoryActivity" />
+        <activity android:name=".EditProfileActivity" />
+        <activity android:name=".OrderActivity" />
+        <activity android:name=".ManageUserActivity" />
+        <activity android:name=".AddUserActivity"/>
+        <activity android:name=".EditUserActivity"/>
+        <activity android:name=".ManageTarotActivity"/>
+        <activity android:name=".AddTarotActivity"/>
+        <activity android:name=".EditTarotActivity"/>
+
+
+
+
+    </application>
 </manifest>

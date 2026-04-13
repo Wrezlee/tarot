@@ -10,37 +10,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="20dp">
-
-        <ImageView
-            android:id="@+id/imgLogoBooking"
-            android:layout_width="180dp"
-            android:layout_height="150dp"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="48dp"
-            android:layout_marginBottom="16dp"
-            app:srcCompat="@drawable/meow" />
+        android:padding="24dp">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:background="@drawable/bg_status_rounded"
-            android:backgroundTint="#E1AFD1"
-            android:paddingHorizontal="12dp"
-            android:paddingVertical="4dp"
-            android:text="✨ BOOKING YOUR READING"
-            android:textColor="#7469B6"
-            android:textSize="10sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="38dp"
             android:fontFamily="serif"
-            android:text="TAROT MEOW"
+            android:text="BOOKING"
             android:textColor="#7469B6"
             android:textSize="28sp"
             android:textStyle="bold" />
@@ -48,25 +25,137 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:background="@drawable/bg_border_rounded"
-            android:gravity="center"
-            android:padding="12dp"
-            android:text="💳 TF: ShopeePay/BRIMO a.n Fateema Az Zahra"
-            android:textColor="#7469B6"
-            android:textSize="11sp" />
+            android:layout_marginTop="4dp"
+            android:text="Pilih paket ritual yang sesuai dengan kebutuhanmu."
+            android:textColor="#AD88C6"
+            android:textSize="12sp" />
+
+        <ImageView
+            android:id="@+id/imgLogoBooking"
+            android:layout_width="169dp"
+            android:layout_height="125dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="24dp"
+            app:srcCompat="@drawable/meow" />
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            app:cardBackgroundColor="#FFFFFF"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="0dp"
+            app:strokeColor="#E1AFD1"
+            app:strokeWidth="1dp">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="💳 CARA ORDER"
+                    android:textColor="#7469B6"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:lineSpacingExtra="4dp"
+                    android:text="1️⃣  Pilih Paket Ritual\n2️⃣  Transfer Dana/ShopeePay: 0856-4947-1086\n      atau BRIMO: 627101007059504\n      a.n Fateema Az Zahra\n3️⃣  Setelah Pay kirim bukti transfer\n4️⃣  Segera kirim Nama + Nama orang bersangkutan\n      beserta Pertanyaan (+ Kronologi Curhatan)"
+                    android:textColor="#7469B6"
+                    android:textSize="11sp" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="32dp"
-            android:text="Reguler Tarot"
+            android:letterSpacing="0.1"
+            android:text="TOPIK KONSULTASI"
+            android:textColor="#AD88C6"
+            android:textSize="11sp"
+            android:textStyle="bold" />
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            app:cardBackgroundColor="#FFFFFF"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="0dp"
+            app:strokeColor="#E1AFD1"
+            app:strokeWidth="1dp">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:padding="16dp"
+                android:text="🕯️ Cinta • Karier • Healing • Masa Depan"
+                android:textColor="#7469B6"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            app:cardBackgroundColor="#FFFFFF"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="0dp"
+            app:strokeColor="#E1AFD1"
+            app:strokeWidth="1dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="DILARANG 🚫"
+                    android:textColor="#D32F2F"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.1"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:gravity="center"
+                    android:text="Menanyakan kematian, barang hilang, atau orang hilang."
+                    android:textColor="#D32F2F"
+                    android:textSize="10sp"
+                    android:textStyle="italic" />
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:text="REGULER TAROT"
             android:textColor="#7469B6"
             android:textSize="16sp"
             android:textStyle="bold" />
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tanyakan apa saja sesuai jumlah kartu"
+            android:textColor="#AD88C6"
+            android:textSize="11sp" />
+
         <com.google.android.material.card.MaterialCardView
-            style="@style/Widget.Material3.CardView.Elevated"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
@@ -74,46 +163,60 @@
             app:cardCornerRadius="16dp"
             app:strokeColor="#E1AFD1"
             app:strokeWidth="1dp">
-            <LinearLayout android:padding="16dp" android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content">
-                <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="1 Kartu (1 Pertanyaan)" android:textColor="#7469B6" android:textStyle="bold" />
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Rp5.000" android:textColor="#7469B6" android:textStyle="bold" />
+            <LinearLayout android:padding="16dp" android:orientation="vertical" android:layout_width="match_parent" android:layout_height="wrap_content">
+                <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content">
+                    <TextView android:text="1 Kartu (1 Pertanyaan)" android:textColor="#7469B6" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                    <TextView android:id="@+id/tvHarga1K" android:layout_alignParentEnd="true" android:text="Rp5.000" android:textColor="#7469B6" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                </RelativeLayout>
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:layout_marginVertical="12dp" android:background="#F3E5F5"/>
+                <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content">
+                    <TextView android:text="3 Kartu (1 Pertanyaan)" android:textColor="#7469B6" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                    <TextView android:id="@+id/tvHarga3K" android:layout_alignParentEnd="true" android:text="Rp10.000" android:textColor="#7469B6" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                </RelativeLayout>
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:layout_marginVertical="12dp" android:background="#F3E5F5"/>
+                <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content">
+                    <TextView android:text="6 Kartu (2 Pertanyaan)" android:textColor="#7469B6" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                    <TextView android:id="@+id/tvHarga6K" android:layout_alignParentEnd="true" android:text="Rp30.000" android:textColor="#7469B6" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                </RelativeLayout>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginHorizontal="8dp"
+            android:text="+ ORACLE CARD Rp10.000\n(Petunjuk semesta agar jawaban lebih akurat)"
+            android:textColor="#AD88C6"
+            android:textSize="11sp"
+            android:textStyle="italic" />
 
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            app:cardBackgroundColor="#FFFFFF"
-            app:cardCornerRadius="16dp"
-            app:strokeColor="#E1AFD1"
-            app:strokeWidth="1dp">
-            <LinearLayout android:padding="16dp" android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content">
-                <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="3 Kartu (1 Pertanyaan)" android:textColor="#7469B6" android:textStyle="bold" />
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Rp10.000" android:textColor="#7469B6" android:textStyle="bold" />
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
-
-        <com.google.android.material.card.MaterialCardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="12dp"
             app:cardBackgroundColor="#E1AFD1"
             app:cardCornerRadius="16dp">
-            <LinearLayout android:padding="16dp" android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content">
-                <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="9 Kartu (Deep + Oracle)" android:textColor="#7469B6" android:textStyle="bold" />
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Rp50.000" android:textColor="#7469B6" android:textStyle="bold" />
-            </LinearLayout>
+            <RelativeLayout android:padding="16dp" android:layout_width="match_parent" android:layout_height="wrap_content">
+                <TextView android:text="9 Kartu (Deep Reading + Oracle)" android:textColor="#7469B6" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                <TextView android:id="@+id/tvHargaDeep" android:layout_alignParentEnd="true" android:text="Rp50.000" android:textColor="#7469B6" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+            </RelativeLayout>
         </com.google.android.material.card.MaterialCardView>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:text="Palm Reading"
+            android:layout_marginTop="32dp"
+            android:text="PALM READING"
             android:textColor="#7469B6"
             android:textSize="16sp"
             android:textStyle="bold" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Include: kesehatan, jodoh, karier, keuangan, dll"
+            android:textColor="#AD88C6"
+            android:textSize="11sp" />
 
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
@@ -123,46 +226,153 @@
             app:cardCornerRadius="16dp"
             app:strokeColor="#E1AFD1"
             app:strokeWidth="1dp">
-            <LinearLayout android:padding="16dp" android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content">
-                <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Analisis Telapak Tangan" android:textColor="#7469B6" android:textStyle="bold" />
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Rp40.000" android:textColor="#7469B6" android:textStyle="bold" />
+            <LinearLayout android:padding="16dp" android:orientation="vertical" android:layout_width="match_parent" android:layout_height="wrap_content">
+                <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content">
+                    <TextView android:text="Analisis Telapak Tangan" android:textColor="#7469B6" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                    <TextView android:id="@+id/tvHargaPalm" android:layout_alignParentEnd="true" android:text="Rp40.000" android:textColor="#7469B6" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                </RelativeLayout>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="* Kirim foto telapak tangan kanan kiri + Nama Lengkap + TTL"
+                    android:textColor="#AD88C6"
+                    android:textSize="10sp"
+                    android:textStyle="italic" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:text="Interactive Session"
+            android:layout_marginTop="32dp"
+            android:text="INTERAKTIF CHAT (VN)"
             android:textColor="#7469B6"
             android:textSize="16sp"
             android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Durasi mulai setelah jawaban pertama terjawab 💕"
+            android:textColor="#AD88C6"
+            android:textSize="11sp"
+            android:textStyle="italic" />
 
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            app:cardBackgroundColor="#AD88C6"
-            app:cardCornerRadius="16dp">
-            <LinearLayout android:padding="16dp" android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content">
-                <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Interaktif Call (30 Menit)" android:textColor="#FFE6E6" android:textStyle="bold" />
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Rp90.000" android:textColor="#FFE6E6" android:textStyle="bold" />
+            app:cardBackgroundColor="#FFFFFF"
+            app:cardCornerRadius="16dp"
+            app:strokeColor="#E1AFD1"
+            app:strokeWidth="1dp">
+            <LinearLayout android:padding="16dp" android:orientation="vertical" android:layout_width="match_parent" android:layout_height="wrap_content">
+                <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content">
+                    <TextView android:text="10 Menit" android:textColor="#7469B6" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                    <TextView android:id="@+id/tvHargaChat10" android:layout_alignParentEnd="true" android:text="Rp50.000" android:textColor="#7469B6" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                </RelativeLayout>
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:layout_marginVertical="12dp" android:background="#F3E5F5"/>
+                <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content">
+                    <TextView android:text="15 Menit" android:textColor="#7469B6" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                    <TextView android:id="@+id/tvHargaChat15" android:layout_alignParentEnd="true" android:text="Rp70.000" android:textColor="#7469B6" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                </RelativeLayout>
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:layout_marginVertical="12dp" android:background="#F3E5F5"/>
+                <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content">
+                    <TextView android:text="20 Menit" android:textColor="#7469B6" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                    <TextView android:id="@+id/tvHargaChat20" android:layout_alignParentEnd="true" android:text="Rp90.000" android:textColor="#7469B6" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                </RelativeLayout>
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:layout_marginVertical="12dp" android:background="#F3E5F5"/>
+                <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content">
+                    <TextView android:text="30 Menit" android:textColor="#7469B6" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                    <TextView android:id="@+id/tvHargaChat30" android:layout_alignParentEnd="true" android:text="Rp130.000" android:textColor="#7469B6" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                </RelativeLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:text="INTERAKTIF CALL"
+            android:textColor="#7469B6"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Slot terbatas, tanya dulu ya 🫶🏻"
+            android:textColor="#AD88C6"
+            android:textSize="11sp"
+            android:textStyle="italic" />
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            app:cardBackgroundColor="#FFFFFF"
+            app:cardCornerRadius="16dp"
+            app:strokeColor="#E1AFD1"
+            app:strokeWidth="1dp">
+            <LinearLayout android:padding="16dp" android:orientation="vertical" android:layout_width="match_parent" android:layout_height="wrap_content">
+                <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content">
+                    <TextView android:text="30 Menit" android:textColor="#7469B6" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                    <TextView android:id="@+id/tvHargaCall30" android:layout_alignParentEnd="true" android:text="Rp90.000" android:textColor="#7469B6" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                </RelativeLayout>
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:layout_marginVertical="12dp" android:background="#F3E5F5"/>
+                <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content">
+                    <TextView android:text="1 Jam" android:textColor="#7469B6" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                    <TextView android:id="@+id/tvHargaCall60" android:layout_alignParentEnd="true" android:text="Rp130.000" android:textColor="#7469B6" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                </RelativeLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            app:cardBackgroundColor="#7469B6"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="4dp">
+            <LinearLayout android:padding="16dp" android:orientation="vertical" android:layout_width="match_parent" android:layout_height="wrap_content">
+                <TextView android:text="⚡ FAST TRACK URGENT" android:textColor="#FFE6E6" android:textStyle="bold" android:textSize="14sp" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                <TextView android:text="Antrian dipercepat, dibaca langsung lebih dulu" android:textColor="#E1AFD1" android:textSize="10sp" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                <RelativeLayout android:layout_marginTop="16dp" android:layout_width="match_parent" android:layout_height="wrap_content">
+                    <TextView android:text="Tarot Reguler" android:textColor="#FFFFFF" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                    <TextView android:text="+Rp30.000" android:textColor="#FFFFFF" android:textStyle="bold" android:layout_alignParentEnd="true" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                </RelativeLayout>
+                <RelativeLayout android:layout_marginTop="8dp" android:layout_width="match_parent" android:layout_height="wrap_content">
+                    <TextView android:text="Interactive Chat" android:textColor="#FFFFFF" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                    <TextView android:text="+Rp50.000" android:textColor="#FFFFFF" android:textStyle="bold" android:layout_alignParentEnd="true" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                </RelativeLayout>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnCaraOrder"
+            android:id="@+id/btnOrderSekarang"
             android:layout_width="match_parent"
             android:layout_height="64dp"
-            android:layout_marginTop="32dp"
-            android:text="CARA ORDER LENGKAP"
+            android:layout_marginTop="40dp"
+            android:text="ORDER DI SINI"
+            android:textStyle="bold"
+            app:backgroundTint="#AD88C6"
+            app:cornerRadius="16dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnKonfirmasiWA"
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:layout_marginTop="12dp"
+            android:text="KONFIRMASI VIA WHATSAPP"
             android:textStyle="bold"
             app:backgroundTint="#7469B6"
             app:cornerRadius="16dp" />
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="80dp" />
+
+        <View android:layout_width="match_parent" android:layout_height="40dp" />
 
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>
