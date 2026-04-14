@@ -11,8 +11,10 @@
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="#FFE6E6"
-        app:titleTextColor="#7469B6"
-        app:popupTheme="@style/ThemeOverlay.Material3.Light" />
+        android:layout_marginTop="16dp"
+        app:menu="@menu/admin_menu_option"
+        app:popupTheme="@style/ThemeOverlay.Material3.Light"
+        app:titleTextColor="#7469B6" />
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
@@ -29,7 +31,7 @@
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp">
+                android:layout_marginTop="1dp">
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
