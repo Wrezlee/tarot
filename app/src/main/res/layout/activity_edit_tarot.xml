@@ -58,26 +58,6 @@
                 android:textSize="16sp" />
             <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#F3E5F5" />
 
-            <!-- KATEGORI (baru) -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="Kategori"
-                android:textColor="#AD88C6"
-                android:textSize="12sp"
-                android:textStyle="bold" />
-            <AutoCompleteTextView
-                android:id="@+id/actvCategory"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:background="@android:color/transparent"
-                android:completionThreshold="1"
-                android:hint="Ketik T atau C..."
-                android:textColor="#251819"
-                android:textSize="16sp" />
-            <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#F3E5F5" />
-
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
