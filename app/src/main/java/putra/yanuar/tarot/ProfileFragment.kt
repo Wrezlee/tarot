@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
+import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
@@ -27,19 +28,39 @@ class ProfileFragment : Fragment(), View.OnClickListener {
         thisParent = activity as CustomerActivity
         db = thisParent.getDbObject()
 
-        // Registrasi Listener
+        // Tombol overflow di pojok kanan atas fragment
+        b.btnOverflowProfile.setOnClickListener { v ->
+            showOverflowMenu(v)
+        }
+
+        // Listener lain
         b.btnEditProfile.setOnClickListener(this)
         b.btnHistory.setOnClickListener(this)
         b.btnTestimony.setOnClickListener(this)
-        b.btnLogout.setOnClickListener(this)
 
         loadUserData()
-
         return b.root
     }
 
+    // Tampilkan PopupMenu dengan menu_cust_profil.xml
+    private fun showOverflowMenu(v: View) {
+        val popup = PopupMenu(thisParent, v)
+        popup.menuInflater.inflate(R.menu.menu_cust_profil, popup.menu)
+        popup.setOnMenuItemClickListener { item ->
+            when (item.itemId) {
+                R.id.menu_cust_logout -> {
+                    val intent = Intent(thisParent, MainActivity::class.java)
+                    startActivity(intent)
+                    thisParent.finish()
+                    true
+                }
+                else -> false
+            }
+        }
+        popup.show()
+    }
+
     override fun onClick(p0: View?) {
-        // Tambahkan try-catch untuk melacak error jika masih force close
         try {
             when (p0?.id) {
                 R.id.btnEditProfile -> {
@@ -55,11 +76,6 @@ class ProfileFragment : Fragment(), View.OnClickListener {
                 R.id.btnTestimony -> {
                     showTestimonialDialog()
                 }
-                R.id.btnLogout -> {
-                    val intent = Intent(thisParent, MainActivity::class.java)
-                    startActivity(intent)
-                    thisParent.finish()
-                }
             }
         } catch (e: Exception) {
             Toast.makeText(thisParent, "Error: ${e.message}", Toast.LENGTH_LONG).show()
@@ -71,7 +87,6 @@ class ProfileFragment : Fragment(), View.OnClickListener {
         val builder = AlertDialog.Builder(thisParent)
         val input = EditText(thisParent)
         input.hint = "Tulis pengalaman mistismu..."
-
         builder.setTitle("✨ Share Your Magic")
         builder.setView(input)
         builder.setPositiveButton("Kirim") { _, _ ->
@@ -80,7 +95,6 @@ class ProfileFragment : Fragment(), View.OnClickListener {
                 val cursor = db.rawQuery("SELECT id FROM users WHERE email = ?", arrayOf(thisParent.userEmail))
                 if (cursor.moveToFirst()) {
                     val userId = cursor.getInt(0)
-                    // Perbaikan parameter execSQL
                     db.execSQL("INSERT INTO testimonials (user_id, message) VALUES (?, ?)", arrayOf(userId.toString(), pesan))
                     Toast.makeText(thisParent, "Terima kasih atas testimoninya! 💕", Toast.LENGTH_SHORT).show()
                     loadUserData()
@@ -94,37 +108,23 @@ class ProfileFragment : Fragment(), View.OnClickListener {
 
     fun loadUserData() {
         val emailLogin = thisParent.userEmail
-
-        // 1. Ambil Data Profil User
-        val sqlUser = "SELECT id, name, email, role FROM users WHERE email = ?"
-        val c = db.rawQuery(sqlUser, arrayOf(emailLogin))
-
+        val c = db.rawQuery("SELECT id, name, email, role FROM users WHERE email = ?", arrayOf(emailLogin))
         if (c.moveToFirst()) {
             val userId = c.getInt(0)
-            b.tvProfileName.text = c.getString(1)
+            b.tvProfileName.text  = c.getString(1)
             b.tvProfileEmail.text = c.getString(2)
-            b.tvProfileRole.text = "LEVEL: ${c.getString(3).uppercase()}"
+            b.tvProfileRole.text  = "LEVEL: ${c.getString(3).uppercase()}"
 
-            // 2. Hitung Statistik Rituals
-            // Gunakan filter status agar hanya menghitung yang sudah lunas/selesai
-            // Sesuaikan 'paid' dengan status yang kamu masukkan di OrderActivity
             val cRitual = db.rawQuery(
                 "SELECT COUNT(*) FROM bookings WHERE email = ? AND (status = 'paid' OR status = 'PAID' OR status = 'done')",
                 arrayOf(emailLogin)
             )
-
-            if (cRitual.moveToFirst()) {
-                b.tvTotalReadings.text = cRitual.getInt(0).toString()
-            }
+            if (cRitual.moveToFirst()) b.tvTotalReadings.text = cRitual.getInt(0).toString()
             cRitual.close()
 
-            // 3. Hitung Statistik Testimonials
             val cTesti = db.rawQuery("SELECT COUNT(*) FROM testimonials WHERE user_id = ?", arrayOf(userId.toString()))
-            if (cTesti.moveToFirst()) {
-                b.tvTestimonialsCount.text = cTesti.getInt(0).toString()
-            }
+            if (cTesti.moveToFirst()) b.tvTestimonialsCount.text = cTesti.getInt(0).toString()
             cTesti.close()
-
         } else {
             b.tvProfileName.text = "User Tidak Ditemukan"
         }
@@ -135,5 +135,4 @@ class ProfileFragment : Fragment(), View.OnClickListener {
         super.onResume()
         loadUserData()
     }
-
 }

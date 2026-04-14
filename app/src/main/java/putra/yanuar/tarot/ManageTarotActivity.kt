@@ -40,7 +40,7 @@ class ManageTarotActivity : AppCompatActivity() {
     fun loadTarotList() {
         listData.clear()
         // Ambil data paket dari tabel tarot_packages
-        val cursor = db.rawQuery("SELECT id, name, description, price FROM tarot_packages", null)
+        val cursor = db.rawQuery("SELECT id, name, category, price FROM tarot_packages", null)
 
         if (cursor.moveToFirst()) {
             do {
