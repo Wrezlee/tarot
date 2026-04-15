@@ -21,13 +21,11 @@ class EditTarotActivity : AppCompatActivity() {
         db = DBOpenHelper(this).writableDatabase
         tarotId = intent.getStringExtra("TAROT_ID") ?: ""
 
-        // Setup AutoCompleteTextView untuk kategori
         val daftarKategori = arrayOf("Tarot", "Chat", "Call", "Palm Reading", "Ritual")
         val adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, daftarKategori)
         b.actvCategory.setAdapter(adapter)
         b.actvCategory.setOnClickListener { b.actvCategory.showDropDown() }
 
-        // Load data lama termasuk kategori
         if (tarotId.isNotEmpty()) {
             val cursor = db.rawQuery(
                 "SELECT name, category, price FROM tarot_packages WHERE id = ?",

@@ -24,22 +24,18 @@ class ManageTarotActivity : AppCompatActivity() {
         b = ActivityManageTarotBinding.inflate(layoutInflater)
         setContentView(b.root)
 
-        // Inisialisasi Database
         db = DBOpenHelper(this).writableDatabase
 
-        // Menuju form tambah (Sudah dihubungkan ke AddTarotActivity)
         b.btnAddTarot.setOnClickListener {
             val intent = Intent(this, AddTarotActivity::class.java)
             startActivity(intent)
         }
 
-        // Memuat data pertama kali
         loadTarotList()
     }
 
     fun loadTarotList() {
         listData.clear()
-        // Ambil data paket dari tabel tarot_packages
         val cursor = db.rawQuery("SELECT id, name, category, price FROM tarot_packages", null)
 
         if (cursor.moveToFirst()) {
@@ -64,7 +60,6 @@ class ManageTarotActivity : AppCompatActivity() {
             override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
                 val view = super.getView(position, convertView, parent)
 
-                // Ambil tombol titik tiga dari layout item_tarot.xml
                 val btnMenu = view.findViewById<ImageButton>(R.id.btnMenuTarot)
 
                 val tarotId = listData[position]["id"] ?: ""
@@ -79,11 +74,9 @@ class ManageTarotActivity : AppCompatActivity() {
         b.lvTarot.adapter = adapter
     }
 
-    // FUNGSI POPUP MENU (Menggunakan menu_data_tarot.xml)
     fun showPopupMenu(view: View, id: String, name: String) {
         val popup = PopupMenu(this, view)
 
-        // Inflate dari file XML menu yang sudah kamu buat
         popup.menuInflater.inflate(R.menu.menu_data_tarot, popup.menu)
 
         popup.setOnMenuItemClickListener { item ->
@@ -103,7 +96,6 @@ class ManageTarotActivity : AppCompatActivity() {
         popup.show()
     }
 
-    // KONFIRMASI HAPUS
     fun confirmDelete(id: String, name: String) {
         val dialog = AlertDialog.Builder(this)
             .setTitle("Hapus Paket")
@@ -122,13 +114,11 @@ class ManageTarotActivity : AppCompatActivity() {
             .create()
 
         dialog.show()
-        // Mengubah warna tombol "Ya, Hapus" menjadi merah (High Contrast)
         dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(android.graphics.Color.RED)
     }
 
     override fun onResume() {
         super.onResume()
-        // Refresh otomatis saat kembali dari AddTarotActivity atau EditTarotActivity
         loadTarotList()
     }
 }

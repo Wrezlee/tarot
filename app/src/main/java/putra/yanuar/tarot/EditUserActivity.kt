@@ -20,7 +20,6 @@ class EditUserActivity : AppCompatActivity() {
         db = DBOpenHelper(this).writableDatabase
         userId = intent.getStringExtra("USER_ID") ?: ""
 
-        // Load data lama ke form
         if (userId.isNotEmpty()) {
             val cursor = db.rawQuery("SELECT name, email, password, role FROM users WHERE id = ?", arrayOf(userId))
             if (cursor.moveToFirst()) {

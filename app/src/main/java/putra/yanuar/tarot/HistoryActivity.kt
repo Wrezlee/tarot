@@ -25,8 +25,6 @@ class HistoryActivity : AppCompatActivity() {
     fun loadHistoryWithListView(email: String) {
         val listData = ArrayList<HashMap<String, String>>()
 
-        // QUERY DIPERBAIKI: Mengambil package_name langsung dari tabel bookings
-        // dan melakukan LEFT JOIN ke tabel questions untuk mengambil jawaban
         val sql = """
             SELECT b.package_name, b.booking_date, b.status, q.question, q.answer 
             FROM bookings b 

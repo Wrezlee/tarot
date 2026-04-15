@@ -20,7 +20,6 @@ class EditProfileActivity : AppCompatActivity() {
         db = DBOpenHelper(this).writableDatabase
         userEmail = intent.getStringExtra("USER_EMAIL") ?: ""
 
-        // Tampilkan data awal
         loadCurrentData()
 
         b.btnSaveProfile.setOnClickListener {
@@ -41,12 +40,10 @@ class EditProfileActivity : AppCompatActivity() {
         val newName = b.etEditName.text.toString()
 
         if (newName.isNotEmpty()) {
-            // Update Database
             db.execSQL("UPDATE users SET name = ? WHERE email = ?", arrayOf(newName, userEmail))
 
             Toast.makeText(this, "Profil berhasil diperbarui! ✨", Toast.LENGTH_SHORT).show()
 
-            // Tutup activity dan kembali ke profil
             finish()
         } else {
             Toast.makeText(this, "Nama tidak boleh kosong", Toast.LENGTH_SHORT).show()

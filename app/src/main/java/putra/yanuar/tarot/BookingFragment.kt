@@ -13,9 +13,7 @@ import putra.yanuar.tarot.databinding.FragmentBookingBinding
 
 class BookingFragment : Fragment(), View.OnClickListener {
 
-    private var _binding: FragmentBookingBinding? = null
-    private val b get() = _binding!!
-
+    lateinit var b: FragmentBookingBinding
     lateinit var thisParent: CustomerActivity
     lateinit var db: SQLiteDatabase
 
@@ -23,17 +21,14 @@ class BookingFragment : Fragment(), View.OnClickListener {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentBookingBinding.inflate(inflater, container, false)
+        b = FragmentBookingBinding.inflate(inflater, container, false)
 
         thisParent = activity as CustomerActivity
-        // Memastikan DB diambil dari activity induk
         db = thisParent.getDbObject()
 
-        // Set Listener
         b.btnKonfirmasiWA.setOnClickListener(this)
         b.btnOrderSekarang.setOnClickListener(this)
 
-        // Muat data harga
         loadPackagePrices()
 
         return b.root
@@ -52,7 +47,6 @@ class BookingFragment : Fragment(), View.OnClickListener {
 
     fun loadPackagePrices() {
         try {
-            // PERBAIKAN UTAMA: Nama tabel harus 'tarot_packages'
             val cursor = db.rawQuery("SELECT name, price FROM tarot_packages", null)
 
             if (cursor.moveToFirst()) {
@@ -61,8 +55,6 @@ class BookingFragment : Fragment(), View.OnClickListener {
                     val price = cursor.getInt(1)
                     val formattedPrice = "Rp$price"
 
-                    // Menyamakan nama di DB dengan ID di XML
-                    // Pastikan String di bawah ini SAMA PERSIS dengan saat kamu INSERT di Admin
                     when (name) {
                         "1 Kartu (1 Pertanyaan)" -> b.tvHarga1K.text = formattedPrice
                         "3 Kartu (1 Pertanyaan)" -> b.tvHarga3K.text = formattedPrice
@@ -80,7 +72,6 @@ class BookingFragment : Fragment(), View.OnClickListener {
             }
             cursor.close()
         } catch (e: Exception) {
-            // Agar tidak force close jika tabel belum ada
             e.printStackTrace()
         }
     }
@@ -97,10 +88,5 @@ class BookingFragment : Fragment(), View.OnClickListener {
         } catch (e: Exception) {
             Toast.makeText(thisParent, "WhatsApp tidak terinstall", Toast.LENGTH_SHORT).show()
         }
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
     }
 }

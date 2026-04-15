@@ -19,7 +19,6 @@ class ManageUserActivity : AppCompatActivity() {
     lateinit var db: SQLiteDatabase
     val listData = ArrayList<HashMap<String, String>>()
 
-    // Simpan item yang sedang dipilih saat long click
     var selectedUserId = ""
     var selectedUserName = ""
 
@@ -66,7 +65,6 @@ class ManageUserActivity : AppCompatActivity() {
         b.lvUser.adapter = adapter
     }
 
-    // ── Context Menu ──────────────────────────────────────────────
     override fun onCreateContextMenu(
         menu: ContextMenu, v: View, menuInfo: ContextMenu.ContextMenuInfo?
     ) {
@@ -95,7 +93,6 @@ class ManageUserActivity : AppCompatActivity() {
         }
     }
 
-    // ── Konfirmasi Hapus ──────────────────────────────────────────
     fun confirmDelete(id: String, name: String) {
         val dialog = AlertDialog.Builder(this)
             .setTitle("Hapus Petugas")

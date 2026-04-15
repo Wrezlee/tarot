@@ -53,7 +53,6 @@ class OrderActivity : AppCompatActivity() {
         listPaket.add("--- Pilih Paket Ritual ---")
 
         try {
-            // PERBAIKAN 1: Nama tabel diganti ke 'tarot_packages'
             val cursor = db.rawQuery("SELECT name, price FROM tarot_packages", null)
             var currentCategory = ""
 
@@ -128,7 +127,7 @@ class OrderActivity : AppCompatActivity() {
             }
             cursor.close()
 
-            // PERBAIKAN 2: Gunakan tabel bookings
+
             val sql = """
                 INSERT INTO bookings (user_id, email, package_name, payment_method, booking_date, booking_time, notes, status, total_price) 
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)

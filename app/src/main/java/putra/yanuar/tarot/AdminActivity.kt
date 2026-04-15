@@ -22,11 +22,9 @@ class AdminActivity : AppCompatActivity(), View.OnClickListener {
 
         db = DBOpenHelper(this).writableDatabase
 
-        // Setup Toolbar sebagai ActionBar
         setSupportActionBar(b.toolbarAdmin)
         supportActionBar?.setDisplayShowTitleEnabled(false)
 
-        // Inisialisasi Listeners Grid Menu
         b.btnMenuUser.setOnClickListener(this)
         b.btnMenuPackages.setOnClickListener(this)
         b.btnMenuTransactions.setOnClickListener(this)
@@ -37,7 +35,6 @@ class AdminActivity : AppCompatActivity(), View.OnClickListener {
         loadStats()
     }
 
-    // Inflate menu dari admin_menu_option.xml
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.admin_menu_option, menu)
         return true

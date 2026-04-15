@@ -19,16 +19,12 @@ class AddTarotActivity : AppCompatActivity() {
 
         db = DBOpenHelper(this).writableDatabase
 
-        // 1. Siapkan Daftar Saran untuk AutoCompleteTextView
         val daftarKategori = arrayOf("Tarot", "Chat", "Call", "Palm Reading", "Ritual")
 
-        // 2. Buat Adapter
         val adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, daftarKategori)
 
-        // 3. Pasangkan ke AutoCompleteTextView
         b.actvCategory.setAdapter(adapter)
 
-        // Opsional: Langsung munculkan saran saat kolom diklik
         b.actvCategory.setOnClickListener {
             b.actvCategory.showDropDown()
         }

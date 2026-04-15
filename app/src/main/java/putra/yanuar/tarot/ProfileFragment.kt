@@ -28,12 +28,10 @@ class ProfileFragment : Fragment(), View.OnClickListener {
         thisParent = activity as CustomerActivity
         db = thisParent.getDbObject()
 
-        // Tombol overflow di pojok kanan atas fragment
         b.btnOverflowProfile.setOnClickListener { v ->
             showOverflowMenu(v)
         }
 
-        // Listener lain
         b.btnEditProfile.setOnClickListener(this)
         b.btnHistory.setOnClickListener(this)
         b.btnTestimony.setOnClickListener(this)
@@ -42,14 +40,14 @@ class ProfileFragment : Fragment(), View.OnClickListener {
         return b.root
     }
 
-    // Tampilkan PopupMenu dengan menu_cust_profil.xml
-    private fun showOverflowMenu(v: View) {
+    fun showOverflowMenu(v: View) {
         val popup = PopupMenu(thisParent, v)
         popup.menuInflater.inflate(R.menu.menu_cust_profil, popup.menu)
         popup.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 R.id.menu_cust_logout -> {
                     val intent = Intent(thisParent, MainActivity::class.java)
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                     startActivity(intent)
                     thisParent.finish()
                     true
