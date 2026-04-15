@@ -32,18 +32,22 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="1dp">
+
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginTop="1dp"
                         android:fontFamily="serif"
                         android:text="Dashboard Admin"
-                        android:textColor="#251819"
-                        android:textSize="24sp"
+                        android:textColor="#7469B6"
+                        android:textSize="28sp"
                         android:textStyle="bold" />
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
