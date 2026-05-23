@@ -17,6 +17,7 @@
         android:orientation="vertical"
         android:padding="16dp">
 
+        <!-- Baris atas: nama paket + status badge -->
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
@@ -40,6 +41,7 @@
                 android:textSize="10sp" />
         </RelativeLayout>
 
+        <!-- Tanggal booking -->
         <TextView
             android:id="@+id/tvItemDate"
             android:layout_width="wrap_content"
@@ -55,6 +57,7 @@
             android:layout_marginVertical="12dp"
             android:background="#FFE6E6" />
 
+        <!-- Pertanyaan -->
         <TextView
             android:id="@+id/tvItemQuestion"
             android:layout_width="match_parent"
@@ -64,6 +67,7 @@
             android:textSize="12sp"
             android:textStyle="italic" />
 
+        <!-- Jawaban -->
         <TextView
             android:id="@+id/tvItemAnswer"
             android:layout_width="match_parent"
@@ -73,6 +77,7 @@
             android:textColor="#AD88C6"
             android:textSize="12sp" />
 
+        <!-- Nama Reader -->
         <TextView
             android:id="@+id/tvItemReader"
             android:layout_width="match_parent"
@@ -83,6 +88,7 @@
             android:textSize="11sp"
             android:textStyle="bold" />
 
+        <!-- Tombol Batalkan (hanya PENDING/PAID) -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnCancelOrder"
             style="@style/Widget.Material3.Button.TextButton"
@@ -94,5 +100,31 @@
             android:textSize="11sp"
             android:visibility="gone"
             app:cornerRadius="8dp" />
+
+        <!-- Tombol Tulis Ulasan (hanya DONE/COMPLETED yang belum ulasan) -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnTulisUlasan"
+            style="@style/Widget.Material3.Button.TonalButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="✍️ Tulis Ulasan"
+            android:textSize="11sp"
+            android:visibility="gone"
+            app:backgroundTint="#F3E5F5"
+            app:cornerRadius="8dp" />
+
+        <!-- Label jika sudah menulis ulasan -->
+        <TextView
+            android:id="@+id/tvSudahUlasan"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="✅ Ulasan sudah dikirim"
+            android:textColor="#AD88C6"
+            android:textSize="10sp"
+            android:textStyle="italic"
+            android:visibility="gone" />
+
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

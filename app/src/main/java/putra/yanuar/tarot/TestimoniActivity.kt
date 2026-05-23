@@ -3,9 +3,12 @@ package putra.yanuar.tarot
 import android.app.AlertDialog
 import android.database.sqlite.SQLiteDatabase
 import android.os.Bundle
+import android.view.ContextMenu
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
 import android.widget.BaseAdapter
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -18,10 +21,16 @@ class TestimoniActivity : AppCompatActivity() {
     lateinit var db: SQLiteDatabase
     val listData = ArrayList<TestimoniItem>()
 
+    // ID dan posisi yang dipilih saat long-press
+    var selectedId = 0
+    var selectedPosition = 0
+
     data class TestimoniItem(
         val id: Int,
         val name: String,
-        val message: String
+        val packageName: String,
+        val message: String,
+        val createdAt: String
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -31,6 +40,9 @@ class TestimoniActivity : AppCompatActivity() {
 
         db = DBOpenHelper(this).writableDatabase
         loadTestimoni()
+
+        // Daftarkan ListView untuk context menu (long press)
+        registerForContextMenu(b.lvTestimoni)
     }
 
     fun loadTestimoni() {
@@ -38,14 +50,19 @@ class TestimoniActivity : AppCompatActivity() {
 
         try {
             val cursor = db.rawQuery(
-                "SELECT t.id, u.name, t.message FROM testimonials t JOIN users u ON t.user_id = u.id ORDER BY t.id DESC",
+                """SELECT t.id, u.name, t.package_name, t.message, t.created_at 
+                   FROM testimonials t 
+                   JOIN users u ON t.user_id = u.id 
+                   ORDER BY t.id DESC""",
                 null
             )
             while (cursor.moveToNext()) {
                 val item = TestimoniItem(
-                    id = cursor.getInt(0),
-                    name = cursor.getString(1) ?: "Anonim",
-                    message = cursor.getString(2) ?: "-"
+                    id          = cursor.getInt(0),
+                    name        = cursor.getString(1) ?: "Anonim",
+                    packageName = cursor.getString(2)?.takeIf { it.isNotEmpty() } ?: "-",
+                    message     = cursor.getString(3) ?: "-",
+                    createdAt   = cursor.getString(4) ?: "-"
                 )
                 listData.add(item)
             }
@@ -62,7 +79,29 @@ class TestimoniActivity : AppCompatActivity() {
         }
     }
 
-    fun deleteTestimoni(testimoniId: Int, position: Int) {
+    // Context menu muncul saat long-press item ListView
+    override fun onCreateContextMenu(
+        menu: ContextMenu, v: View, menuInfo: ContextMenu.ContextMenuInfo?
+    ) {
+        super.onCreateContextMenu(menu, v, menuInfo)
+        val info = menuInfo as? AdapterView.AdapterContextMenuInfo ?: return
+        selectedPosition = info.position
+        selectedId       = listData[info.position].id
+        menu.setHeaderTitle("Testimoni dari ${listData[info.position].name}")
+        menu.add(0, MENU_HAPUS, 0, "Hapus Ulasan")
+    }
+
+    override fun onContextItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            MENU_HAPUS -> {
+                confirmDelete(selectedId, selectedPosition)
+                true
+            }
+            else -> super.onContextItemSelected(item)
+        }
+    }
+
+    fun confirmDelete(testimoniId: Int, position: Int) {
         AlertDialog.Builder(this)
             .setTitle("Hapus Testimoni")
             .setMessage("Apakah kamu yakin ingin menghapus ulasan ini?")
@@ -94,7 +133,9 @@ class TestimoniActivity : AppCompatActivity() {
             val view: View
 
             if (convertView == null) {
-                binding = ItemTestimoniBinding.inflate(LayoutInflater.from(this@TestimoniActivity), parent, false)
+                binding = ItemTestimoniBinding.inflate(
+                    LayoutInflater.from(this@TestimoniActivity), parent, false
+                )
                 view = binding.root
                 view.tag = binding
             } else {
@@ -102,14 +143,16 @@ class TestimoniActivity : AppCompatActivity() {
                 view = convertView
             }
 
-            binding.tvTestimoniName.text = item.name
-            binding.tvTestimoniMessage.text = item.message
-
-            binding.btnDeleteTestimoni.setOnClickListener {
-                deleteTestimoni(item.id, position)
-            }
+            binding.tvTestimoniName.text       = item.name
+            binding.tvTestimoniPackage.text    = "📦 ${item.packageName}"
+            binding.tvTestimoniMessage.text    = item.message
+            binding.tvTestimoniCreatedAt.text  = "🕒 ${item.createdAt}"
 
             return view
         }
+    }
+
+    companion object {
+        private const val MENU_HAPUS = 1001
     }
 }

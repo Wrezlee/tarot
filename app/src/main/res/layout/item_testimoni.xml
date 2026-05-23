@@ -11,17 +11,16 @@
     app:strokeColor="#E1AFD1"
     app:strokeWidth="1dp">
 
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="vertical"
         android:padding="16dp">
 
-        <LinearLayout
-            android:id="@+id/contentLayout"
+        <!-- Baris 1: Nama customer + badge paket -->
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_toStartOf="@+id/btnDeleteTestimoni"
-            android:orientation="vertical">
+            android:layout_height="wrap_content">
 
             <TextView
                 android:id="@+id/tvTestimoniName"
@@ -33,27 +32,55 @@
                 android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/tvTestimoniMessage"
-                android:layout_width="match_parent"
+                android:id="@+id/tvTestimoniPackage"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:text="Pesan testimoni..."
-                android:textColor="#251819"
-                android:textSize="13sp"
-                android:lineSpacingExtra="2dp" />
-        </LinearLayout>
+                android:layout_alignParentEnd="true"
+                android:background="@drawable/bg_status_rounded"
+                android:backgroundTint="#F3E5F5"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="3dp"
+                android:text="📦 Paket"
+                android:textColor="#7469B6"
+                android:textSize="10sp"
+                android:textStyle="bold" />
+        </RelativeLayout>
 
+        <!-- Tanggal & jam ulasan -->
         <TextView
-            android:id="@+id/btnDeleteTestimoni"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            android:gravity="center"
-            android:text="🗑"
-            android:textSize="18sp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="Hapus testimoni" />
+            android:id="@+id/tvTestimoniCreatedAt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:text="🕒 -"
+            android:textColor="#80251819"
+            android:textSize="10sp" />
 
-    </RelativeLayout>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginVertical="10dp"
+            android:background="#F3E5F5" />
+
+        <!-- Isi ulasan -->
+        <TextView
+            android:id="@+id/tvTestimoniMessage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Pesan testimoni..."
+            android:textColor="#251819"
+            android:textSize="13sp"
+            android:lineSpacingExtra="2dp" />
+
+        <!-- Hint long-press -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Tahan untuk menghapus"
+            android:textColor="#BDBDBD"
+            android:textSize="9sp"
+            android:textStyle="italic" />
+
+    </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

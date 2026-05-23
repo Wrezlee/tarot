@@ -5,7 +5,7 @@ import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 
 
-class DBOpenHelper(context: Context) : SQLiteOpenHelper(context, "tarot_meow_db", null, 2) {
+class DBOpenHelper(context: Context) : SQLiteOpenHelper(context, "tarot_meow_db", null, 3) {
 
     override fun onCreate(db: SQLiteDatabase) {
         // 1. Tabel Users
@@ -41,8 +41,17 @@ class DBOpenHelper(context: Context) : SQLiteOpenHelper(context, "tarot_meow_db"
         // 5. Tabel Questions
         db.execSQL("CREATE TABLE IF NOT EXISTS questions (id INTEGER PRIMARY KEY AUTOINCREMENT, booking_id INTEGER, question TEXT, answer TEXT)")
 
-        // 6. Tabel Testimonials
-        db.execSQL("CREATE TABLE IF NOT EXISTS testimonials (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER, message TEXT)")
+        // 6. Tabel Testimonials — tambah created_at dan package_name
+        db.execSQL("""
+            CREATE TABLE IF NOT EXISTS testimonials (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER,
+                booking_id INTEGER DEFAULT 0,
+                package_name TEXT DEFAULT '',
+                message TEXT,
+                created_at TEXT DEFAULT (datetime('now','localtime'))
+            )
+        """)
 
         seedData(db)
     }
