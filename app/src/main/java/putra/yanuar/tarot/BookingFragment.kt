@@ -28,6 +28,7 @@ class BookingFragment : Fragment(), View.OnClickListener {
 
         b.btnKonfirmasiWA.setOnClickListener(this)
         b.btnOrderSekarang.setOnClickListener(this)
+        b.btnTiktok.setOnClickListener(this)
 
         loadPackagePrices()
 
@@ -37,6 +38,7 @@ class BookingFragment : Fragment(), View.OnClickListener {
     override fun onClick(p0: View?) {
         when (p0?.id) {
             R.id.btnKonfirmasiWA -> openWhatsApp()
+            R.id.btnTiktok -> openTiktok()
             R.id.btnOrderSekarang -> {
                 val intent = Intent(thisParent, OrderActivity::class.java)
                 intent.putExtra("USER_EMAIL", thisParent.userEmail)
@@ -87,6 +89,17 @@ class BookingFragment : Fragment(), View.OnClickListener {
             startActivity(intent)
         } catch (e: Exception) {
             Toast.makeText(thisParent, "WhatsApp tidak terinstall", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    fun openTiktok() {
+        try {
+            val url = "https://www.tiktok.com/@tarotmeow111?_r=1&_t=ZS-96cFFk5SlQS"
+            val intent = Intent(Intent.ACTION_VIEW)
+            intent.data = Uri.parse(url)
+            startActivity(intent)
+        } catch (e: Exception) {
+            Toast.makeText(thisParent, "Tidak bisa membuka TikTok", Toast.LENGTH_SHORT).show()
         }
     }
 }
