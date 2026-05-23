@@ -17,7 +17,7 @@ class CustomerActivity : AppCompatActivity(),
     lateinit var fragBooking: BookingFragment
     lateinit var fragProfile: ProfileFragment
 
-    // Variabel untuk menampung email yang login
+
     lateinit var userEmail: String
 
     public fun getDbObject(): SQLiteDatabase {
@@ -30,7 +30,6 @@ class CustomerActivity : AppCompatActivity(),
         b = ActivityCustomerBinding.inflate(layoutInflater)
         setContentView(b.root)
 
-        // AMBIL EMAIL DARI INTENT LOGIN
         userEmail = intent.getStringExtra("USER_EMAIL") ?: ""
 
         fragBooking = BookingFragment()

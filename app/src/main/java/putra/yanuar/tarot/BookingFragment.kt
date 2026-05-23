@@ -78,7 +78,7 @@ class BookingFragment : Fragment(), View.OnClickListener {
 
     fun openWhatsApp() {
         val phoneNumber = "+6285649471086"
-        val message = "Halo min, saya ingin konfirmasi order Tarot Meow ✨"
+        val message = "Halo min, saya ingin konfirmasi order Tarot Meow "
 
         try {
             val url = "https://api.whatsapp.com/send?phone=$phoneNumber&text=${Uri.encode(message)}"

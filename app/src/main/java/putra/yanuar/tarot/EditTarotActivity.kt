@@ -50,7 +50,7 @@ class EditTarotActivity : AppCompatActivity() {
                         "UPDATE tarot_packages SET name = ?, category = ?, price = ? WHERE id = ?",
                         arrayOf(name, category, price.toInt(), tarotId)
                     )
-                    Toast.makeText(this, "Paket berhasil diperbarui ✨", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Paket berhasil diperbarui ", Toast.LENGTH_SHORT).show()
                     finish()
                 } catch (e: Exception) {
                     Toast.makeText(this, "Gagal update: ${e.message}", Toast.LENGTH_SHORT).show()

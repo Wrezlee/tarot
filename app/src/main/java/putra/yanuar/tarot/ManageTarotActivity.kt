@@ -104,7 +104,7 @@ class ManageTarotActivity : AppCompatActivity() {
             .setPositiveButton("Ya, Hapus") { _, _ ->
                 try {
                     db.execSQL("DELETE FROM tarot_packages WHERE id = ?", arrayOf(id))
-                    Toast.makeText(this, "Paket $name berhasil dihapus ✨", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Paket $name berhasil dihapus ", Toast.LENGTH_SHORT).show()
                     loadTarotList() // Refresh data list
                 } catch (e: Exception) {
                     Toast.makeText(this, "Gagal menghapus: ${e.message}", Toast.LENGTH_SHORT).show()

@@ -42,7 +42,7 @@ class EditProfileActivity : AppCompatActivity() {
         if (newName.isNotEmpty()) {
             db.execSQL("UPDATE users SET name = ? WHERE email = ?", arrayOf(newName, userEmail))
 
-            Toast.makeText(this, "Profil berhasil diperbarui! ✨", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Profil berhasil diperbarui! ", Toast.LENGTH_SHORT).show()
 
             finish()
         } else {

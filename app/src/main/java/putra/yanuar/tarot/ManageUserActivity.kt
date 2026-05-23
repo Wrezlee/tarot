@@ -101,7 +101,7 @@ class ManageUserActivity : AppCompatActivity() {
             .setPositiveButton("Ya, Hapus") { _, _ ->
                 try {
                     db.execSQL("DELETE FROM users WHERE id = ?", arrayOf(id))
-                    Toast.makeText(this, "$name berhasil dihapus ✨", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "$name berhasil dihapus ", Toast.LENGTH_SHORT).show()
                     loadUserList()
                 } catch (e: Exception) {
                     Toast.makeText(this, "Gagal menghapus: ${e.message}", Toast.LENGTH_SHORT).show()

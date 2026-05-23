@@ -85,7 +85,7 @@ class ProfileFragment : Fragment(), View.OnClickListener {
         val builder = AlertDialog.Builder(thisParent)
         val input = EditText(thisParent)
         input.hint = "Tulis pengalaman mistismu..."
-        builder.setTitle("✨ Share Your Magic")
+        builder.setTitle(" Share Your Magic")
         builder.setView(input)
         builder.setPositiveButton("Kirim") { _, _ ->
             val pesan = input.text.toString()

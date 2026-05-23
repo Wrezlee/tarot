@@ -146,7 +146,7 @@ class OrderActivity : AppCompatActivity() {
             }
             cursorId.close()
 
-            Toast.makeText(this, "Ritual berhasil dipesan! ✨", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "Ritual berhasil dipesan! ", Toast.LENGTH_LONG).show()
             finish()
 
         } catch (e: Exception) {

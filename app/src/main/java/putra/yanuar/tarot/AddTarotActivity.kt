@@ -40,7 +40,7 @@ class AddTarotActivity : AppCompatActivity() {
                         "INSERT INTO tarot_packages (name, category, price) VALUES (?, ?, ?)",
                         arrayOf(name, category, price.toInt())
                     )
-                    Toast.makeText(this, "Paket $name Berhasil Disimpan ✨", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Paket $name Berhasil Disimpan ", Toast.LENGTH_SHORT).show()
                     finish()
                 } catch (e: Exception) {
                     Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_SHORT).show()

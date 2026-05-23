@@ -34,7 +34,7 @@ class AddUserActivity : AppCompatActivity() {
                         "INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)",
                         arrayOf(name, email, pass, role)
                     )
-                    Toast.makeText(this, "Berhasil menambah $name ✨", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Berhasil menambah $name ", Toast.LENGTH_SHORT).show()
                     finish()
                 } catch (e: Exception) {
                     Toast.makeText(this, "Gagal: ${e.message}", Toast.LENGTH_SHORT).show()

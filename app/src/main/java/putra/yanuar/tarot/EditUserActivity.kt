@@ -51,7 +51,7 @@ class EditUserActivity : AppCompatActivity() {
                         "UPDATE users SET name = ?, email = ?, password = ?, role = ? WHERE id = ?",
                         arrayOf(name, email, pass, role, userId)
                     )
-                    Toast.makeText(this, "Data $name diperbarui ✨", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Data $name diperbarui ", Toast.LENGTH_SHORT).show()
                     finish()
                 } catch (e: Exception) {
                     Toast.makeText(this, "Gagal update: ${e.message}", Toast.LENGTH_SHORT).show()
