@@ -101,7 +101,7 @@ class CustomerActivity : AppCompatActivity(),
 
         try {
             val cursor = db.rawQuery(
-                "SELECT id, name, email FROM users WHERE role = 'reader'", null
+                "SELECT id, name, email, is_online FROM users WHERE role = 'reader'", null
             )
 
             if (!cursor.moveToFirst()) {
@@ -118,6 +118,7 @@ class CustomerActivity : AppCompatActivity(),
                 val readerId    = cursor.getInt(0)
                 val readerName  = cursor.getString(1)
                 val readerEmail = cursor.getString(2)
+                val isOnline    = cursor.getInt(3) == 1
 
                 val card = MaterialCardView(this).apply {
                     layoutParams = LinearLayout.LayoutParams(
@@ -126,20 +127,23 @@ class CustomerActivity : AppCompatActivity(),
                     ).also { it.bottomMargin = 16.dpToPx() }
                     radius = 24f.dpToFloat()
                     cardElevation = 4f
-                    strokeColor = 0xFFE1AFD1.toInt()
+                    strokeColor = if (isOnline) 0xFFE1AFD1.toInt() else 0xFFCCCCCC.toInt()
                     strokeWidth = 3
-                    setCardBackgroundColor(0xFFFFFFFF.toInt())
-                    isClickable = true
-                    isFocusable = true
-                    val typedArray = context.obtainStyledAttributes(intArrayOf(android.R.attr.selectableItemBackground))
-                    val rippleDrawable = typedArray.getDrawable(0)
-                    typedArray.recycle()
-                    foreground = rippleDrawable
+                    setCardBackgroundColor(if (isOnline) 0xFFFFFFFF.toInt() else 0xFFF5F5F5.toInt())
+                    isClickable = isOnline
+                    isFocusable = isOnline
+                    if (isOnline) {
+                        val typedArray = context.obtainStyledAttributes(intArrayOf(android.R.attr.selectableItemBackground))
+                        val rippleDrawable = typedArray.getDrawable(0)
+                        typedArray.recycle()
+                        foreground = rippleDrawable
+                    }
                 }
 
                 val row = LinearLayout(this).apply {
                     orientation = LinearLayout.HORIZONTAL
                     setPadding(20.dpToPx(), 20.dpToPx(), 20.dpToPx(), 20.dpToPx())
+                    alpha = if (isOnline) 1.0f else 0.5f
                 }
 
                 // Avatar
@@ -164,21 +168,22 @@ class CustomerActivity : AppCompatActivity(),
 
                 val tvName = TextView(this).apply {
                     text = readerName
-                    setTextColor(0xFF7469B6.toInt())
+                    setTextColor(if (isOnline) 0xFF7469B6.toInt() else 0xFF999999.toInt())
                     textSize = 18f
                     setTypeface(null, android.graphics.Typeface.BOLD)
                 }
 
                 val tvRole = TextView(this).apply {
                     text = "MYSTIC READER"
-                    setTextColor(0xFFAD88C6.toInt())
+                    setTextColor(if (isOnline) 0xFFAD88C6.toInt() else 0xFFBBBBBB.toInt())
                     textSize = 10f
                     letterSpacing = 0.1f
                 }
 
-                // Hitung jumlah booking reader ini
+                // Hitung jumlah booking reader ini yang selesai
                 val bookingCursor = db.rawQuery(
-                    "SELECT COUNT(*) FROM bookings WHERE status IN ('paid','PAID','done','DONE')", null
+                    "SELECT COUNT(*) FROM bookings WHERE reader_id = ? AND status IN ('completed','COMPLETED','done','DONE')",
+                    arrayOf(readerId.toString())
                 )
                 var totalDone = 0
                 if (bookingCursor.moveToFirst()) totalDone = bookingCursor.getInt(0)
@@ -186,15 +191,15 @@ class CustomerActivity : AppCompatActivity(),
 
                 val tvStats = TextView(this).apply {
                     text = "✨ $totalDone reading selesai"
-                    setTextColor(0xFFAD88C6.toInt())
+                    setTextColor(if (isOnline) 0xFFAD88C6.toInt() else 0xFFBBBBBB.toInt())
                     textSize = 11f
                     setPadding(0, 4.dpToPx(), 0, 0)
                 }
 
-                // Status badge
+                // Status badge - ONLINE atau OFFLINE
                 val tvStatus = TextView(this).apply {
-                    text = "OPEN"
-                    setTextColor(0xFFFFE6E6.toInt())
+                    text = if (isOnline) "ONLINE" else "OFFLINE"
+                    setTextColor(0xFFFFFFFF.toInt())
                     textSize = 9f
                     setTypeface(null, android.graphics.Typeface.BOLD)
                     setPadding(10.dpToPx(), 4.dpToPx(), 10.dpToPx(), 4.dpToPx())
@@ -203,7 +208,7 @@ class CustomerActivity : AppCompatActivity(),
                         LinearLayout.LayoutParams.WRAP_CONTENT
                     ).also { it.topMargin = 8.dpToPx() }
                     background = android.graphics.drawable.GradientDrawable().apply {
-                        setColor(0xFF7469B6.toInt())
+                        setColor(if (isOnline) 0xFF4CAF50.toInt() else 0xFF9E9E9E.toInt())
                         cornerRadius = 100f
                     }
                 }
@@ -218,12 +223,15 @@ class CustomerActivity : AppCompatActivity(),
                 card.addView(row)
                 container.addView(card)
 
-                // Klik card reader → buka OrderActivity
-                card.setOnClickListener {
-                    val intent = Intent(this, OrderActivity::class.java)
-                    intent.putExtra("USER_EMAIL", userEmail)
-                    intent.putExtra("READER_NAME", readerName)
-                    startActivity(intent)
+                // Klik card reader → buka OrderActivity (hanya jika online)
+                if (isOnline) {
+                    card.setOnClickListener {
+                        val intent = Intent(this, OrderActivity::class.java)
+                        intent.putExtra("USER_EMAIL", userEmail)
+                        intent.putExtra("READER_NAME", readerName)
+                        intent.putExtra("READER_ID", readerId)
+                        startActivity(intent)
+                    }
                 }
 
             } while (cursor.moveToNext())

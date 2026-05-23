@@ -158,12 +158,11 @@ class ProfileFragment : Fragment() {
             b.tvProfileEmail.text = c.getString(2)
             b.tvProfileRole.text  = "LEVEL: ${c.getString(3).uppercase()}"
 
-            // Hitung total ritual yang sudah selesai (paid / done)
+            // Hitung total ritual yang sudah selesai (done / completed)
             val cRitual = db.rawQuery(
                 """SELECT COUNT(*) FROM bookings 
                    WHERE email = ? 
-                   AND (status = 'paid' OR status = 'PAID' 
-                        OR status = 'done' OR status = 'DONE'
+                   AND (status = 'done' OR status = 'DONE'
                         OR status = 'completed' OR status = 'COMPLETED')""",
                 arrayOf(emailLogin)
             )

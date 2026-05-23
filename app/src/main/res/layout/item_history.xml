@@ -72,5 +72,27 @@
             android:text="A: Belum ada jawaban dari Reader."
             android:textColor="#AD88C6"
             android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/tvItemReader"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Reader: -"
+            android:textColor="#7469B6"
+            android:textSize="11sp"
+            android:textStyle="bold" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnCancelOrder"
+            style="@style/Widget.Material3.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Batalkan Pesanan"
+            android:textColor="#E57373"
+            android:textSize="11sp"
+            android:visibility="gone"
+            app:cornerRadius="8dp" />
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

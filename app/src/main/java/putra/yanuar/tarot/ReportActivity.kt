@@ -21,12 +21,13 @@ class ReportActivity : AppCompatActivity() {
 
     fun loadReport() {
         try {
-            // Total pendapatan semua booking paid
+            // Total pendapatan hanya dari booking yang sudah selesai (done/completed)
             val cursorTotal = db.rawQuery(
-                "SELECT SUM(total_price) FROM bookings WHERE status IN ('paid','PAID','done','DONE')", null
+                "SELECT SUM(total_price) FROM bookings WHERE status IN ('done','DONE','completed','COMPLETED')", null
             )
             if (cursorTotal.moveToFirst()) {
-                b.tvReportTotalRevenue.text = "Rp${cursorTotal.getInt(0)}"
+                val total = cursorTotal.getInt(0)
+                b.tvReportTotalRevenue.text = "Rp$total"
             }
             cursorTotal.close()
 
@@ -55,9 +56,9 @@ class ReportActivity : AppCompatActivity() {
             }
             cursorPending.close()
 
-            // Paket terlaris
+            // Paket terlaris (hanya dari booking yang sudah selesai)
             val cursorTop = db.rawQuery(
-                "SELECT package_name, COUNT(*) as total FROM bookings GROUP BY package_name ORDER BY total DESC LIMIT 1", null
+                "SELECT package_name, COUNT(*) as total FROM bookings WHERE status IN ('done','DONE','completed','COMPLETED') GROUP BY package_name ORDER BY total DESC LIMIT 1", null
             )
             if (cursorTop.moveToFirst()) {
                 b.tvReportTopPackage.text = cursorTop.getString(0)

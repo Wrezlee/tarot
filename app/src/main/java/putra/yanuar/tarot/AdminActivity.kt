@@ -64,8 +64,12 @@ class AdminActivity : AppCompatActivity(), View.OnClickListener {
 
     fun loadStats() {
         try {
-            val cursorRev = db.rawQuery("SELECT SUM(total_price) FROM bookings WHERE status IN ('paid', 'PAID')", null)
-            if (cursorRev.moveToFirst()) b.tvTotalRevenue.text = "Rp${cursorRev.getInt(0)}"
+            // Total pendapatan hanya dari booking yang sudah selesai
+            val cursorRev = db.rawQuery("SELECT SUM(total_price) FROM bookings WHERE status IN ('done', 'DONE', 'completed', 'COMPLETED')", null)
+            if (cursorRev.moveToFirst()) {
+                val total = cursorRev.getInt(0)
+                b.tvTotalRevenue.text = "Rp$total"
+            }
             cursorRev.close()
 
             val cursorUser = db.rawQuery("SELECT COUNT(*) FROM users WHERE role = 'customer'", null)

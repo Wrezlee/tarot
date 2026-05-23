@@ -4,13 +4,14 @@ import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 
+
 class DBOpenHelper(context: Context) : SQLiteOpenHelper(context, "tarot_meow_db", null, 1) {
 
     override fun onCreate(db: SQLiteDatabase) {
         // 1. Tabel Users
-        db.execSQL("CREATE TABLE users (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, email TEXT, password TEXT, role TEXT)")
+        db.execSQL("CREATE TABLE users (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, email TEXT, password TEXT, role TEXT, is_online INTEGER DEFAULT 0)")
 
-        // 2. Tabel Tarot Packages (Nama sinkron dengan Activity: tarot_packages)
+        // 2. Tabel Tarot Packages
         db.execSQL("CREATE TABLE tarot_packages (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, category TEXT, description TEXT, price INTEGER, question_limit INTEGER, duration INTEGER, is_online INTEGER DEFAULT 1, is_offline INTEGER DEFAULT 0)")
 
         // 3. Tabel Addons
@@ -21,6 +22,8 @@ class DBOpenHelper(context: Context) : SQLiteOpenHelper(context, "tarot_meow_db"
             CREATE TABLE bookings ( 
                 id INTEGER PRIMARY KEY AUTOINCREMENT, 
                 user_id INTEGER, 
+                reader_id INTEGER DEFAULT 0,
+                reader_name TEXT,
                 package_name TEXT, 
                 type TEXT, 
                 booking_date TEXT, 
@@ -41,14 +44,14 @@ class DBOpenHelper(context: Context) : SQLiteOpenHelper(context, "tarot_meow_db"
         // 6. Tabel Testimonials
         db.execSQL("CREATE TABLE testimonials (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER, message TEXT)")
 
-        // --- SEEDING DATA ---
+        // --- SEEDING DATA UTAMA (Bukan Data Testing) ---
 
-        // Users
-        db.execSQL("INSERT INTO users (name, email, password, role) VALUES ('Admin Meow', 'admin@meow.com', '123', 'admin')")
-        db.execSQL("INSERT INTO users (name, email, password, role) VALUES ('Madame Seraphina', 'reader@meow.com', '123', 'reader')")
-        db.execSQL("INSERT INTO users (name, email, password, role) VALUES ('Putra Yanuar', 'customer@meow.com', '123', 'customer')")
+        // Akun bawaan sistem untuk testing login/peran
+        db.execSQL("INSERT INTO users (name, email, password, role, is_online) VALUES ('Admin Meow', 'admin@meow.com', '123', 'admin', 0)")
+        db.execSQL("INSERT INTO users (name, email, password, role, is_online) VALUES ('Mas Ruli', 'reader@meow.com', '123', 'reader', 1)")
+        db.execSQL("INSERT INTO users (name, email, password, role, is_online) VALUES ('Putra Yanuar', 'customer@meow.com', '123', 'customer', 0)")
 
-        // Packages Data (Menggunakan Data Lama kamu ke Tabel tarot_packages)
+        // Master Data Paket Tarot
         val packages = arrayOf(
             "('1 Kartu (1 Pertanyaan)', 'tarot', 5000)",
             "('3 Kartu (1 Pertanyaan)', 'tarot', 10000)",
@@ -66,26 +69,14 @@ class DBOpenHelper(context: Context) : SQLiteOpenHelper(context, "tarot_meow_db"
             db.execSQL("INSERT INTO tarot_packages (name, category, price) VALUES $pkg")
         }
 
-        // Addons
+        // Master Data Addons
         db.execSQL("INSERT INTO addons (name, price) VALUES ('Oracle Card', 10000)")
         db.execSQL("INSERT INTO addons (name, price) VALUES ('Fast Track', 30000)")
 
-        // Data Testing Awal
-        db.execSQL("""
-            INSERT INTO bookings (user_id, package_name, type, booking_date, booking_time, name, email, status, total_price) 
-            VALUES (3, '9 Kartu (Deep Reading)', 'online', '2026-04-12', '10:45', 'Fateema Az Zahra', 'customer@meow.com', 'paid', 60000)
-        """)
-
-        db.execSQL("INSERT INTO questions (booking_id, question) VALUES (1, 'Bagaimana keberuntungan saya bulan ini?')")
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-        db.execSQL("DROP TABLE IF EXISTS users")
-        db.execSQL("DROP TABLE IF EXISTS tarot_packages")
-        db.execSQL("DROP TABLE IF EXISTS addons")
-        db.execSQL("DROP TABLE IF EXISTS bookings")
-        db.execSQL("DROP TABLE IF EXISTS questions")
-        db.execSQL("DROP TABLE IF EXISTS testimonials")
-        onCreate(db)
+        // Karena versi dimulai dari 1, fungsi ini dikosongkan terlebih dahulu.
+        // Jika nanti ada perubahan struktur tabel di versi 2, logic baru bisa ditambahkan di sini.
     }
 }

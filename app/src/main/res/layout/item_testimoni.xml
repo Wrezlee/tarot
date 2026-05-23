@@ -11,30 +11,49 @@
     app:strokeColor="#E1AFD1"
     app:strokeWidth="1dp">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
         android:padding="16dp">
 
-        <TextView
-            android:id="@+id/tvTestimoniName"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Nama User"
-            android:textColor="#7469B6"
-            android:textSize="14sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/tvTestimoniMessage"
+        <LinearLayout
+            android:id="@+id/contentLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:text="Pesan testimoni..."
-            android:textColor="#251819"
-            android:textSize="13sp"
-            android:lineSpacingExtra="2dp" />
+            android:layout_toStartOf="@+id/btnDeleteTestimoni"
+            android:orientation="vertical">
 
-    </LinearLayout>
+            <TextView
+                android:id="@+id/tvTestimoniName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Nama User"
+                android:textColor="#7469B6"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvTestimoniMessage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:text="Pesan testimoni..."
+                android:textColor="#251819"
+                android:textSize="13sp"
+                android:lineSpacingExtra="2dp" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/btnDeleteTestimoni"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:gravity="center"
+            android:text="🗑"
+            android:textSize="18sp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Hapus testimoni" />
+
+    </RelativeLayout>
 </com.google.android.material.card.MaterialCardView>

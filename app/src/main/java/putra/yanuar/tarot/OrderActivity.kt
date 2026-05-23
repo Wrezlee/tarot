@@ -26,6 +26,7 @@ class OrderActivity : AppCompatActivity() {
         val emailUser    = intent.getStringExtra("USER_EMAIL") ?: ""
         val selectedDateFromIntent = intent.getStringExtra("SELECTED_DATE") ?: ""
         val readerName   = intent.getStringExtra("READER_NAME") ?: ""
+        val readerId     = intent.getIntExtra("READER_ID", 0)
 
         setupSpinner()
 
@@ -129,6 +130,8 @@ class OrderActivity : AppCompatActivity() {
         if (b.cbFastTrack.isChecked) totalPrice += 30000
 
         val notes = b.etNotes.text.toString()
+        val readerName = intent.getStringExtra("READER_NAME") ?: ""
+        val readerId = intent.getIntExtra("READER_ID", 0)
 
         try {
             var userId = 0
@@ -137,12 +140,12 @@ class OrderActivity : AppCompatActivity() {
             cursor.close()
 
             val sql = """
-                INSERT INTO bookings (user_id, email, package_name, payment_method, booking_date, booking_time, notes, status, total_price) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO bookings (user_id, reader_id, reader_name, email, package_name, payment_method, booking_date, booking_time, notes, status, total_price) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """.trimIndent()
 
             db.execSQL(sql, arrayOf(
-                userId, email, paketClean, payment, selectedDate, selectedTime, notes, "paid", totalPrice
+                userId, readerId, readerName, email, paketClean, payment, selectedDate, selectedTime, notes, "paid", totalPrice
             ))
 
             val cursorId = db.rawQuery("SELECT last_insert_rowid()", null)
