@@ -34,6 +34,22 @@
             android:textColor="#AD88C6"
             android:textSize="12sp" />
 
+        <!-- Reader terpilih (tampil jika dari kartu reader) -->
+        <TextView
+            android:id="@+id/tvSelectedReader"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/bg_status_rounded"
+            android:backgroundTint="#F3E5F5"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="6dp"
+            android:text="Reader: -"
+            android:textColor="#7469B6"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:visibility="gone" />
+
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -88,8 +104,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Transfer"
-                        android:textColor="#251819"/>
-
+                        android:textColor="#251819" />
                     <RadioButton
                         android:id="@+id/rbShopee"
                         android:layout_width="wrap_content"
@@ -114,14 +129,14 @@
                     android:layout_height="wrap_content"
                     android:text="Tambah Oracle Card (+10rb)"
                     android:textColor="#251819"
-                    android:textSize="13sp"/>
+                    android:textSize="13sp" />
                 <CheckBox
                     android:id="@+id/cbFastTrack"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Fast Track Urgent (+30rb)"
                     android:textColor="#251819"
-                    android:textSize="13sp"/>
+                    android:textSize="13sp" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -163,22 +178,23 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="24dp"
+                    android:textColorHint="#AD88C6"
                     app:boxStrokeColor="#7469B6"
                     app:hintTextColor="#7469B6"
-                    android:textColorHint="#AD88C6"
-                    app:placeholderText="Contoh: Bagaimana karir saya?"> <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/etNotes"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="top"
-                    android:hint="Nama Lengkap &amp; Pertanyaan"
-                    android:inputType="textMultiLine"
-                    android:lines="4"
-                    android:textColor="#251819"
-                    android:textSize="14sp" />
+                    app:placeholderText="Contoh: Bagaimana karir saya?">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etNotes"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="top"
+                        android:hint="Nama Lengkap &amp; Pertanyaan"
+                        android:inputType="textMultiLine"
+                        android:lines="4"
+                        android:textColor="#251819"
+                        android:textSize="14sp" />
                 </com.google.android.material.textfield.TextInputLayout>
-            </LinearLayout>
 
+            </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
         <com.google.android.material.button.MaterialButton

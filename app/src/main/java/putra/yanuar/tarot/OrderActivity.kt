@@ -23,9 +23,23 @@ class OrderActivity : AppCompatActivity() {
         setContentView(b.root)
 
         db = DBOpenHelper(this).writableDatabase
-        val emailUser = intent.getStringExtra("USER_EMAIL") ?: ""
+        val emailUser    = intent.getStringExtra("USER_EMAIL") ?: ""
+        val selectedDateFromIntent = intent.getStringExtra("SELECTED_DATE") ?: ""
+        val readerName   = intent.getStringExtra("READER_NAME") ?: ""
 
         setupSpinner()
+
+        // Isi tanggal otomatis jika dari klik kartu tanggal
+        if (selectedDateFromIntent.isNotEmpty()) {
+            selectedDate = selectedDateFromIntent
+            b.btnSetDate.text = selectedDate
+        }
+
+        // Tampilkan nama reader jika dari klik kartu reader
+        if (readerName.isNotEmpty()) {
+            b.tvSelectedReader.visibility = android.view.View.VISIBLE
+            b.tvSelectedReader.text = "Reader: $readerName"
+        }
 
         b.btnSetDate.setOnClickListener {
             val c = Calendar.getInstance()
@@ -62,11 +76,11 @@ class OrderActivity : AppCompatActivity() {
                     val price = cursor.getInt(1)
 
                     val category = when {
-                        name.contains("Kartu") -> "🔮 REGULER TAROT"
+                        name.contains("Kartu")   -> "🔮 REGULER TAROT"
                         name.contains("Telapak") -> "✋ PALM READING"
-                        name.contains("Chat") -> "💬 INTERAKTIF CHAT"
-                        name.contains("Call") -> "📞 INTERAKTIF CALL"
-                        else -> "✨ LAINNYA"
+                        name.contains("Chat")    -> "💬 INTERAKTIF CHAT"
+                        name.contains("Call")    -> "📞 INTERAKTIF CALL"
+                        else                     -> "✨ LAINNYA"
                     }
 
                     if (category != currentCategory) {
@@ -105,13 +119,10 @@ class OrderActivity : AppCompatActivity() {
 
         val payment = if (b.rbTransfer.isChecked) "Transfer" else "Dana/ShopeePay"
 
-        // LOGIKA HARGA: Ambil harga dasar dari string yang dipilih
         var totalPrice = 0
         try {
             val parts = paketRaw.split("Rp")
-            if (parts.size > 1) {
-                totalPrice = parts[1].trim().toInt()
-            }
+            if (parts.size > 1) totalPrice = parts[1].trim().toInt()
         } catch (e: Exception) { totalPrice = 0 }
 
         if (b.cbOracle.isChecked) totalPrice += 10000
@@ -122,11 +133,8 @@ class OrderActivity : AppCompatActivity() {
         try {
             var userId = 0
             val cursor = db.rawQuery("SELECT id FROM users WHERE email = ?", arrayOf(email))
-            if (cursor.moveToFirst()) {
-                userId = cursor.getInt(0)
-            }
+            if (cursor.moveToFirst()) userId = cursor.getInt(0)
             cursor.close()
-
 
             val sql = """
                 INSERT INTO bookings (user_id, email, package_name, payment_method, booking_date, booking_time, notes, status, total_price) 
@@ -137,7 +145,6 @@ class OrderActivity : AppCompatActivity() {
                 userId, email, paketClean, payment, selectedDate, selectedTime, notes, "paid", totalPrice
             ))
 
-            // Simpan pertanyaan
             val cursorId = db.rawQuery("SELECT last_insert_rowid()", null)
             if (cursorId.moveToFirst()) {
                 val lastBookingId = cursorId.getInt(0)
@@ -146,7 +153,7 @@ class OrderActivity : AppCompatActivity() {
             }
             cursorId.close()
 
-            Toast.makeText(this, "Ritual berhasil dipesan! ", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "Ritual berhasil dipesan! ✨", Toast.LENGTH_LONG).show()
             finish()
 
         } catch (e: Exception) {
