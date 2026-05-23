@@ -6,6 +6,8 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.EditText
+import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -98,10 +100,7 @@ class ReaderActivity : AppCompatActivity(), View.OnClickListener {
                 true
             }
             R.id.menu_logout -> {
-                // Hanya saat logout: set offline dulu baru keluar
-                try {
-                    db.execSQL("UPDATE users SET is_online = 0 WHERE id = ?", arrayOf(readerId.toString()))
-                } catch (e: Exception) { e.printStackTrace() }
+                // Logout TIDAK mengubah status online/offline, biarkan sesuai switch
                 logout()
                 true
             }
@@ -119,7 +118,12 @@ class ReaderActivity : AppCompatActivity(), View.OnClickListener {
     override fun onClick(v: View?) {
         when (v?.id) {
             R.id.btnStartReading -> {
-                if (isProcessing) completeReading() else startReading()
+                if (isProcessing) {
+                    // Tampilkan pilihan: selesaikan atau batalkan
+                    showReadingOptions()
+                } else {
+                    startReading()
+                }
             }
             R.id.btnViewHistory -> {
                 val intent = Intent(this, HistoryActivity::class.java)
@@ -140,12 +144,113 @@ class ReaderActivity : AppCompatActivity(), View.OnClickListener {
                 arrayOf(readerId.toString(), readerName, currentBookingId.toString())
             )
             isProcessing = true
-            b.btnStartReading.text = "Selesaikan Ramalan"
+            b.btnStartReading.text = "Sesi Sedang Berjalan ▼"
             b.btnStartReading.setBackgroundColor(0xFF4CAF50.toInt())
             Toast.makeText(this, "Sesi ramalan dimulai!", Toast.LENGTH_SHORT).show()
             loadStats()
         } catch (e: Exception) {
             Toast.makeText(this, "Gagal memulai: ${e.message}", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    /**
+     * Tampilkan dialog pilihan saat sesi sedang berjalan:
+     * 1. Jawab Pertanyaan Customer
+     * 2. Selesaikan Ramalan
+     * 3. Batalkan Ramalan
+     */
+    private fun showReadingOptions() {
+        // Ambil pertanyaan customer terlebih dahulu
+        var customerQuestion = "Belum ada pertanyaan"
+        var questionId = 0
+        try {
+            val cQ = db.rawQuery(
+                "SELECT id, question FROM questions WHERE booking_id = ? LIMIT 1",
+                arrayOf(currentBookingId.toString())
+            )
+            if (cQ.moveToFirst()) {
+                questionId = cQ.getInt(0)
+                customerQuestion = cQ.getString(1) ?: "Belum ada pertanyaan"
+            }
+            cQ.close()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+        val finalQuestionId = questionId
+        val finalQuestion = customerQuestion
+
+        AlertDialog.Builder(this)
+            .setTitle("Sesi Ramalan Aktif")
+            .setMessage("Pertanyaan Customer:\n\n\"$finalQuestion\"")
+            .setPositiveButton("✍️ Jawab Pertanyaan") { _, _ ->
+                showAnswerDialog(finalQuestionId, finalQuestion)
+            }
+            .setNeutralButton("✅ Selesaikan") { _, _ ->
+                completeReading()
+            }
+            .setNegativeButton("❌ Batalkan Sesi") { _, _ ->
+                cancelReading()
+            }
+            .show()
+    }
+
+    /**
+     * Dialog untuk reader mengetik jawaban atas pertanyaan customer
+     */
+    private fun showAnswerDialog(questionId: Int, question: String) {
+        val layout = LinearLayout(this)
+        layout.orientation = LinearLayout.VERTICAL
+        val padding = (20 * resources.displayMetrics.density).toInt()
+        layout.setPadding(padding, padding / 2, padding, 0)
+
+        val tvQuestion = android.widget.TextView(this)
+        tvQuestion.text = "Q: $question"
+        tvQuestion.setTextColor(0xFF7469B6.toInt())
+        tvQuestion.textSize = 13f
+        tvQuestion.setPadding(0, 0, 0, padding / 2)
+        layout.addView(tvQuestion)
+
+        val etAnswer = EditText(this)
+        etAnswer.hint = "Tulis jawaban/ramalan di sini..."
+        etAnswer.minLines = 4
+        etAnswer.inputType = android.text.InputType.TYPE_CLASS_TEXT or
+                android.text.InputType.TYPE_TEXT_FLAG_MULTI_LINE
+        etAnswer.gravity = android.view.Gravity.TOP
+        layout.addView(etAnswer)
+
+        AlertDialog.Builder(this)
+            .setTitle("💬 Jawab Pertanyaan")
+            .setView(layout)
+            .setPositiveButton("Kirim Jawaban") { _, _ ->
+                val jawaban = etAnswer.text.toString().trim()
+                if (jawaban.isEmpty()) {
+                    Toast.makeText(this, "Jawaban tidak boleh kosong", Toast.LENGTH_SHORT).show()
+                    return@setPositiveButton
+                }
+                saveAnswer(questionId, jawaban)
+            }
+            .setNegativeButton("Batal", null)
+            .show()
+    }
+
+    private fun saveAnswer(questionId: Int, answer: String) {
+        try {
+            if (questionId > 0) {
+                db.execSQL(
+                    "UPDATE questions SET answer = ? WHERE id = ?",
+                    arrayOf(answer, questionId.toString())
+                )
+            } else {
+                // Jika belum ada row questions untuk booking ini, insert baru
+                db.execSQL(
+                    "INSERT INTO questions (booking_id, answer) VALUES (?, ?)",
+                    arrayOf(currentBookingId.toString(), answer)
+                )
+            }
+            Toast.makeText(this, "Jawaban berhasil dikirim! ✨", Toast.LENGTH_SHORT).show()
+        } catch (e: Exception) {
+            Toast.makeText(this, "Gagal kirim jawaban: ${e.message}", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -172,6 +277,32 @@ class ReaderActivity : AppCompatActivity(), View.OnClickListener {
                 }
             }
             .setNegativeButton("Batal", null)
+            .show()
+    }
+
+    private fun cancelReading() {
+        if (currentBookingId <= 0) return
+        AlertDialog.Builder(this)
+            .setTitle("Batalkan Sesi")
+            .setMessage("Yakin ingin membatalkan sesi ini? Status booking akan kembali ke 'paid' dan masuk antrean lagi.")
+            .setPositiveButton("Ya, Batalkan") { _, _ ->
+                try {
+                    db.execSQL(
+                        "UPDATE bookings SET status = 'paid', reader_id = 0, reader_name = '' WHERE id = ?",
+                        arrayOf(currentBookingId.toString())
+                    )
+                    isProcessing = false
+                    currentBookingId = 0
+                    b.btnStartReading.text = "Mulai Ramalan"
+                    b.btnStartReading.setBackgroundColor(0xFF7469B6.toInt())
+                    Toast.makeText(this, "Sesi dibatalkan, booking kembali ke antrean.", Toast.LENGTH_SHORT).show()
+                    loadStats()
+                    loadNextBooking()
+                } catch (e: Exception) {
+                    Toast.makeText(this, "Gagal membatalkan: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+            }
+            .setNegativeButton("Tidak", null)
             .show()
     }
 
@@ -253,4 +384,5 @@ class ReaderActivity : AppCompatActivity(), View.OnClickListener {
         loadNextBooking()
     }
 
+    // onDestroy TIDAK set offline — status hanya berubah lewat toggle switch
 }
