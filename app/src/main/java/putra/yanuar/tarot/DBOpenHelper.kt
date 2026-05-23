@@ -5,21 +5,21 @@ import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 
 
-class DBOpenHelper(context: Context) : SQLiteOpenHelper(context, "tarot_meow_db", null, 1) {
+class DBOpenHelper(context: Context) : SQLiteOpenHelper(context, "tarot_meow_db", null, 2) {
 
     override fun onCreate(db: SQLiteDatabase) {
         // 1. Tabel Users
-        db.execSQL("CREATE TABLE users (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, email TEXT, password TEXT, role TEXT, is_online INTEGER DEFAULT 0)")
+        db.execSQL("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, email TEXT, password TEXT, role TEXT, is_online INTEGER DEFAULT 0)")
 
         // 2. Tabel Tarot Packages
-        db.execSQL("CREATE TABLE tarot_packages (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, category TEXT, description TEXT, price INTEGER, question_limit INTEGER, duration INTEGER, is_online INTEGER DEFAULT 1, is_offline INTEGER DEFAULT 0)")
+        db.execSQL("CREATE TABLE IF NOT EXISTS tarot_packages (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, category TEXT, description TEXT, price INTEGER, question_limit INTEGER, duration INTEGER, is_online INTEGER DEFAULT 1, is_offline INTEGER DEFAULT 0)")
 
         // 3. Tabel Addons
-        db.execSQL("CREATE TABLE addons (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, price INTEGER, description TEXT)")
+        db.execSQL("CREATE TABLE IF NOT EXISTS addons (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, price INTEGER, description TEXT)")
 
         // 4. Tabel Bookings
         db.execSQL("""
-            CREATE TABLE bookings ( 
+            CREATE TABLE IF NOT EXISTS bookings ( 
                 id INTEGER PRIMARY KEY AUTOINCREMENT, 
                 user_id INTEGER, 
                 reader_id INTEGER DEFAULT 0,
@@ -39,14 +39,27 @@ class DBOpenHelper(context: Context) : SQLiteOpenHelper(context, "tarot_meow_db"
         """)
 
         // 5. Tabel Questions
-        db.execSQL("CREATE TABLE questions (id INTEGER PRIMARY KEY AUTOINCREMENT, booking_id INTEGER, question TEXT, answer TEXT)")
+        db.execSQL("CREATE TABLE IF NOT EXISTS questions (id INTEGER PRIMARY KEY AUTOINCREMENT, booking_id INTEGER, question TEXT, answer TEXT)")
 
         // 6. Tabel Testimonials
-        db.execSQL("CREATE TABLE testimonials (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER, message TEXT)")
+        db.execSQL("CREATE TABLE IF NOT EXISTS testimonials (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER, message TEXT)")
 
-        // --- SEEDING DATA UTAMA (Bukan Data Testing) ---
+        seedData(db)
+    }
 
-        // Akun bawaan sistem untuk testing login/peran
+    override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
+        // Drop semua tabel lama lalu buat ulang
+        db.execSQL("DROP TABLE IF EXISTS testimonials")
+        db.execSQL("DROP TABLE IF EXISTS questions")
+        db.execSQL("DROP TABLE IF EXISTS bookings")
+        db.execSQL("DROP TABLE IF EXISTS addons")
+        db.execSQL("DROP TABLE IF EXISTS tarot_packages")
+        db.execSQL("DROP TABLE IF EXISTS users")
+        onCreate(db)
+    }
+
+    private fun seedData(db: SQLiteDatabase) {
+        // Akun bawaan sistem
         db.execSQL("INSERT INTO users (name, email, password, role, is_online) VALUES ('Admin Meow', 'admin@meow.com', '123', 'admin', 0)")
         db.execSQL("INSERT INTO users (name, email, password, role, is_online) VALUES ('Mas Ruli', 'reader@meow.com', '123', 'reader', 1)")
         db.execSQL("INSERT INTO users (name, email, password, role, is_online) VALUES ('Putra Yanuar', 'customer@meow.com', '123', 'customer', 0)")
@@ -72,11 +85,5 @@ class DBOpenHelper(context: Context) : SQLiteOpenHelper(context, "tarot_meow_db"
         // Master Data Addons
         db.execSQL("INSERT INTO addons (name, price) VALUES ('Oracle Card', 10000)")
         db.execSQL("INSERT INTO addons (name, price) VALUES ('Fast Track', 30000)")
-
-    }
-
-    override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-        // Karena versi dimulai dari 1, fungsi ini dikosongkan terlebih dahulu.
-        // Jika nanti ada perubahan struktur tabel di versi 2, logic baru bisa ditambahkan di sini.
     }
 }
