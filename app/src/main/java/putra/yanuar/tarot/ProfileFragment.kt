@@ -49,18 +49,6 @@ class ProfileFragment : Fragment() {
             }
         }
 
-        // Card Bagikan Keajaiban → arahkan ke riwayat ramalan untuk tulis ulasan
-        b.btnTestimony.setOnClickListener {
-            Toast.makeText(
-                thisParent,
-                "Tulis ulasan melalui Riwayat Ramalan setelah sesi selesai ✨",
-                Toast.LENGTH_LONG
-            ).show()
-            // Langsung buka HistoryActivity agar customer bisa langsung ke sana
-            val i = Intent(thisParent, HistoryActivity::class.java)
-            i.putExtra("USER_EMAIL", thisParent.userEmail)
-            startActivity(i)
-        }
 
         loadUserData()
         return b.root

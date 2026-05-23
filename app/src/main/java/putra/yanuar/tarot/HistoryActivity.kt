@@ -28,7 +28,8 @@ class HistoryActivity : AppCompatActivity() {
         val answer: String,
         val readerName: String,
         val userId: Int,
-        val hasTestimoni: Boolean
+        val hasTestimoni: Boolean,
+        val isiUlasan: String   // isi teks ulasan jika sudah ada
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -65,13 +66,17 @@ class HistoryActivity : AppCompatActivity() {
                 val bookingId = cursor.getInt(0)
                 val status = (cursor.getString(3) ?: "PENDING").uppercase()
 
-                // Cek apakah booking ini sudah ada testimoninya
+                // Cek apakah booking ini sudah ada testimoninya & ambil isinya
                 var hasTestimoni = false
+                var isiUlasan = ""
                 val cTesti = db.rawQuery(
-                    "SELECT COUNT(*) FROM testimonials WHERE booking_id = ?",
+                    "SELECT message FROM testimonials WHERE booking_id = ? LIMIT 1",
                     arrayOf(bookingId.toString())
                 )
-                if (cTesti.moveToFirst()) hasTestimoni = cTesti.getInt(0) > 0
+                if (cTesti.moveToFirst()) {
+                    hasTestimoni = true
+                    isiUlasan = cTesti.getString(0) ?: ""
+                }
                 cTesti.close()
 
                 val item = HistoryItem(
@@ -83,7 +88,8 @@ class HistoryActivity : AppCompatActivity() {
                     answer      = "A: " + (cursor.getString(5) ?: "Menunggu jawaban Reader..."),
                     readerName  = cursor.getString(6) ?: "-",
                     userId      = userId,
-                    hasTestimoni = hasTestimoni
+                    hasTestimoni = hasTestimoni,
+                    isiUlasan   = isiUlasan
                 )
                 listData.add(item)
             }
@@ -152,7 +158,7 @@ class HistoryActivity : AppCompatActivity() {
                         arrayOf(userId.toString(), bookingId.toString(), packageName, pesan)
                     )
                     Toast.makeText(this, "Ulasan berhasil dikirim! 💕", Toast.LENGTH_SHORT).show()
-                    loadHistory() // refresh supaya tombol ulasan hilang
+                    loadHistory() // refresh supaya isi ulasan tampil
                 } catch (e: Exception) {
                     Toast.makeText(this, "Gagal kirim ulasan: ${e.message}", Toast.LENGTH_SHORT).show()
                 }
@@ -194,8 +200,9 @@ class HistoryActivity : AppCompatActivity() {
             binding.btnCancelOrder.visibility = if (canCancel) View.VISIBLE else View.GONE
             binding.btnCancelOrder.setOnClickListener { cancelOrder(item.id) }
 
-            // Tombol ulasan — hanya untuk status selesai dan belum ada testimoninya
             val isDone = item.status == "DONE" || item.status == "COMPLETED"
+
+            // Tombol tulis ulasan — tampil hanya jika selesai & belum ada ulasan
             binding.btnTulisUlasan.visibility = when {
                 isDone && !item.hasTestimoni -> View.VISIBLE
                 else -> View.GONE
@@ -204,8 +211,13 @@ class HistoryActivity : AppCompatActivity() {
                 showTestimoniDialog(item.id, item.pkg, item.userId)
             }
 
-            // Jika sudah ada testimoni, tampilkan label kecil
-            binding.tvSudahUlasan.visibility = if (isDone && item.hasTestimoni) View.VISIBLE else View.GONE
+            // Kotak isi ulasan — tampil hanya jika sudah ada ulasan
+            if (isDone && item.hasTestimoni && item.isiUlasan.isNotEmpty()) {
+                binding.layoutUlasanTerkirim.visibility = View.VISIBLE
+                binding.tvIsiUlasan.text = item.isiUlasan
+            } else {
+                binding.layoutUlasanTerkirim.visibility = View.GONE
+            }
 
             return view
         }

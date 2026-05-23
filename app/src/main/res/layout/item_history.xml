@@ -104,27 +104,47 @@
         <!-- Tombol Tulis Ulasan (hanya DONE/COMPLETED yang belum ulasan) -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnTulisUlasan"
-            style="@style/Widget.Material3.Button.TonalButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
             android:text="✍️ Tulis Ulasan"
+            android:textColor="#7469B6"
             android:textSize="11sp"
             android:visibility="gone"
             app:backgroundTint="#F3E5F5"
             app:cornerRadius="8dp" />
 
-        <!-- Label jika sudah menulis ulasan -->
-        <TextView
-            android:id="@+id/tvSudahUlasan"
-            android:layout_width="wrap_content"
+        <!-- Kotak ulasan yang sudah dikirim (tampil setelah submit) -->
+        <LinearLayout
+            android:id="@+id/layoutUlasanTerkirim"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:text="✅ Ulasan sudah dikirim"
-            android:textColor="#AD88C6"
-            android:textSize="10sp"
-            android:textStyle="italic"
-            android:visibility="gone" />
+            android:layout_marginTop="8dp"
+            android:background="@drawable/bg_status_rounded"
+            android:backgroundTint="#F8F0FF"
+            android:orientation="vertical"
+            android:padding="12dp"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="✅ Ulasan Kamu"
+                android:textColor="#7469B6"
+                android:textSize="10sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvIsiUlasan"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text=""
+                android:textColor="#251819"
+                android:textSize="12sp"
+                android:lineSpacingExtra="2dp" />
+
+        </LinearLayout>
 
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>
