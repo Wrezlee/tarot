@@ -3,15 +3,20 @@ package putra.yanuar.tarot
 import android.content.Intent
 import android.database.sqlite.SQLiteDatabase
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.view.ViewGroup
+import android.widget.BaseAdapter
 import android.widget.EditText
 import android.widget.LinearLayout
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import putra.yanuar.tarot.databinding.ActivityReaderBinding
+import putra.yanuar.tarot.databinding.ItemHistoryBinding
 
 class ReaderActivity : AppCompatActivity(), View.OnClickListener {
 
@@ -22,6 +27,19 @@ class ReaderActivity : AppCompatActivity(), View.OnClickListener {
     private var readerName: String = ""
     private var currentBookingId: Int = 0
     private var isProcessing: Boolean = false
+
+    // Data class untuk history
+    data class ReaderHistoryItem(
+        val id: Int,
+        val customerName: String,
+        val packageName: String,
+        val bookingDate: String,
+        val status: String,
+        val question: String,
+        val answer: String
+    )
+
+    val historyList = ArrayList<ReaderHistoryItem>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,7 +83,6 @@ class ReaderActivity : AppCompatActivity(), View.OnClickListener {
         }
 
         b.btnStartReading.setOnClickListener(this)
-        b.btnViewHistory.setOnClickListener(this)
 
         b.switchStatus.setOnCheckedChangeListener { _, isChecked ->
             try {
@@ -86,6 +103,7 @@ class ReaderActivity : AppCompatActivity(), View.OnClickListener {
         loadReaderProfile()
         loadStats()
         loadNextBooking()
+        loadReadingHistory()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -100,7 +118,6 @@ class ReaderActivity : AppCompatActivity(), View.OnClickListener {
                 true
             }
             R.id.menu_logout -> {
-                // Logout TIDAK mengubah status online/offline, biarkan sesuai switch
                 logout()
                 true
             }
@@ -119,16 +136,10 @@ class ReaderActivity : AppCompatActivity(), View.OnClickListener {
         when (v?.id) {
             R.id.btnStartReading -> {
                 if (isProcessing) {
-                    // Tampilkan pilihan: selesaikan atau batalkan
                     showReadingOptions()
                 } else {
                     startReading()
                 }
-            }
-            R.id.btnViewHistory -> {
-                val intent = Intent(this, HistoryActivity::class.java)
-                intent.putExtra("USER_EMAIL", userEmail)
-                startActivity(intent)
             }
         }
     }
@@ -153,14 +164,7 @@ class ReaderActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 
-    /**
-     * Tampilkan dialog pilihan saat sesi sedang berjalan:
-     * 1. Jawab Pertanyaan Customer
-     * 2. Selesaikan Ramalan
-     * 3. Batalkan Ramalan
-     */
     private fun showReadingOptions() {
-        // Ambil pertanyaan customer terlebih dahulu
         var customerQuestion = "Belum ada pertanyaan"
         var questionId = 0
         try {
@@ -195,16 +199,13 @@ class ReaderActivity : AppCompatActivity(), View.OnClickListener {
             .show()
     }
 
-    /**
-     * Dialog untuk reader mengetik jawaban atas pertanyaan customer
-     */
     private fun showAnswerDialog(questionId: Int, question: String) {
         val layout = LinearLayout(this)
         layout.orientation = LinearLayout.VERTICAL
         val padding = (20 * resources.displayMetrics.density).toInt()
         layout.setPadding(padding, padding / 2, padding, 0)
 
-        val tvQuestion = android.widget.TextView(this)
+        val tvQuestion = TextView(this)
         tvQuestion.text = "Q: $question"
         tvQuestion.setTextColor(0xFF7469B6.toInt())
         tvQuestion.textSize = 13f
@@ -242,7 +243,6 @@ class ReaderActivity : AppCompatActivity(), View.OnClickListener {
                     arrayOf(answer, questionId.toString())
                 )
             } else {
-                // Jika belum ada row questions untuk booking ini, insert baru
                 db.execSQL(
                     "INSERT INTO questions (booking_id, answer) VALUES (?, ?)",
                     arrayOf(currentBookingId.toString(), answer)
@@ -272,6 +272,7 @@ class ReaderActivity : AppCompatActivity(), View.OnClickListener {
                     Toast.makeText(this, "Sesi ramalan selesai!", Toast.LENGTH_SHORT).show()
                     loadStats()
                     loadNextBooking()
+                    loadReadingHistory()
                 } catch (e: Exception) {
                     Toast.makeText(this, "Gagal menyelesaikan: ${e.message}", Toast.LENGTH_SHORT).show()
                 }
@@ -298,6 +299,7 @@ class ReaderActivity : AppCompatActivity(), View.OnClickListener {
                     Toast.makeText(this, "Sesi dibatalkan, booking kembali ke antrean.", Toast.LENGTH_SHORT).show()
                     loadStats()
                     loadNextBooking()
+                    loadReadingHistory()
                 } catch (e: Exception) {
                     Toast.makeText(this, "Gagal membatalkan: ${e.message}", Toast.LENGTH_SHORT).show()
                 }
@@ -341,21 +343,34 @@ class ReaderActivity : AppCompatActivity(), View.OnClickListener {
 
     private fun loadNextBooking() {
         try {
+            // JOIN ke tabel users untuk ambil nama customer berdasarkan email booking
             val sql = """
-                SELECT id, email, booking_time, package_name 
-                FROM bookings 
-                WHERE status IN ('paid','PAID') 
-                AND (reader_id = ? OR reader_id = 0)
-                ORDER BY booking_date ASC, booking_time ASC 
+                SELECT b.id, u.name, b.booking_date, b.booking_time, b.package_name, b.email
+                FROM bookings b
+                LEFT JOIN users u ON b.email = u.email
+                WHERE b.status IN ('paid','PAID') 
+                AND (b.reader_id = ? OR b.reader_id = 0)
+                ORDER BY b.booking_date ASC, b.booking_time ASC 
                 LIMIT 1
             """.trimIndent()
 
             val c = db.rawQuery(sql, arrayOf(readerId.toString()))
             if (c.moveToFirst()) {
                 currentBookingId = c.getInt(0)
-                b.tvNextCustomerName.text = c.getString(1) ?: "-"
-                b.tvNextBookingTime.text  = c.getString(2)?.takeIf { it.isNotEmpty() } ?: "--:--"
-                b.tvNextPackageName.text  = "Paket: ${c.getString(3) ?: "-"}"
+
+                // Tampilkan nama customer; fallback ke email kalau nama tidak ada
+                val customerName = c.getString(1)?.takeIf { it.isNotEmpty() }
+                    ?: c.getString(5) ?: "-"
+                b.tvNextCustomerName.text = customerName
+
+                // Tampilkan tanggal booking
+                val bookingDate = c.getString(2)?.takeIf { it.isNotEmpty() } ?: "-"
+                b.tvNextBookingDate.text = "📅 $bookingDate"
+
+                // Tampilkan jam booking
+                b.tvNextBookingTime.text = c.getString(3)?.takeIf { it.isNotEmpty() } ?: "--:--"
+
+                b.tvNextPackageName.text = "Paket: ${c.getString(4) ?: "-"}"
                 b.btnStartReading.visibility = View.VISIBLE
                 b.btnStartReading.text = "Mulai Ramalan"
                 b.btnStartReading.setBackgroundColor(0xFF7469B6.toInt())
@@ -364,6 +379,7 @@ class ReaderActivity : AppCompatActivity(), View.OnClickListener {
                 currentBookingId = 0
                 isProcessing = false
                 b.tvNextCustomerName.text = "Belum Ada Antrean"
+                b.tvNextBookingDate.text = ""
                 b.tvNextBookingTime.text  = "--:--"
                 b.tvNextPackageName.text  = "Siap melayani sesi baru"
                 b.btnStartReading.visibility = View.GONE
@@ -372,17 +388,93 @@ class ReaderActivity : AppCompatActivity(), View.OnClickListener {
         } catch (e: Exception) {
             e.printStackTrace()
             b.tvNextCustomerName.text = "Belum Ada Antrean"
+            b.tvNextBookingDate.text = ""
             b.tvNextBookingTime.text  = "--:--"
             b.tvNextPackageName.text  = "Siap melayani sesi baru"
             b.btnStartReading.visibility = View.GONE
         }
     }
 
+    /**
+     * Muat riwayat sesi yang sudah diselesaikan oleh reader ini,
+     * lalu tampilkan ke containerReaderHistory secara programatik.
+     */
+    private fun loadReadingHistory() {
+        try {
+            val sql = """
+                SELECT b.id, u.name, b.email, b.package_name, b.booking_date, b.status,
+                       q.question, q.answer
+                FROM bookings b
+                LEFT JOIN users u ON b.email = u.email
+                LEFT JOIN questions q ON b.id = q.booking_id
+                WHERE b.reader_id = ? 
+                AND b.status IN ('completed','COMPLETED','done','DONE')
+                ORDER BY b.id DESC
+                LIMIT 20
+            """.trimIndent()
+
+            val c = db.rawQuery(sql, arrayOf(readerId.toString()))
+            historyList.clear()
+
+            while (c.moveToNext()) {
+                val customerName = c.getString(1)?.takeIf { it.isNotEmpty() }
+                    ?: c.getString(2) ?: "-"
+                historyList.add(
+                    ReaderHistoryItem(
+                        id          = c.getInt(0),
+                        customerName = customerName,
+                        packageName  = c.getString(3) ?: "-",
+                        bookingDate  = c.getString(4) ?: "-",
+                        status       = (c.getString(5) ?: "").uppercase(),
+                        question     = "Q: " + (c.getString(6) ?: "Tidak ada pertanyaan"),
+                        answer       = "A: " + (c.getString(7) ?: "Belum dijawab")
+                    )
+                )
+            }
+            c.close()
+
+            val container = b.containerReaderHistory
+
+            if (historyList.isEmpty()) {
+                container.removeAllViews()
+                val tvEmpty = TextView(this).apply {
+                    text = "Belum ada sesi yang selesai"
+                    setTextColor(0xFFAD88C6.toInt())
+                    textSize = 13f
+                    setPadding(0, 8.dpToPx(), 0, 8.dpToPx())
+                }
+                container.addView(tvEmpty)
+                return
+            }
+
+            container.removeAllViews()
+            for (item in historyList) {
+                val inflater = LayoutInflater.from(this)
+                val binding = ItemHistoryBinding.inflate(inflater, container, false)
+
+                binding.tvItemPackage.text  = item.packageName
+                binding.tvItemDate.text     = item.bookingDate
+                binding.tvItemStatus.text   = item.status
+                binding.tvItemQuestion.text = item.question
+                binding.tvItemAnswer.text   = item.answer
+                binding.tvItemReader.text   = "Customer: ${item.customerName}"
+                binding.btnCancelOrder.visibility = View.GONE   // reader tidak bisa cancel
+
+                container.addView(binding.root)
+            }
+
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    private fun Int.dpToPx(): Int =
+        (this * resources.displayMetrics.density).toInt()
+
     override fun onResume() {
         super.onResume()
         loadStats()
         loadNextBooking()
+        loadReadingHistory()
     }
-
-    // onDestroy TIDAK set offline — status hanya berubah lewat toggle switch
 }
