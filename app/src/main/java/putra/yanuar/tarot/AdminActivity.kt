@@ -27,8 +27,6 @@ class AdminActivity : AppCompatActivity(), View.OnClickListener {
 
         b.btnMenuUser.setOnClickListener(this)
         b.btnMenuPackages.setOnClickListener(this)
-        b.btnMenuTransactions.setOnClickListener(this)
-        b.btnMenuQuestions.setOnClickListener(this)
         b.btnMenuTestimony.setOnClickListener(this)
         b.btnMenuReport.setOnClickListener(this)
 
@@ -50,12 +48,10 @@ class AdminActivity : AppCompatActivity(), View.OnClickListener {
 
     override fun onClick(p0: View?) {
         when (p0?.id) {
-            R.id.btnMenuUser         -> startActivity(Intent(this, ManageUserActivity::class.java))
-            R.id.btnMenuPackages     -> startActivity(Intent(this, ManageTarotActivity::class.java))
-            R.id.btnMenuTransactions -> Toast.makeText(this, "Data Transaksi", Toast.LENGTH_SHORT).show()
-            R.id.btnMenuQuestions    -> Toast.makeText(this, "Daftar Pertanyaan", Toast.LENGTH_SHORT).show()
-            R.id.btnMenuTestimony    -> Toast.makeText(this, "Moderasi Testimoni", Toast.LENGTH_SHORT).show()
-            R.id.btnMenuReport       -> Toast.makeText(this, "Laporan Keuangan", Toast.LENGTH_SHORT).show()
+            R.id.btnMenuUser      -> startActivity(Intent(this, ManageUserActivity::class.java))
+            R.id.btnMenuPackages  -> startActivity(Intent(this, ManageTarotActivity::class.java))
+            R.id.btnMenuTestimony -> startActivity(Intent(this, TestimoniActivity::class.java))
+            R.id.btnMenuReport    -> startActivity(Intent(this, ReportActivity::class.java))
         }
     }
 

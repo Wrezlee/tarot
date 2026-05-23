@@ -39,6 +39,9 @@
         <activity android:name=".ManageTarotActivity"/>
         <activity android:name=".AddTarotActivity"/>
         <activity android:name=".EditTarotActivity"/>
+        <activity android:name=".TestimoniActivity"/>
+        <activity android:name=".ReportActivity"/>
+
 
 
 
