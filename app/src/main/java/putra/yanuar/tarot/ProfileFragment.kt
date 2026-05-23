@@ -13,7 +13,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import putra.yanuar.tarot.databinding.FragmentProfileBinding
 
-class ProfileFragment : Fragment(), View.OnClickListener {
+class ProfileFragment : Fragment() {
 
     lateinit var b: FragmentProfileBinding
     lateinit var thisParent: CustomerActivity
@@ -28,13 +28,37 @@ class ProfileFragment : Fragment(), View.OnClickListener {
         thisParent = activity as CustomerActivity
         db = thisParent.getDbObject()
 
+        // Tombol overflow (logout)
         b.btnOverflowProfile.setOnClickListener { v ->
             showOverflowMenu(v)
         }
 
-        b.btnEditProfile.setOnClickListener(this)
-        b.btnHistory.setOnClickListener(this)
-        b.btnTestimony.setOnClickListener(this)
+        // Tombol Edit Profile
+        b.btnEditProfile.setOnClickListener {
+            val i = Intent(thisParent, EditProfileActivity::class.java)
+            i.putExtra("USER_EMAIL", thisParent.userEmail)
+            startActivity(i)
+        }
+
+        // Card Riwayat Ramalan — klik langsung buka HistoryActivity dengan email dari database
+        b.btnHistory.setOnClickListener {
+            try {
+                val i = Intent(thisParent, HistoryActivity::class.java)
+                i.putExtra("USER_EMAIL", thisParent.userEmail)
+                startActivity(i)
+            } catch (e: Exception) {
+                Toast.makeText(thisParent, "Error: ${e.message}", Toast.LENGTH_LONG).show()
+            }
+        }
+
+        // Card Bagikan Keajaiban — tampilkan dialog input lalu simpan ke tabel testimonials
+        b.btnTestimony.setOnClickListener {
+            try {
+                showTestimonialDialog()
+            } catch (e: Exception) {
+                Toast.makeText(thisParent, "Error: ${e.message}", Toast.LENGTH_LONG).show()
+            }
+        }
 
         loadUserData()
         return b.root
@@ -58,71 +82,106 @@ class ProfileFragment : Fragment(), View.OnClickListener {
         popup.show()
     }
 
-    override fun onClick(p0: View?) {
-        try {
-            when (p0?.id) {
-                R.id.btnEditProfile -> {
-                    val i = Intent(thisParent, EditProfileActivity::class.java)
-                    i.putExtra("USER_EMAIL", thisParent.userEmail)
-                    startActivity(i)
-                }
-                R.id.btnHistory -> {
-                    val i = Intent(thisParent, HistoryActivity::class.java)
-                    i.putExtra("USER_EMAIL", thisParent.userEmail)
-                    startActivity(i)
-                }
-                R.id.btnTestimony -> {
-                    showTestimonialDialog()
-                }
-            }
-        } catch (e: Exception) {
-            Toast.makeText(thisParent, "Error: ${e.message}", Toast.LENGTH_LONG).show()
-            e.printStackTrace()
-        }
-    }
-
+    /**
+     * Dialog input testimoni.
+     * Setelah user submit:
+     *  1. Cari user_id berdasarkan email yang sedang login
+     *  2. INSERT ke tabel testimonials
+     *  3. Refresh tampilan (tvTestimonialsCount ter-update)
+     */
     fun showTestimonialDialog() {
         val builder = AlertDialog.Builder(thisParent)
         val input = EditText(thisParent)
         input.hint = "Tulis pengalaman mistismu..."
-        builder.setTitle(" Share Your Magic")
+        builder.setTitle("✨ Share Your Magic")
         builder.setView(input)
+
         builder.setPositiveButton("Kirim") { _, _ ->
-            val pesan = input.text.toString()
+            val pesan = input.text.toString().trim()
             if (pesan.isNotEmpty()) {
-                val cursor = db.rawQuery("SELECT id FROM users WHERE email = ?", arrayOf(thisParent.userEmail))
+                // Ambil user_id dari tabel users berdasarkan email login
+                val cursor = db.rawQuery(
+                    "SELECT id FROM users WHERE email = ?",
+                    arrayOf(thisParent.userEmail)
+                )
                 if (cursor.moveToFirst()) {
                     val userId = cursor.getInt(0)
-                    db.execSQL("INSERT INTO testimonials (user_id, message) VALUES (?, ?)", arrayOf(userId.toString(), pesan))
-                    Toast.makeText(thisParent, "Terima kasih atas testimoninya! 💕", Toast.LENGTH_SHORT).show()
-                    loadUserData()
+                    try {
+                        db.execSQL(
+                            "INSERT INTO testimonials (user_id, message) VALUES (?, ?)",
+                            arrayOf(userId.toString(), pesan)
+                        )
+                        Toast.makeText(
+                            thisParent,
+                            "Terima kasih atas testimoninya! 💕",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        // Refresh counter testimoni
+                        loadUserData()
+                    } catch (e: Exception) {
+                        Toast.makeText(
+                            thisParent,
+                            "Gagal menyimpan testimoni: ${e.message}",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                } else {
+                    Toast.makeText(thisParent, "User tidak ditemukan", Toast.LENGTH_SHORT).show()
                 }
                 cursor.close()
+            } else {
+                Toast.makeText(thisParent, "Testimoni tidak boleh kosong", Toast.LENGTH_SHORT).show()
             }
         }
+
         builder.setNegativeButton("Batal", null)
         builder.show()
     }
 
+    /**
+     * Muat data profil dari database:
+     *  - Nama, email, role
+     *  - Jumlah booking yang sudah paid/done  → tvTotalReadings
+     *  - Jumlah testimoni yang pernah dikirim → tvTestimonialsCount
+     */
     fun loadUserData() {
         val emailLogin = thisParent.userEmail
-        val c = db.rawQuery("SELECT id, name, email, role FROM users WHERE email = ?", arrayOf(emailLogin))
+
+        val c = db.rawQuery(
+            "SELECT id, name, email, role FROM users WHERE email = ?",
+            arrayOf(emailLogin)
+        )
+
         if (c.moveToFirst()) {
             val userId = c.getInt(0)
             b.tvProfileName.text  = c.getString(1)
             b.tvProfileEmail.text = c.getString(2)
             b.tvProfileRole.text  = "LEVEL: ${c.getString(3).uppercase()}"
 
+            // Hitung total ritual yang sudah selesai (paid / done)
             val cRitual = db.rawQuery(
-                "SELECT COUNT(*) FROM bookings WHERE email = ? AND (status = 'paid' OR status = 'PAID' OR status = 'done')",
+                """SELECT COUNT(*) FROM bookings 
+                   WHERE email = ? 
+                   AND (status = 'paid' OR status = 'PAID' 
+                        OR status = 'done' OR status = 'DONE'
+                        OR status = 'completed' OR status = 'COMPLETED')""",
                 arrayOf(emailLogin)
             )
-            if (cRitual.moveToFirst()) b.tvTotalReadings.text = cRitual.getInt(0).toString()
+            if (cRitual.moveToFirst()) {
+                b.tvTotalReadings.text = cRitual.getInt(0).toString()
+            }
             cRitual.close()
 
-            val cTesti = db.rawQuery("SELECT COUNT(*) FROM testimonials WHERE user_id = ?", arrayOf(userId.toString()))
-            if (cTesti.moveToFirst()) b.tvTestimonialsCount.text = cTesti.getInt(0).toString()
+            // Hitung total testimoni yang sudah dikirim user ini
+            val cTesti = db.rawQuery(
+                "SELECT COUNT(*) FROM testimonials WHERE user_id = ?",
+                arrayOf(userId.toString())
+            )
+            if (cTesti.moveToFirst()) {
+                b.tvTestimonialsCount.text = cTesti.getInt(0).toString()
+            }
             cTesti.close()
+
         } else {
             b.tvProfileName.text = "User Tidak Ditemukan"
         }
