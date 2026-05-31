@@ -6,9 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.PopupMenu
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import putra.yanuar.tarot.databinding.FragmentProfileBinding
 
@@ -26,10 +24,6 @@ class ProfileFragment : Fragment() {
 
         thisParent = activity as CustomerActivity
         db = thisParent.getDbObject()
-
-        b.btnOverflowProfile.setOnClickListener { v ->
-            showOverflowMenu(v)
-        }
 
         b.btnEditProfile.setOnClickListener {
             val i = Intent(thisParent, EditProfileActivity::class.java)
@@ -49,50 +43,6 @@ class ProfileFragment : Fragment() {
 
         loadUserData()
         return b.root
-    }
-
-    fun showOverflowMenu(v: View) {
-        val popup = PopupMenu(thisParent, v)
-        popup.menuInflater.inflate(R.menu.menu_cust_profil, popup.menu)
-        popup.setOnMenuItemClickListener { item ->
-            when (item.itemId) {
-                R.id.menu_cust_about -> {
-                    showAboutDialog()
-                    true
-                }
-                R.id.menu_cust_logout -> {
-                    val intent = Intent(thisParent, MainActivity::class.java)
-                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                    startActivity(intent)
-                    thisParent.finish()
-                    true
-                }
-                else -> false
-            }
-        }
-        popup.show()
-    }
-
-    private fun showAboutDialog() {
-        AlertDialog.Builder(thisParent)
-            .setTitle("🔮 Tarot Meow")
-            .setMessage(
-                "Versi: 1.0\n\n" +
-                        "Tarot Meow adalah aplikasi layanan pembacaan tarot profesional yang " +
-                        "menghubungkan pelanggan dengan reader berpengalaman.\n\n" +
-                        "Fitur Customer:\n" +
-                        "• Lihat jadwal & pilih reader online\n" +
-                        "• Pesan paket ritual tarot favoritmu\n" +
-                        "• Booking via tanggal (Hari ini, Besok, Lusa)\n" +
-                        "• Riwayat semua sesi ramalan\n" +
-                        "• Tulis ulasan setelah sesi selesai\n\n" +
-                        "Kontak: +62 856-4947-1086 (WhatsApp)\n" +
-                        "TikTok: @tarotmeow111\n\n" +
-                        "Dikembangkan oleh Kelompok 1 PSI\n" +
-                        "© 2026 Tarot Meow. All rights reserved."
-            )
-            .setPositiveButton("Tutup", null)
-            .show()
     }
 
     fun loadUserData() {

@@ -4,17 +4,16 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#FFE6E6">
+    android:background="#FFE6E6"
+    android:fitsSystemWindows="true">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbarAdmin"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="#7469B6"
-        android:elevation="4dp"
-        app:title="Tarot Meow"
         app:titleTextColor="#FFFFFF"
-        app:popupTheme="@style/ThemeOverlay.Material3.Dark" />
+        app:popupTheme="@style/ThemeOverlay.Material3.Light" />
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"

@@ -22,9 +22,9 @@ class AdminActivity : AppCompatActivity(), View.OnClickListener {
 
         db = DBOpenHelper(this).writableDatabase
 
-        // Set toolbar sebagai ActionBar
         setSupportActionBar(b.toolbarAdmin)
         supportActionBar?.setDisplayShowTitleEnabled(true)
+        supportActionBar?.title = "Tarot Meow"
 
         b.btnMenuUser.setOnClickListener(this)
         b.btnMenuPackages.setOnClickListener(this)

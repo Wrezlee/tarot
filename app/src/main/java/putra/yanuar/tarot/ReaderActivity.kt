@@ -76,6 +76,7 @@ class ReaderActivity : AppCompatActivity(), View.OnClickListener {
         try {
             setSupportActionBar(b.toolbarReader)
             supportActionBar?.setDisplayShowTitleEnabled(true)
+            supportActionBar?.title = "Tarot Meow"
         } catch (e: Exception) {
             e.printStackTrace()
         }

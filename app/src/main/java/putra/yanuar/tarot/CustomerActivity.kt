@@ -3,10 +3,12 @@ package putra.yanuar.tarot
 import android.content.Intent
 import android.database.sqlite.SQLiteDatabase
 import android.os.Bundle
+import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentTransaction
 import com.google.android.material.card.MaterialCardView
@@ -39,34 +41,82 @@ class CustomerActivity : AppCompatActivity(),
         fragProfile = ProfileFragment()
         db = DBOpenHelper(this).writableDatabase
 
+        setSupportActionBar(b.toolbarCustomer)
+        supportActionBar?.setDisplayShowTitleEnabled(true)
+        supportActionBar?.title = "Tarot Meow"
+
         b.navbarCustomer.setOnItemSelectedListener(this)
 
         setupDates()
         loadReaders()
     }
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_cust_profil, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.menu_cust_about -> {
+                showAboutDialog()
+                true
+            }
+            R.id.menu_cust_logout -> {
+                logout()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    private fun showAboutDialog() {
+        AlertDialog.Builder(this)
+            .setTitle("🔮 Tarot Meow")
+            .setMessage(
+                "Versi: 1.0\n\n" +
+                        "Tarot Meow adalah aplikasi layanan pembacaan tarot profesional yang " +
+                        "menghubungkan pelanggan dengan reader berpengalaman.\n\n" +
+                        "Fitur Customer:\n" +
+                        "• Lihat jadwal & pilih reader online\n" +
+                        "• Pesan paket ritual tarot favoritmu\n" +
+                        "• Booking via tanggal (Hari ini, Besok, Lusa)\n" +
+                        "• Riwayat semua sesi ramalan\n" +
+                        "• Tulis ulasan setelah sesi selesai\n\n" +
+                        "Kontak: +62 856-4947-1086 (WhatsApp)\n" +
+                        "TikTok: @tarotmeow111\n\n" +
+                        "Dikembangkan oleh Kelompok 1 PSI\n" +
+                        "© 2026 Tarot Meow. All rights reserved."
+            )
+            .setPositiveButton("Tutup", null)
+            .show()
+    }
+
+    private fun logout() {
+        val intent = Intent(this, MainActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        startActivity(intent)
+        finish()
+    }
+
     private fun setupDates() {
         val cal = Calendar.getInstance()
         val monthNames = arrayOf("Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des")
 
-        // Hari ini
         b.tvDay0.text   = cal.get(Calendar.DAY_OF_MONTH).toString()
         b.tvMonth0.text = monthNames[cal.get(Calendar.MONTH)]
         b.tvLabel0.text = "HARI INI"
 
-        // Besok
         val cal1 = Calendar.getInstance().apply { add(Calendar.DAY_OF_MONTH, 1) }
         b.tvDay1.text   = cal1.get(Calendar.DAY_OF_MONTH).toString()
         b.tvMonth1.text = monthNames[cal1.get(Calendar.MONTH)]
         b.tvLabel1.text = "BESOK"
 
-        // Lusa
         val cal2 = Calendar.getInstance().apply { add(Calendar.DAY_OF_MONTH, 2) }
         b.tvDay2.text   = cal2.get(Calendar.DAY_OF_MONTH).toString()
         b.tvMonth2.text = monthNames[cal2.get(Calendar.MONTH)]
         b.tvLabel2.text = "LUSA"
 
-        // Klik tanggal → langsung buka booking dengan tanggal terpilih
         val dateCards = listOf(b.cardDate0, b.cardDate1, b.cardDate2)
         val dateDays  = listOf(
             cal.get(Calendar.DAY_OF_MONTH),
@@ -146,7 +196,6 @@ class CustomerActivity : AppCompatActivity(),
                     alpha = if (isOnline) 1.0f else 0.5f
                 }
 
-                // Avatar
                 val avatar = ShapeableImageView(this).apply {
                     layoutParams = LinearLayout.LayoutParams(90.dpToPx(), 90.dpToPx())
                     setImageResource(R.drawable.meow)
@@ -156,7 +205,6 @@ class CustomerActivity : AppCompatActivity(),
                         .build()
                 }
 
-                // Info column
                 val infoCol = LinearLayout(this).apply {
                     orientation = LinearLayout.VERTICAL
                     layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f).also {
@@ -180,7 +228,6 @@ class CustomerActivity : AppCompatActivity(),
                     letterSpacing = 0.1f
                 }
 
-                // Hitung jumlah booking reader ini yang selesai
                 val bookingCursor = db.rawQuery(
                     "SELECT COUNT(*) FROM bookings WHERE reader_id = ? AND status IN ('completed','COMPLETED','done','DONE')",
                     arrayOf(readerId.toString())
@@ -196,7 +243,6 @@ class CustomerActivity : AppCompatActivity(),
                     setPadding(0, 4.dpToPx(), 0, 0)
                 }
 
-                // Status badge - ONLINE atau OFFLINE
                 val tvStatus = TextView(this).apply {
                     text = if (isOnline) "ONLINE" else "OFFLINE"
                     setTextColor(0xFFFFFFFF.toInt())
@@ -223,7 +269,6 @@ class CustomerActivity : AppCompatActivity(),
                 card.addView(row)
                 container.addView(card)
 
-                // Klik card reader → buka OrderActivity (hanya jika online)
                 if (isOnline) {
                     card.setOnClickListener {
                         val intent = Intent(this, OrderActivity::class.java)

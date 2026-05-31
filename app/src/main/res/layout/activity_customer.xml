@@ -4,7 +4,19 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFE6E6">
+    android:background="#FFE6E6"
+    android:fitsSystemWindows="true">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbarCustomer"
+        android:layout_width="0dp"
+        android:layout_height="?attr/actionBarSize"
+        android:background="#7469B6"
+        app:titleTextColor="#FFFFFF"
+        app:popupTheme="@style/ThemeOverlay.Material3.Light"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <androidx.core.widget.NestedScrollView
         android:id="@+id/nestedScrollView"
@@ -15,7 +27,7 @@
         app:layout_constraintBottom_toTopOf="@+id/navbarCustomer"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toBottomOf="@+id/toolbarCustomer">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -28,7 +40,7 @@
                 android:layout_width="180dp"
                 android:layout_height="150dp"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginTop="48dp"
+                android:layout_marginTop="24dp"
                 android:layout_marginBottom="16dp"
                 app:srcCompat="@drawable/meow" />
 
@@ -76,7 +88,6 @@
                 android:textColor="#7469B6"
                 android:textSize="11sp" />
 
-            <!-- 3 DATE CARDS -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -98,28 +109,9 @@
                         android:gravity="center"
                         android:orientation="vertical"
                         android:padding="8dp">
-                        <TextView
-                            android:id="@+id/tvLabel0"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="HARI INI"
-                            android:textColor="#FFE6E6"
-                            android:textSize="9sp" />
-                        <TextView
-                            android:id="@+id/tvDay0"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="1"
-                            android:textColor="#FFE6E6"
-                            android:textSize="28sp"
-                            android:textStyle="bold" />
-                        <TextView
-                            android:id="@+id/tvMonth0"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Jan"
-                            android:textColor="#FFE6E6"
-                            android:textSize="10sp" />
+                        <TextView android:id="@+id/tvLabel0" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="HARI INI" android:textColor="#FFE6E6" android:textSize="9sp" />
+                        <TextView android:id="@+id/tvDay0" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="1" android:textColor="#FFE6E6" android:textSize="28sp" android:textStyle="bold" />
+                        <TextView android:id="@+id/tvMonth0" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Jan" android:textColor="#FFE6E6" android:textSize="10sp" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
@@ -138,28 +130,9 @@
                         android:layout_height="match_parent"
                         android:gravity="center"
                         android:orientation="vertical">
-                        <TextView
-                            android:id="@+id/tvLabel1"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="BESOK"
-                            android:textColor="#AD88C6"
-                            android:textSize="9sp" />
-                        <TextView
-                            android:id="@+id/tvDay1"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="2"
-                            android:textColor="#7469B6"
-                            android:textSize="28sp"
-                            android:textStyle="bold" />
-                        <TextView
-                            android:id="@+id/tvMonth1"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Jan"
-                            android:textColor="#AD88C6"
-                            android:textSize="10sp" />
+                        <TextView android:id="@+id/tvLabel1" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="BESOK" android:textColor="#AD88C6" android:textSize="9sp" />
+                        <TextView android:id="@+id/tvDay1" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="2" android:textColor="#7469B6" android:textSize="28sp" android:textStyle="bold" />
+                        <TextView android:id="@+id/tvMonth1" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Jan" android:textColor="#AD88C6" android:textSize="10sp" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
@@ -178,28 +151,9 @@
                         android:layout_height="match_parent"
                         android:gravity="center"
                         android:orientation="vertical">
-                        <TextView
-                            android:id="@+id/tvLabel2"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="LUSA"
-                            android:textColor="#AD88C6"
-                            android:textSize="9sp" />
-                        <TextView
-                            android:id="@+id/tvDay2"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="3"
-                            android:textColor="#7469B6"
-                            android:textSize="28sp"
-                            android:textStyle="bold" />
-                        <TextView
-                            android:id="@+id/tvMonth2"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Jan"
-                            android:textColor="#AD88C6"
-                            android:textSize="10sp" />
+                        <TextView android:id="@+id/tvLabel2" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="LUSA" android:textColor="#AD88C6" android:textSize="9sp" />
+                        <TextView android:id="@+id/tvDay2" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="3" android:textColor="#7469B6" android:textSize="28sp" android:textStyle="bold" />
+                        <TextView android:id="@+id/tvMonth2" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Jan" android:textColor="#AD88C6" android:textSize="10sp" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
@@ -223,7 +177,6 @@
                 android:textSize="11sp"
                 android:textStyle="italic" />
 
-            <!-- READER LIST CONTAINER -->
             <LinearLayout
                 android:id="@+id/containerReaders"
                 android:layout_width="match_parent"
@@ -246,7 +199,7 @@
         app:layout_constraintBottom_toTopOf="@+id/navbarCustomer"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/toolbarCustomer" />
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/navbarCustomer"

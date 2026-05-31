@@ -4,16 +4,16 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#FFE6E6">
+    android:background="#FFE6E6"
+    android:fitsSystemWindows="true">
 
-    <com.google.android.material.appbar.MaterialToolbar
+    <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbarReader"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="#FFE6E6"
-        android:layout_marginTop="16dp"
-        app:popupTheme="@style/ThemeOverlay.Material3.Light"
-        app:titleTextColor="#7469B6" />
+        android:background="#7469B6"
+        app:titleTextColor="#FFFFFF"
+        app:popupTheme="@style/ThemeOverlay.Material3.Light" />
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
@@ -27,7 +27,6 @@
             android:orientation="vertical"
             android:padding="24dp">
 
-            <!-- HEADER -->
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
@@ -54,7 +53,6 @@
                 </LinearLayout>
             </RelativeLayout>
 
-            <!-- STATUS CARD -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -78,7 +76,6 @@
                 </RelativeLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- STAT CARDS -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -113,7 +110,6 @@
                 </com.google.android.material.card.MaterialCardView>
             </LinearLayout>
 
-            <!-- ANTREAN AKTIF -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -134,7 +130,6 @@
                 app:strokeWidth="1dp">
                 <LinearLayout android:padding="16dp" android:orientation="vertical" android:layout_width="match_parent" android:layout_height="wrap_content">
 
-                    <!-- Baris 1: Nama customer + Jam -->
                     <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content">
                         <TextView
                             android:id="@+id/tvNextCustomerName"
@@ -155,7 +150,6 @@
                             android:layout_height="wrap_content" />
                     </RelativeLayout>
 
-                    <!-- Baris 2: Tanggal booking -->
                     <TextView
                         android:id="@+id/tvNextBookingDate"
                         android:layout_width="wrap_content"
@@ -165,7 +159,6 @@
                         android:textSize="12sp"
                         android:textColor="#AD88C6" />
 
-                    <!-- Baris 3: Nama paket -->
                     <TextView
                         android:id="@+id/tvNextPackageName"
                         android:layout_marginTop="4dp"
@@ -187,7 +180,6 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- ===== READING HISTORY SECTION ===== -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -206,7 +198,6 @@
                 android:textSize="11sp"
                 android:textStyle="italic" />
 
-            <!-- Container untuk history items (diisi programatik) -->
             <LinearLayout
                 android:id="@+id/containerReaderHistory"
                 android:layout_width="match_parent"
