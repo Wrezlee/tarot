@@ -138,10 +138,10 @@ class ReaderActivity : AppCompatActivity(), View.OnClickListener {
                         "• Jawab pertanyaan pelanggan\n" +
                         "• Riwayat sesi yang telah diselesaikan\n\n" +
                         "Dikembangkan oleh kelompok 1 PSI\n" +
-                        "Fateema Az Zahra                  243107030134\n" +
-                        "Maharani Citra Dwi Syahputri      243107030140\n" +
-                        "Mochammad Yanuar Putra Wibowo     243107030146\n" +
-                        "Muh. Muafan Al Farisi             243107030079\n" +
+                        "Fateema Az Zahra                     (243107030134)\n" +
+                        "Maharani Citra Dwi Syahputri  (243107030140)\n" +
+                        "Moch. Yanuar Putra Wibowo   (243107030146)\n" +
+                        "Muh. Muafan Al Farisi              (243107030079)\n" +
                         "© 2026 Tarot Meow. All rights reserved."
             )
             .setPositiveButton("Tutup", null)
