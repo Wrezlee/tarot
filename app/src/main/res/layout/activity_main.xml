@@ -85,8 +85,9 @@
                 android:inputType="textEmailAddress"
                 android:paddingHorizontal="16dp"
                 android:textColor="#251819"
-                android:textColorHighlight="#251819"
-                android:textColorHint="#9D251819" />
+                android:textColorHighlight="#507469B6"
+                android:textColorHint="#9D251819"
+                android:textCursorDrawable="@null" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -106,7 +107,8 @@
                 android:inputType="textPassword"
                 android:paddingHorizontal="16dp"
                 android:textColor="#251819"
-                android:textColorHighlight="#251819" />
+                android:textColorHighlight="#507469B6"
+                android:textCursorDrawable="@null" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btLogin"

@@ -6,7 +6,7 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import putra.yanuar.tarot.databinding.ActivityAdminBinding
 
@@ -22,8 +22,9 @@ class AdminActivity : AppCompatActivity(), View.OnClickListener {
 
         db = DBOpenHelper(this).writableDatabase
 
+        // Set toolbar sebagai ActionBar
         setSupportActionBar(b.toolbarAdmin)
-        supportActionBar?.setDisplayShowTitleEnabled(false)
+        supportActionBar?.setDisplayShowTitleEnabled(true)
 
         b.btnMenuUser.setOnClickListener(this)
         b.btnMenuPackages.setOnClickListener(this)
@@ -40,10 +41,29 @@ class AdminActivity : AppCompatActivity(), View.OnClickListener {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.menu_about  -> Toast.makeText(this, "Tarot Meow v1.0 by Putra Yanuar", Toast.LENGTH_SHORT).show()
+            R.id.menu_about  -> showAboutDialog()
             R.id.menu_logout -> logout()
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun showAboutDialog() {
+        AlertDialog.Builder(this)
+            .setTitle("🔮 Tarot Meow")
+            .setMessage(
+                "Versi: 1.0\n\n" +
+                        "Tarot Meow adalah aplikasi layanan pembacaan tarot profesional " +
+                        "yang menghubungkan pelanggan dengan reader berpengalaman.\n\n" +
+                        "Fitur Admin:\n" +
+                        "• Kelola data pengguna (Admin, Reader, Customer)\n" +
+                        "• Kelola paket layanan tarot\n" +
+                        "• Moderasi testimoni pelanggan\n" +
+                        "• Laporan keuangan & statistik\n\n" +
+                        "Dikembangkan oleh Kelompok 1 PSI\n" +
+                        "© 2026 Tarot Meow. All rights reserved."
+            )
+            .setPositiveButton("Tutup", null)
+            .show()
     }
 
     override fun onClick(p0: View?) {
@@ -55,7 +75,7 @@ class AdminActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 
-    fun logout() {
+    private fun logout() {
         val intent = Intent(this, MainActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
@@ -64,12 +84,9 @@ class AdminActivity : AppCompatActivity(), View.OnClickListener {
 
     fun loadStats() {
         try {
-            // Total pendapatan hanya dari booking yang sudah selesai
-            val cursorRev = db.rawQuery("SELECT SUM(total_price) FROM bookings WHERE status IN ('done', 'DONE', 'completed', 'COMPLETED')", null)
-            if (cursorRev.moveToFirst()) {
-                val total = cursorRev.getInt(0)
-                b.tvTotalRevenue.text = "Rp$total"
-            }
+            val cursorRev = db.rawQuery(
+                "SELECT SUM(total_price) FROM bookings WHERE status IN ('done','DONE','completed','COMPLETED')", null)
+            if (cursorRev.moveToFirst()) b.tvTotalRevenue.text = "Rp${cursorRev.getInt(0)}"
             cursorRev.close()
 
             val cursorUser = db.rawQuery("SELECT COUNT(*) FROM users WHERE role = 'customer'", null)
@@ -79,7 +96,6 @@ class AdminActivity : AppCompatActivity(), View.OnClickListener {
             val cursorReader = db.rawQuery("SELECT COUNT(*) FROM users WHERE role = 'reader'", null)
             if (cursorReader.moveToFirst()) b.tvVerifiedReaders.text = cursorReader.getInt(0).toString()
             cursorReader.close()
-
         } catch (e: Exception) {
             b.tvTotalRevenue.text = "Rp0"
             b.tvActiveSeekers.text = "0"

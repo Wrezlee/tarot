@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import putra.yanuar.tarot.databinding.FragmentProfileBinding
 
@@ -26,19 +27,16 @@ class ProfileFragment : Fragment() {
         thisParent = activity as CustomerActivity
         db = thisParent.getDbObject()
 
-        // Tombol overflow (logout)
         b.btnOverflowProfile.setOnClickListener { v ->
             showOverflowMenu(v)
         }
 
-        // Tombol Edit Profile
         b.btnEditProfile.setOnClickListener {
             val i = Intent(thisParent, EditProfileActivity::class.java)
             i.putExtra("USER_EMAIL", thisParent.userEmail)
             startActivity(i)
         }
 
-        // Card Riwayat Ramalan → buka HistoryActivity
         b.btnHistory.setOnClickListener {
             try {
                 val i = Intent(thisParent, HistoryActivity::class.java)
@@ -49,7 +47,6 @@ class ProfileFragment : Fragment() {
             }
         }
 
-
         loadUserData()
         return b.root
     }
@@ -59,6 +56,10 @@ class ProfileFragment : Fragment() {
         popup.menuInflater.inflate(R.menu.menu_cust_profil, popup.menu)
         popup.setOnMenuItemClickListener { item ->
             when (item.itemId) {
+                R.id.menu_cust_about -> {
+                    showAboutDialog()
+                    true
+                }
                 R.id.menu_cust_logout -> {
                     val intent = Intent(thisParent, MainActivity::class.java)
                     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -70,6 +71,28 @@ class ProfileFragment : Fragment() {
             }
         }
         popup.show()
+    }
+
+    private fun showAboutDialog() {
+        AlertDialog.Builder(thisParent)
+            .setTitle("🔮 Tarot Meow")
+            .setMessage(
+                "Versi: 1.0\n\n" +
+                        "Tarot Meow adalah aplikasi layanan pembacaan tarot profesional yang " +
+                        "menghubungkan pelanggan dengan reader berpengalaman.\n\n" +
+                        "Fitur Customer:\n" +
+                        "• Lihat jadwal & pilih reader online\n" +
+                        "• Pesan paket ritual tarot favoritmu\n" +
+                        "• Booking via tanggal (Hari ini, Besok, Lusa)\n" +
+                        "• Riwayat semua sesi ramalan\n" +
+                        "• Tulis ulasan setelah sesi selesai\n\n" +
+                        "Kontak: +62 856-4947-1086 (WhatsApp)\n" +
+                        "TikTok: @tarotmeow111\n\n" +
+                        "Dikembangkan oleh Kelompok 1 PSI\n" +
+                        "© 2026 Tarot Meow. All rights reserved."
+            )
+            .setPositiveButton("Tutup", null)
+            .show()
     }
 
     fun loadUserData() {
@@ -86,7 +109,6 @@ class ProfileFragment : Fragment() {
             b.tvProfileEmail.text = c.getString(2)
             b.tvProfileRole.text  = "LEVEL: ${c.getString(3).uppercase()}"
 
-            // Hitung total ritual yang sudah selesai
             val cRitual = db.rawQuery(
                 """SELECT COUNT(*) FROM bookings 
                    WHERE email = ? 
@@ -99,7 +121,6 @@ class ProfileFragment : Fragment() {
             }
             cRitual.close()
 
-            // Hitung total testimoni yang sudah dikirim user ini
             val cTesti = db.rawQuery(
                 "SELECT COUNT(*) FROM testimonials WHERE user_id = ?",
                 arrayOf(userId.toString())

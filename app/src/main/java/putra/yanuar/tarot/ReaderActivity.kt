@@ -8,7 +8,6 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.BaseAdapter
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -28,7 +27,6 @@ class ReaderActivity : AppCompatActivity(), View.OnClickListener {
     private var currentBookingId: Int = 0
     private var isProcessing: Boolean = false
 
-    // Data class untuk history
     data class ReaderHistoryItem(
         val id: Int,
         val customerName: String,
@@ -77,7 +75,7 @@ class ReaderActivity : AppCompatActivity(), View.OnClickListener {
 
         try {
             setSupportActionBar(b.toolbarReader)
-            supportActionBar?.setDisplayShowTitleEnabled(false)
+            supportActionBar?.setDisplayShowTitleEnabled(true)
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -114,7 +112,7 @@ class ReaderActivity : AppCompatActivity(), View.OnClickListener {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.menu_about -> {
-                Toast.makeText(this, "Tarot Meow v1.0 Reader Dashboard", Toast.LENGTH_SHORT).show()
+                showAboutDialog()
                 true
             }
             R.id.menu_logout -> {
@@ -123,6 +121,26 @@ class ReaderActivity : AppCompatActivity(), View.OnClickListener {
             }
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    private fun showAboutDialog() {
+        AlertDialog.Builder(this)
+            .setTitle("🔮 Tarot Meow")
+            .setMessage(
+                "Versi: 1.0\n\n" +
+                        "Tarot Meow adalah aplikasi layanan pembacaan tarot profesional yang " +
+                        "menghubungkan pelanggan dengan reader berpengalaman.\n\n" +
+                        "Fitur Reader:\n" +
+                        "• Kelola status online/offline\n" +
+                        "• Lihat antrean booking pelanggan\n" +
+                        "• Mulai & selesaikan sesi ramalan\n" +
+                        "• Jawab pertanyaan pelanggan\n" +
+                        "• Riwayat sesi yang telah diselesaikan\n\n" +
+                        "Dikembangkan oleh kelompok 1 PSI\n" +
+                        "© 2026 Tarot Meow. All rights reserved."
+            )
+            .setPositiveButton("Tutup", null)
+            .show()
     }
 
     private fun logout() {
@@ -343,7 +361,6 @@ class ReaderActivity : AppCompatActivity(), View.OnClickListener {
 
     private fun loadNextBooking() {
         try {
-            // JOIN ke tabel users untuk ambil nama customer berdasarkan email booking
             val sql = """
                 SELECT b.id, u.name, b.booking_date, b.booking_time, b.package_name, b.email
                 FROM bookings b
@@ -357,19 +374,12 @@ class ReaderActivity : AppCompatActivity(), View.OnClickListener {
             val c = db.rawQuery(sql, arrayOf(readerId.toString()))
             if (c.moveToFirst()) {
                 currentBookingId = c.getInt(0)
-
-                // Tampilkan nama customer; fallback ke email kalau nama tidak ada
                 val customerName = c.getString(1)?.takeIf { it.isNotEmpty() }
                     ?: c.getString(5) ?: "-"
                 b.tvNextCustomerName.text = customerName
-
-                // Tampilkan tanggal booking
                 val bookingDate = c.getString(2)?.takeIf { it.isNotEmpty() } ?: "-"
                 b.tvNextBookingDate.text = "📅 $bookingDate"
-
-                // Tampilkan jam booking
                 b.tvNextBookingTime.text = c.getString(3)?.takeIf { it.isNotEmpty() } ?: "--:--"
-
                 b.tvNextPackageName.text = "Paket: ${c.getString(4) ?: "-"}"
                 b.btnStartReading.visibility = View.VISIBLE
                 b.btnStartReading.text = "Mulai Ramalan"
@@ -395,10 +405,6 @@ class ReaderActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 
-    /**
-     * Muat riwayat sesi yang sudah diselesaikan oleh reader ini,
-     * lalu tampilkan ke containerReaderHistory secara programatik.
-     */
     private fun loadReadingHistory() {
         try {
             val sql = """
@@ -451,15 +457,13 @@ class ReaderActivity : AppCompatActivity(), View.OnClickListener {
             for (item in historyList) {
                 val inflater = LayoutInflater.from(this)
                 val binding = ItemHistoryBinding.inflate(inflater, container, false)
-
                 binding.tvItemPackage.text  = item.packageName
                 binding.tvItemDate.text     = item.bookingDate
                 binding.tvItemStatus.text   = item.status
                 binding.tvItemQuestion.text = item.question
                 binding.tvItemAnswer.text   = item.answer
                 binding.tvItemReader.text   = "Customer: ${item.customerName}"
-                binding.btnCancelOrder.visibility = View.GONE   // reader tidak bisa cancel
-
+                binding.btnCancelOrder.visibility = View.GONE
                 container.addView(binding.root)
             }
 
