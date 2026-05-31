@@ -86,6 +86,10 @@ class CustomerActivity : AppCompatActivity(),
                         "Kontak: +62 856-4947-1086 (WhatsApp)\n" +
                         "TikTok: @tarotmeow111\n\n" +
                         "Dikembangkan oleh Kelompok 1 PSI\n" +
+                        "Fateema Az Zahra                  243107030134\n" +
+                        "Maharani Citra Dwi Syahputri      243107030140\n" +
+                        "Mochammad Yanuar Putra Wibowo     243107030146\n" +
+                        "Muh. Muafan Al Farisi             243107030079\n" +
                         "© 2026 Tarot Meow. All rights reserved."
             )
             .setPositiveButton("Tutup", null)

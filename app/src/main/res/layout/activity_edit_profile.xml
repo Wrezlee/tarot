@@ -25,10 +25,51 @@
         android:textColor="#AD88C6"
         android:textSize="12sp" />
 
+    <!-- Foto Profil yang bisa diklik -->
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="28dp">
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/imgProfileEdit"
+            android:layout_width="110dp"
+            android:layout_height="110dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackgroundBorderless"
+            android:scaleType="centerCrop"
+            android:src="@drawable/meow"
+            app:shapeAppearanceOverlay="@style/CircleAppearance"
+            app:strokeColor="#7469B6"
+            app:strokeWidth="2dp" />
+
+        <!-- Badge kamera di pojok kanan bawah -->
+        <TextView
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_gravity="bottom|end"
+            android:background="@drawable/bg_button_gradient"
+            android:gravity="center"
+            android:text="📷"
+            android:textSize="14sp" />
+    </FrameLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="8dp"
+        android:text="Ketuk foto untuk mengubah"
+        android:textColor="#AD88C6"
+        android:textSize="11sp"
+        android:textStyle="italic" />
+
     <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="24dp"
         app:cardBackgroundColor="#FFFFFF"
         app:cardCornerRadius="16dp"
         app:cardElevation="0dp"

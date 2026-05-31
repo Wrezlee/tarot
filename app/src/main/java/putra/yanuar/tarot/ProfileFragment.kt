@@ -2,7 +2,9 @@ package putra.yanuar.tarot
 
 import android.content.Intent
 import android.database.sqlite.SQLiteDatabase
+import android.graphics.BitmapFactory
 import android.os.Bundle
+import android.util.Base64
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -49,7 +51,7 @@ class ProfileFragment : Fragment() {
         val emailLogin = thisParent.userEmail
 
         val c = db.rawQuery(
-            "SELECT id, name, email, role FROM users WHERE email = ?",
+            "SELECT id, name, email, role, foto FROM users WHERE email = ?",
             arrayOf(emailLogin)
         )
 
@@ -58,6 +60,20 @@ class ProfileFragment : Fragment() {
             b.tvProfileName.text  = c.getString(1)
             b.tvProfileEmail.text = c.getString(2)
             b.tvProfileRole.text  = "LEVEL: ${c.getString(3).uppercase()}"
+
+            // Load foto profil dari Base64 jika ada
+            val fotoBase64 = if (!c.isNull(4)) c.getString(4) else null
+            if (!fotoBase64.isNullOrEmpty()) {
+                try {
+                    val bytes = Base64.decode(fotoBase64, Base64.DEFAULT)
+                    val bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+                    b.imgAvatar.setImageBitmap(bmp)
+                } catch (e: Exception) {
+                    b.imgAvatar.setImageResource(R.drawable.meow)
+                }
+            } else {
+                b.imgAvatar.setImageResource(R.drawable.meow)
+            }
 
             val cRitual = db.rawQuery(
                 """SELECT COUNT(*) FROM bookings 
