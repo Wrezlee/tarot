@@ -52,6 +52,8 @@ dependencies {
     implementation("com.squareup.picasso:picasso:2.8")
     implementation("com.guolindev.permissionx:permissionx:1.8.1")
     implementation("com.github.dhaval2404:imagepicker:2.1")
+    implementation("com.google.android.material:material:1.13.0")
+
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

@@ -4,62 +4,64 @@ import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 
-
-class DBOpenHelper(context: Context) : SQLiteOpenHelper(context, "tarot_meow_db", null, 4) {
+class DBOpenHelper(context: Context) : SQLiteOpenHelper(context, "tarot_meow_db", null, 6) {
 
     override fun onCreate(db: SQLiteDatabase) {
-        // 1. Tabel Users  ← tambah kolom foto TEXT
         db.execSQL("""
             CREATE TABLE IF NOT EXISTS users (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT,
-                email TEXT,
-                password TEXT,
-                role TEXT,
-                is_online INTEGER DEFAULT 0,
-                foto TEXT DEFAULT ''
+                name TEXT, email TEXT, password TEXT, role TEXT,
+                is_online INTEGER DEFAULT 0, foto TEXT DEFAULT ''
             )
         """)
 
-        // 2. Tabel Tarot Packages
-        db.execSQL("CREATE TABLE IF NOT EXISTS tarot_packages (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, category TEXT, description TEXT, price INTEGER, question_limit INTEGER, duration INTEGER, is_online INTEGER DEFAULT 1, is_offline INTEGER DEFAULT 0)")
-
-        // 3. Tabel Addons
-        db.execSQL("CREATE TABLE IF NOT EXISTS addons (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, price INTEGER, description TEXT)")
-
-        // 4. Tabel Bookings
         db.execSQL("""
-            CREATE TABLE IF NOT EXISTS bookings ( 
-                id INTEGER PRIMARY KEY AUTOINCREMENT, 
-                user_id INTEGER, 
-                reader_id INTEGER DEFAULT 0,
-                reader_name TEXT,
-                package_name TEXT, 
-                type TEXT, 
-                booking_date TEXT, 
-                booking_time TEXT, 
-                name TEXT, 
-                email TEXT, 
-                phone TEXT, 
-                payment_method TEXT,
-                status TEXT DEFAULT 'pending', 
-                total_price INTEGER, 
-                notes TEXT
+            CREATE TABLE IF NOT EXISTS tarot_packages (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT, category TEXT, description TEXT, price INTEGER,
+                question_limit INTEGER, duration INTEGER,
+                is_online INTEGER DEFAULT 1, is_offline INTEGER DEFAULT 0
             )
         """)
 
-        // 5. Tabel Questions
-        db.execSQL("CREATE TABLE IF NOT EXISTS questions (id INTEGER PRIMARY KEY AUTOINCREMENT, booking_id INTEGER, question TEXT, answer TEXT)")
+        db.execSQL("""
+            CREATE TABLE IF NOT EXISTS addons (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT, price INTEGER, description TEXT
+            )
+        """)
 
-        // 6. Tabel Testimonials
+        db.execSQL("""
+            CREATE TABLE IF NOT EXISTS bookings (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER, reader_id INTEGER DEFAULT 0, reader_name TEXT,
+                package_name TEXT, type TEXT, booking_date TEXT, booking_time TEXT,
+                name TEXT, email TEXT, phone TEXT, payment_method TEXT,
+                status TEXT DEFAULT 'pending', total_price INTEGER, notes TEXT
+            )
+        """)
+
+        db.execSQL("""
+            CREATE TABLE IF NOT EXISTS questions (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                booking_id INTEGER, question TEXT, answer TEXT
+            )
+        """)
+
         db.execSQL("""
             CREATE TABLE IF NOT EXISTS testimonials (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                user_id INTEGER,
-                booking_id INTEGER DEFAULT 0,
-                package_name TEXT DEFAULT '',
-                message TEXT,
-                created_at TEXT DEFAULT (datetime('now','localtime'))
+                user_id INTEGER, booking_id INTEGER DEFAULT 0,
+                package_name TEXT DEFAULT '', rating INTEGER DEFAULT 0,
+                message TEXT, created_at TEXT DEFAULT (datetime('now','localtime'))
+            )
+        """)
+
+        db.execSQL("""
+            CREATE TABLE IF NOT EXISTS reader_notes (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                reader_id INTEGER, booking_id INTEGER,
+                note TEXT, created_at TEXT DEFAULT (datetime('now','localtime'))
             )
         """)
 
@@ -68,12 +70,21 @@ class DBOpenHelper(context: Context) : SQLiteOpenHelper(context, "tarot_meow_db"
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
         if (oldVersion < 4) {
-            // Migrasi ringan: cukup tambah kolom foto tanpa hapus data lama
+            try { db.execSQL("ALTER TABLE users ADD COLUMN foto TEXT DEFAULT ''") } catch (e: Exception) {}
+        }
+        if (oldVersion < 5) {
+            try { db.execSQL("ALTER TABLE testimonials ADD COLUMN rating INTEGER DEFAULT 0") } catch (e: Exception) {}
+        }
+        if (oldVersion < 6) {
             try {
-                db.execSQL("ALTER TABLE users ADD COLUMN foto TEXT DEFAULT ''")
-            } catch (e: Exception) {
-                // Kolom sudah ada, abaikan
-            }
+                db.execSQL("""
+                    CREATE TABLE IF NOT EXISTS reader_notes (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        reader_id INTEGER, booking_id INTEGER,
+                        note TEXT, created_at TEXT DEFAULT (datetime('now','localtime'))
+                    )
+                """)
+            } catch (e: Exception) {}
         }
     }
 
@@ -95,9 +106,7 @@ class DBOpenHelper(context: Context) : SQLiteOpenHelper(context, "tarot_meow_db"
             "('30 Menit Call', 'call', 90000)",
             "('1 Jam Call', 'call', 130000)"
         )
-        for (pkg in packages) {
-            db.execSQL("INSERT INTO tarot_packages (name, category, price) VALUES $pkg")
-        }
+        for (pkg in packages) db.execSQL("INSERT INTO tarot_packages (name, category, price) VALUES $pkg")
 
         db.execSQL("INSERT INTO addons (name, price) VALUES ('Oracle Card', 10000)")
         db.execSQL("INSERT INTO addons (name, price) VALUES ('Fast Track', 30000)")

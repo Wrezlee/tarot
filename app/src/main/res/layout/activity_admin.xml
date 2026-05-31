@@ -27,36 +27,25 @@
             android:orientation="vertical"
             android:padding="24dp">
 
-            <RelativeLayout
-                android:layout_width="match_parent"
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp">
+                android:layout_marginTop="8dp"
+                android:fontFamily="serif"
+                android:text="Dashboard Admin"
+                android:textColor="#7469B6"
+                android:textSize="28sp"
+                android:textStyle="bold" />
 
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Welcome back, Administrator"
+                android:textColor="#AD88C6"
+                android:textSize="13sp" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="serif"
-                        android:text="Dashboard Admin"
-                        android:textColor="#7469B6"
-                        android:textSize="28sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Welcome back, Administrator"
-                        android:textColor="#AD88C6"
-                        android:textSize="13sp" />
-                </LinearLayout>
-            </RelativeLayout>
-
+            <!-- Revenue Card -->
             <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardRevenue"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
@@ -64,101 +53,67 @@
                 app:cardCornerRadius="24dp"
                 app:cardElevation="8dp"
                 app:strokeWidth="0dp">
-                <LinearLayout
-                    android:padding="24dp"
-                    android:orientation="vertical"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-                    <TextView
-                        android:text="TOTAL REVENUE"
-                        android:textSize="12sp"
-                        android:textColor="#E1AFD1"
-                        android:textStyle="bold"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" />
-                    <TextView
-                        android:id="@+id/tvTotalRevenue"
-                        android:text="Rp0"
-                        android:textSize="28sp"
-                        android:textColor="#FFFFFF"
-                        android:textStyle="bold"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp" />
+                <LinearLayout android:padding="24dp" android:orientation="vertical"
+                    android:layout_width="match_parent" android:layout_height="wrap_content">
+                    <TextView android:text="TOTAL REVENUE" android:textSize="12sp"
+                        android:textColor="#E1AFD1" android:textStyle="bold"
+                        android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                    <TextView android:id="@+id/tvTotalRevenue" android:text="Rp0"
+                        android:textSize="28sp" android:textColor="#FFFFFF" android:textStyle="bold"
+                        android:layout_marginTop="4dp"
+                        android:layout_width="wrap_content" android:layout_height="wrap_content" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:orientation="horizontal"
-                android:weightSum="2">
+            <!-- Seekers & Readers -->
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="16dp" android:orientation="horizontal" android:weightSum="2">
 
                 <com.google.android.material.card.MaterialCardView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginEnd="8dp"
-                    app:cardCornerRadius="16dp"
-                    app:cardElevation="2dp">
+                    android:layout_width="0dp" android:layout_height="wrap_content"
+                    android:layout_weight="1" android:layout_marginEnd="8dp"
+                    app:cardCornerRadius="16dp" app:cardElevation="2dp">
                     <LinearLayout android:padding="16dp" android:orientation="vertical"
                         android:layout_width="match_parent" android:layout_height="wrap_content">
                         <TextView android:text="SEEKERS" android:textSize="10sp"
-                            android:textColor="#AD88C6" android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"/>
+                            android:textColor="#AD88C6" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
                         <TextView android:id="@+id/tvActiveSeekers" android:text="0"
-                            android:textStyle="bold" android:textSize="18sp"
-                            android:textColor="#7469B6" android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"/>
+                            android:textStyle="bold" android:textSize="18sp" android:textColor="#7469B6"
+                            android:layout_width="wrap_content" android:layout_height="wrap_content"/>
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
                 <com.google.android.material.card.MaterialCardView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginStart="8dp"
-                    app:cardCornerRadius="16dp"
-                    app:cardElevation="2dp">
+                    android:layout_width="0dp" android:layout_height="wrap_content"
+                    android:layout_weight="1" android:layout_marginStart="8dp"
+                    app:cardCornerRadius="16dp" app:cardElevation="2dp">
                     <LinearLayout android:padding="16dp" android:orientation="vertical"
                         android:layout_width="match_parent" android:layout_height="wrap_content">
                         <TextView android:text="READERS" android:textSize="10sp"
-                            android:textColor="#AD88C6" android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"/>
+                            android:textColor="#AD88C6" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
                         <TextView android:id="@+id/tvVerifiedReaders" android:text="0"
-                            android:textStyle="bold" android:textSize="18sp"
-                            android:textColor="#7469B6" android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"/>
+                            android:textStyle="bold" android:textSize="18sp" android:textColor="#7469B6"
+                            android:layout_width="wrap_content" android:layout_height="wrap_content"/>
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
             </LinearLayout>
 
-            <GridLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:columnCount="2"
-                android:alignmentMode="alignMargins"
-                android:columnOrderPreserved="false">
+            <!-- Menu Grid -->
+            <GridLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="24dp" android:columnCount="2"
+                android:alignmentMode="alignMargins" android:columnOrderPreserved="false">
 
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/btnMenuUser"
                     style="@style/Widget.Material3.CardView.Elevated"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_columnWeight="1"
-                    android:layout_margin="8dp"
-                    app:cardBackgroundColor="#FFFFFF"
-                    app:cardCornerRadius="20dp"
-                    android:clickable="true"
-                    android:focusable="true"
+                    android:layout_width="0dp" android:layout_height="wrap_content"
+                    android:layout_columnWeight="1" android:layout_margin="8dp"
+                    app:cardBackgroundColor="#FFFFFF" app:cardCornerRadius="20dp"
+                    android:clickable="true" android:focusable="true"
                     android:foreground="?attr/selectableItemBackground">
                     <LinearLayout android:padding="20dp" android:gravity="center"
-                        android:orientation="vertical" android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
-                        <TextView android:text="👤" android:textSize="24sp"
-                            android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                        android:orientation="vertical" android:layout_width="match_parent" android:layout_height="wrap_content">
+                        <TextView android:text="👤" android:textSize="24sp" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
                         <TextView android:text="Data User" android:layout_marginTop="8dp"
                             android:textColor="#251819" android:textStyle="bold"
                             android:layout_width="wrap_content" android:layout_height="wrap_content"/>
@@ -168,20 +123,14 @@
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/btnMenuPackages"
                     style="@style/Widget.Material3.CardView.Elevated"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_columnWeight="1"
-                    android:layout_margin="8dp"
-                    app:cardBackgroundColor="#FFFFFF"
-                    app:cardCornerRadius="20dp"
-                    android:clickable="true"
-                    android:focusable="true"
+                    android:layout_width="0dp" android:layout_height="wrap_content"
+                    android:layout_columnWeight="1" android:layout_margin="8dp"
+                    app:cardBackgroundColor="#FFFFFF" app:cardCornerRadius="20dp"
+                    android:clickable="true" android:focusable="true"
                     android:foreground="?attr/selectableItemBackground">
                     <LinearLayout android:padding="20dp" android:gravity="center"
-                        android:orientation="vertical" android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
-                        <TextView android:text="🔮" android:textSize="24sp"
-                            android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                        android:orientation="vertical" android:layout_width="match_parent" android:layout_height="wrap_content">
+                        <TextView android:text="🔮" android:textSize="24sp" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
                         <TextView android:text="Paket Tarot" android:layout_marginTop="8dp"
                             android:textColor="#251819" android:textStyle="bold"
                             android:layout_width="wrap_content" android:layout_height="wrap_content"/>
@@ -191,20 +140,14 @@
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/btnMenuTestimony"
                     style="@style/Widget.Material3.CardView.Elevated"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_columnWeight="1"
-                    android:layout_margin="8dp"
-                    app:cardBackgroundColor="#FFFFFF"
-                    app:cardCornerRadius="20dp"
-                    android:clickable="true"
-                    android:focusable="true"
+                    android:layout_width="0dp" android:layout_height="wrap_content"
+                    android:layout_columnWeight="1" android:layout_margin="8dp"
+                    app:cardBackgroundColor="#FFFFFF" app:cardCornerRadius="20dp"
+                    android:clickable="true" android:focusable="true"
                     android:foreground="?attr/selectableItemBackground">
                     <LinearLayout android:padding="20dp" android:gravity="center"
-                        android:orientation="vertical" android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
-                        <TextView android:text="✨" android:textSize="24sp"
-                            android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                        android:orientation="vertical" android:layout_width="match_parent" android:layout_height="wrap_content">
+                        <TextView android:text="✨" android:textSize="24sp" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
                         <TextView android:text="Testimoni" android:layout_marginTop="8dp"
                             android:textColor="#251819" android:textStyle="bold"
                             android:layout_width="wrap_content" android:layout_height="wrap_content"/>
@@ -214,27 +157,73 @@
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/btnMenuReport"
                     style="@style/Widget.Material3.CardView.Elevated"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_columnWeight="1"
-                    android:layout_margin="8dp"
-                    app:cardBackgroundColor="#FFFFFF"
-                    app:cardCornerRadius="20dp"
-                    android:clickable="true"
-                    android:focusable="true"
+                    android:layout_width="0dp" android:layout_height="wrap_content"
+                    android:layout_columnWeight="1" android:layout_margin="8dp"
+                    app:cardBackgroundColor="#FFFFFF" app:cardCornerRadius="20dp"
+                    android:clickable="true" android:focusable="true"
                     android:foreground="?attr/selectableItemBackground">
                     <LinearLayout android:padding="20dp" android:gravity="center"
-                        android:orientation="vertical" android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
-                        <TextView android:text="📊" android:textSize="24sp"
-                            android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                        android:orientation="vertical" android:layout_width="match_parent" android:layout_height="wrap_content">
+                        <TextView android:text="📊" android:textSize="24sp" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
                         <TextView android:text="Laporan" android:layout_marginTop="8dp"
                             android:textColor="#251819" android:textStyle="bold"
                             android:layout_width="wrap_content" android:layout_height="wrap_content"/>
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/btnMenuBooking"
+                    style="@style/Widget.Material3.CardView.Elevated"
+                    android:layout_width="0dp" android:layout_height="wrap_content"
+                    android:layout_columnWeight="1" android:layout_margin="8dp"
+                    app:cardBackgroundColor="#FFFFFF" app:cardCornerRadius="20dp"
+                    android:clickable="true" android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground">
+                    <LinearLayout android:padding="20dp" android:gravity="center"
+                        android:orientation="vertical" android:layout_width="match_parent" android:layout_height="wrap_content">
+                        <TextView android:text="📋" android:textSize="24sp" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                        <TextView android:text="Kelola Booking" android:layout_marginTop="8dp"
+                            android:textColor="#251819" android:textStyle="bold"
+                            android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
             </GridLayout>
+
+            <!-- Grafik Paket Terlaris -->
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:layout_marginTop="32dp" android:text="Grafik Paket Terlaris"
+                android:textColor="#7469B6" android:textSize="18sp" android:textStyle="bold" />
+
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:layout_marginTop="4dp" android:text="Top 5 paket dari booking yang selesai"
+                android:textColor="#AD88C6" android:textSize="11sp" android:textStyle="italic" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                app:cardBackgroundColor="#FFFFFF" app:cardCornerRadius="16dp"
+                app:cardElevation="2dp" app:strokeColor="#E1AFD1" app:strokeWidth="1dp">
+
+                <ImageView
+                    android:id="@+id/chartTopPackages"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    android:scaleType="fitXY"
+                    android:padding="8dp" />
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Export Laporan -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnExportLaporan"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_marginTop="24dp"
+                android:text="⬇ Export Laporan ke Downloads"
+                android:textStyle="bold"
+                app:backgroundTint="#AD88C6"
+                app:cornerRadius="16dp" />
 
             <View android:layout_width="match_parent" android:layout_height="40dp" />
 

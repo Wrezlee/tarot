@@ -6,31 +6,26 @@
     android:background="#FFE6E6"
     android:orientation="vertical">
 
-    <View android:layout_width="match_parent" android:layout_height="38dp" />
+    <View android:layout_width="match_parent" android:layout_height="60dp" />
 
-    <RelativeLayout
-        android:layout_width="match_parent"
+    <TextView
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="24dp">
+        android:layout_marginStart="24dp"
+        android:fontFamily="serif"
+        android:text="Kelola Booking"
+        android:textColor="#7469B6"
+        android:textSize="24sp"
+        android:textStyle="bold" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="serif"
-            android:text="Data User"
-            android:textColor="#7469B6"
-            android:textSize="28sp"
-            android:textStyle="bold" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnAddUser"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:text="+ User"
-            app:backgroundTint="#7469B6"
-            app:cornerRadius="12dp" />
-    </RelativeLayout>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="4dp"
+        android:text="Lihat dan ubah status semua booking"
+        android:textColor="#AD88C6"
+        android:textSize="12sp" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -38,21 +33,22 @@
         android:orientation="horizontal"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
+        android:paddingTop="12dp"
         android:paddingBottom="8dp"
         android:gravity="center_vertical">
 
         <androidx.appcompat.widget.SearchView
-            android:id="@+id/searchViewUser"
+            android:id="@+id/searchViewBooking"
             android:layout_width="0dp"
             android:layout_height="44dp"
             android:layout_weight="1"
-            app:queryHint="Cari nama / email..."
+            app:queryHint="Cari nama / paket..."
             app:iconifiedByDefault="false"
             app:queryBackground="@null" />
 
         <Spinner
-            android:id="@+id/spinnerRoleFilter"
-            android:layout_width="110dp"
+            android:id="@+id/spinnerBookingStatus"
+            android:layout_width="120dp"
             android:layout_height="44dp"
             android:layout_marginStart="8dp"
             android:background="@drawable/bg_spinner" />
@@ -60,12 +56,10 @@
     </LinearLayout>
 
     <ListView
-        android:id="@+id/lvUser"
+        android:id="@+id/lvBooking"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:divider="@android:color/transparent"
-        android:dividerHeight="0dp"
-        android:paddingBottom="16dp"
-        android:clipToPadding="false" />
+        android:dividerHeight="0dp" />
 
 </LinearLayout>

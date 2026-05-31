@@ -49,6 +49,7 @@ class CustomerActivity : AppCompatActivity(),
 
         setupDates()
         loadReaders()
+        updateBookingBadge()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -58,14 +59,8 @@ class CustomerActivity : AppCompatActivity(),
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
-            R.id.menu_cust_about -> {
-                showAboutDialog()
-                true
-            }
-            R.id.menu_cust_logout -> {
-                logout()
-                true
-            }
+            R.id.menu_cust_about -> { showAboutDialog(); true }
+            R.id.menu_cust_logout -> { logout(); true }
             else -> super.onOptionsItemSelected(item)
         }
     }
@@ -103,6 +98,33 @@ class CustomerActivity : AppCompatActivity(),
         finish()
     }
 
+    fun updateBookingBadge() {
+        try {
+            var userId = 0
+            val c = db.rawQuery("SELECT id FROM users WHERE email = ?", arrayOf(userEmail))
+            if (c.moveToFirst()) userId = c.getInt(0)
+            c.close()
+
+            val cursor = db.rawQuery(
+                "SELECT COUNT(*) FROM bookings WHERE user_id = ? AND status IN ('paid','PAID','pending','PENDING','processing','PROCESSING')",
+                arrayOf(userId.toString())
+            )
+            var count = 0
+            if (cursor.moveToFirst()) count = cursor.getInt(0)
+            cursor.close()
+
+            val badge = b.navbarCustomer.getOrCreateBadge(R.id.itemBooking)
+            if (count > 0) {
+                badge.isVisible = true
+                badge.number = count
+            } else {
+                badge.isVisible = false
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
     private fun setupDates() {
         val cal = Calendar.getInstance()
         val monthNames = arrayOf("Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des")
@@ -121,22 +143,10 @@ class CustomerActivity : AppCompatActivity(),
         b.tvMonth2.text = monthNames[cal2.get(Calendar.MONTH)]
         b.tvLabel2.text = "LUSA"
 
-        val dateCards = listOf(b.cardDate0, b.cardDate1, b.cardDate2)
-        val dateDays  = listOf(
-            cal.get(Calendar.DAY_OF_MONTH),
-            cal1.get(Calendar.DAY_OF_MONTH),
-            cal2.get(Calendar.DAY_OF_MONTH)
-        )
-        val dateMonths = listOf(
-            cal.get(Calendar.MONTH) + 1,
-            cal1.get(Calendar.MONTH) + 1,
-            cal2.get(Calendar.MONTH) + 1
-        )
-        val dateYears = listOf(
-            cal.get(Calendar.YEAR),
-            cal1.get(Calendar.YEAR),
-            cal2.get(Calendar.YEAR)
-        )
+        val dateCards  = listOf(b.cardDate0, b.cardDate1, b.cardDate2)
+        val dateDays   = listOf(cal.get(Calendar.DAY_OF_MONTH), cal1.get(Calendar.DAY_OF_MONTH), cal2.get(Calendar.DAY_OF_MONTH))
+        val dateMonths = listOf(cal.get(Calendar.MONTH) + 1, cal1.get(Calendar.MONTH) + 1, cal2.get(Calendar.MONTH) + 1)
+        val dateYears  = listOf(cal.get(Calendar.YEAR), cal1.get(Calendar.YEAR), cal2.get(Calendar.YEAR))
 
         dateCards.forEachIndexed { i, card ->
             card.setOnClickListener {
@@ -267,7 +277,6 @@ class CustomerActivity : AppCompatActivity(),
                 infoCol.addView(tvRole)
                 infoCol.addView(tvStats)
                 infoCol.addView(tvStatus)
-
                 row.addView(avatar)
                 row.addView(infoCol)
                 card.addView(row)
@@ -291,15 +300,11 @@ class CustomerActivity : AppCompatActivity(),
         }
     }
 
-    private fun Int.dpToPx(): Int =
-        (this * resources.displayMetrics.density).toInt()
-
-    private fun Float.dpToFloat(): Float =
-        this * resources.displayMetrics.density
+    private fun Int.dpToPx(): Int = (this * resources.displayMetrics.density).toInt()
+    private fun Float.dpToFloat(): Float = this * resources.displayMetrics.density
 
     override fun onNavigationItemSelected(p0: MenuItem): Boolean {
         ft = supportFragmentManager.beginTransaction()
-
         when (p0.itemId) {
             R.id.itemHome -> {
                 b.nestedScrollView.visibility = View.VISIBLE
@@ -324,5 +329,6 @@ class CustomerActivity : AppCompatActivity(),
     override fun onResume() {
         super.onResume()
         loadReaders()
+        updateBookingBadge()
     }
 }
