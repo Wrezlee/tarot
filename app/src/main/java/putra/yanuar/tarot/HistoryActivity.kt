@@ -267,22 +267,18 @@ class HistoryActivity : AppCompatActivity() {
             appendLine("📞 +62 856-4947-1086 | TikTok: @tarotmeow111")
         }
 
-        val options = arrayOf("WhatsApp", "Instagram (Copy Teks)", "Lainnya")
+        val options = arrayOf("WhatsApp", "Bagikan ke Aplikasi Lain")
         AlertDialog.Builder(this)
             .setTitle("Bagikan Ramalan")
             .setItems(options) { _, which ->
                 when (which) {
                     0 -> shareViaWhatsApp(teks)
-                    1 -> {
-                        val clipboard = getSystemService(CLIPBOARD_SERVICE) as android.content.ClipboardManager
-                        clipboard.setPrimaryClip(android.content.ClipData.newPlainText("Ramalan", teks))
-                        Toast.makeText(this, "Teks disalin! Tempel di caption Instagram.", Toast.LENGTH_LONG).show()
-                    }
-                    2 -> shareGeneral(teks)
+                    1 -> shareGeneral(teks)
                 }
             }
             .show()
     }
+
 
     private fun shareViaWhatsApp(teks: String) {
         try {

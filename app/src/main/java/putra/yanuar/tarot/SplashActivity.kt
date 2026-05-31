@@ -10,17 +10,12 @@ class SplashActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // Menyembunyikan Action Bar untuk tampilan full screen
         supportActionBar?.hide()
         setContentView(R.layout.activity_splash)
 
-        // Handler untuk menunda perpindahan halaman
         Handler(Looper.getMainLooper()).postDelayed({
-            // Berpindah ke MainActivity (atau LoginActivity jika ada)
-            val intent = Intent(this, MainActivity::class.java)
-            startActivity(intent)
-
-            // Menutup SplashActivity agar tidak bisa kembali saat tekan tombol 'Back'
+            // Arahkan ke Onboarding (di sana dicek apakah sudah pernah onboarding)
+            startActivity(Intent(this, OnboardingActivity::class.java))
             finish()
         }, 1000)
     }

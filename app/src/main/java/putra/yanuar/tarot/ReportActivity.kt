@@ -27,7 +27,7 @@ class ReportActivity : AppCompatActivity() {
             )
             if (cursorTotal.moveToFirst()) {
                 val total = cursorTotal.getInt(0)
-                b.tvReportTotalRevenue.text = "Rp$total"
+                b.tvReportTotalRevenue.text = "Rp $total"
             }
             cursorTotal.close()
 

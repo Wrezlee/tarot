@@ -124,6 +124,22 @@
                 app:backgroundTint="@null"
                 app:cornerRadius="100dp" />
 
+            <TextView
+                android:id="@+id/tvForgotPassword"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="16dp"
+                android:text="Lupa Password?"
+                android:textColor="#7469B6"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="4dp" />
+
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 

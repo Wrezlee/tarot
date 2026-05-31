@@ -108,7 +108,7 @@ class AdminActivity : AppCompatActivity(), View.OnClickListener {
         try {
             val cursorRev = db.rawQuery(
                 "SELECT SUM(total_price) FROM bookings WHERE status IN ('done','DONE','completed','COMPLETED')", null)
-            if (cursorRev.moveToFirst()) b.tvTotalRevenue.text = "Rp${cursorRev.getInt(0)}"
+            if (cursorRev.moveToFirst()) b.tvTotalRevenue.text = "Rp ${cursorRev.getInt(0)}"
             cursorRev.close()
 
             val cursorUser = db.rawQuery("SELECT COUNT(*) FROM users WHERE role = 'customer'", null)
@@ -119,7 +119,7 @@ class AdminActivity : AppCompatActivity(), View.OnClickListener {
             if (cursorReader.moveToFirst()) b.tvVerifiedReaders.text = cursorReader.getInt(0).toString()
             cursorReader.close()
         } catch (e: Exception) {
-            b.tvTotalRevenue.text    = "Rp0"
+            b.tvTotalRevenue.text    = "Rp 0"
             b.tvActiveSeekers.text   = "0"
             b.tvVerifiedReaders.text = "0"
         }

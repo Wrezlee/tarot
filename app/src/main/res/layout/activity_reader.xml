@@ -1,25 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:background="#FFE6E6"
     android:fitsSystemWindows="true">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbarReader"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="?attr/actionBarSize"
         android:background="#7469B6"
         app:titleTextColor="#FFFFFF"
-        app:popupTheme="@style/ThemeOverlay.Material3.Light" />
+        app:popupTheme="@style/ThemeOverlay.Material3.Light"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
+    <!-- HOME FRAGMENT CONTAINER -->
     <androidx.core.widget.NestedScrollView
-        android:layout_width="match_parent"
+        android:id="@+id/scrollReaderHome"
+        android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:fillViewport="true">
+        android:fillViewport="true"
+        android:visibility="visible"
+        app:layout_constraintTop_toBottomOf="@+id/toolbarReader"
+        app:layout_constraintBottom_toTopOf="@+id/navbarReader"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -53,6 +61,7 @@
                 </LinearLayout>
             </RelativeLayout>
 
+            <!-- Status Card -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -76,6 +85,7 @@
                 </RelativeLayout>
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- Stats Row -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -110,6 +120,7 @@
                 </com.google.android.material.card.MaterialCardView>
             </LinearLayout>
 
+            <!-- Antrean Aktif -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -129,7 +140,6 @@
                 app:strokeColor="#E1AFD1"
                 app:strokeWidth="1dp">
                 <LinearLayout android:padding="16dp" android:orientation="vertical" android:layout_width="match_parent" android:layout_height="wrap_content">
-
                     <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content">
                         <TextView
                             android:id="@+id/tvNextCustomerName"
@@ -149,7 +159,6 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content" />
                     </RelativeLayout>
-
                     <TextView
                         android:id="@+id/tvNextBookingDate"
                         android:layout_width="wrap_content"
@@ -158,7 +167,6 @@
                         android:text=""
                         android:textSize="12sp"
                         android:textColor="#AD88C6" />
-
                     <TextView
                         android:id="@+id/tvNextPackageName"
                         android:layout_marginTop="4dp"
@@ -167,7 +175,6 @@
                         android:textColor="#AD88C6"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content" />
-
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnStartReading"
                         android:layout_width="match_parent"
@@ -180,58 +187,121 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-
-
+            <!-- Kalender Booking -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="32dp"
-                android:text="Riwayat Reading Saya"
+                android:text="Kalender Booking Minggu Ini"
                 android:textColor="#7469B6"
                 android:textSize="18sp"
                 android:textStyle="bold" />
-
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="Sesi yang sudah diselesaikan"
+                android:text="Semua booking yang terjadwal minggu ini"
                 android:textColor="#AD88C6"
                 android:textSize="11sp"
                 android:textStyle="italic" />
-
             <LinearLayout
-                android:id="@+id/containerReaderHistory"
+                android:id="@+id/containerCalendar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
                 android:orientation="vertical" />
 
             <View android:layout_width="match_parent" android:layout_height="40dp" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
 
-            <!-- Statistik Pendapatan - tambahkan setelah LinearLayout stats pending/completed -->
+    <!-- HISTORY TAB -->
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/scrollReaderHistory"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@+id/toolbarReader"
+        app:layout_constraintBottom_toTopOf="@+id/navbarReader"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="24dp">
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="32dp"
+                android:layout_marginTop="8dp"
+                android:fontFamily="serif"
+                android:text="Riwayat Reading"
+                android:textColor="#7469B6"
+                android:textSize="28sp"
+                android:textStyle="bold" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="Sesi yang sudah diselesaikan"
+                android:textColor="#AD88C6"
+                android:textSize="12sp"
+                android:textStyle="italic" />
+
+            <LinearLayout
+                android:id="@+id/containerReaderHistory"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:orientation="vertical" />
+
+            <View android:layout_width="match_parent" android:layout_height="40dp" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <!-- STATISTIK TAB -->
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/scrollReaderStats"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@+id/toolbarReader"
+        app:layout_constraintBottom_toTopOf="@+id/navbarReader"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="24dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:fontFamily="serif"
                 android:text="Statistik Pendapatan"
                 android:textColor="#7469B6"
-                android:textSize="18sp"
+                android:textSize="28sp"
                 android:textStyle="bold" />
-
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:text="Pendapatan dari sesi yang sudah selesai"
                 android:textColor="#AD88C6"
-                android:textSize="11sp"
+                android:textSize="12sp"
                 android:textStyle="italic" />
 
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="24dp"
                 app:cardBackgroundColor="#7469B6"
                 app:cardCornerRadius="24dp"
                 app:cardElevation="8dp"
@@ -306,34 +376,81 @@
                 </com.google.android.material.card.MaterialCardView>
             </LinearLayout>
 
+            <!-- Detail sesi selesai -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="32dp"
-                android:text="Kalender Booking Minggu Ini"
+                android:text="Ringkasan Sesi"
                 android:textColor="#7469B6"
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:text="Semua booking yang terjadwal minggu ini"
-                android:textColor="#AD88C6"
-                android:textSize="11sp"
-                android:textStyle="italic" />
-
             <LinearLayout
-                android:id="@+id/containerCalendar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                android:orientation="vertical" />
+                android:orientation="horizontal"
+                android:weightSum="2">
 
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="8dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="2dp">
+                    <LinearLayout android:padding="16dp" android:orientation="vertical"
+                        android:layout_width="match_parent" android:layout_height="wrap_content">
+                        <TextView android:text="SESI SELESAI" android:textSize="10sp"
+                            android:textColor="#AD88C6" android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"/>
+                        <TextView android:id="@+id/tvStatsDone" android:text="0"
+                            android:textStyle="bold" android:textSize="22sp"
+                            android:textColor="#7469B6" android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"/>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="8dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="2dp">
+                    <LinearLayout android:padding="16dp" android:orientation="vertical"
+                        android:layout_width="match_parent" android:layout_height="wrap_content">
+                        <TextView android:text="MENUNGGU" android:textSize="10sp"
+                            android:textColor="#AD88C6" android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"/>
+                        <TextView android:id="@+id/tvStatsPending" android:text="0"
+                            android:textStyle="bold" android:textSize="22sp"
+                            android:textColor="#7469B6" android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"/>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+            </LinearLayout>
+
+            <View android:layout_width="match_parent" android:layout_height="40dp" />
         </LinearLayout>
-
-
     </androidx.core.widget.NestedScrollView>
 
-</LinearLayout>
+    <!-- BOTTOM NAV -->
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/navbarReader"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="#FFFFFF"
+        app:elevation="8dp"
+        app:itemIconTint="@color/nav_item_color"
+        app:itemTextColor="@color/nav_item_color"
+        app:itemRippleColor="#207469B6"
+        app:labelVisibilityMode="labeled"
+        app:itemActiveIndicatorStyle="@style/CustomIndicator"
+        app:menu="@menu/menu_nav_reader"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
