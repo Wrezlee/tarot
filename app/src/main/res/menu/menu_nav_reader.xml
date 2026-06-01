@@ -13,9 +13,9 @@
         android:title="History"
         app:showAsAction="ifRoom" />
     <item
-        android:id="@+id/readerStats"
-        android:icon="@drawable/booking"
-        android:title="Statistik"
+        android:id="@+id/readerProfile"
+        android:icon="@drawable/outline_account_circle_24"
+        android:title="Profile"
         app:showAsAction="ifRoom" />
 
 </menu>
