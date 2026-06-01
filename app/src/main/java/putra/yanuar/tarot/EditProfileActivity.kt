@@ -36,8 +36,8 @@ class EditProfileActivity : AppCompatActivity() {
         // Tombol "Edit Foto" oval di bawah foto — popup pilih sumber
         b.btnChangePhoto.setOnClickListener { view ->
             val popUp = PopupMenu(this, view)
-            popUp.menu.add(0, 0, 0, "📷  Ambil dari Kamera")
-            popUp.menu.add(0, 1, 1, "🖼️  Pilih dari Galeri")
+            popUp.menu.add(0, 0, 0, "Kamera")
+            popUp.menu.add(0, 1, 1, "Galeri")
             popUp.setOnMenuItemClickListener { item ->
                 when (item.itemId) {
                     0 -> {
@@ -154,9 +154,9 @@ class EditProfileActivity : AppCompatActivity() {
             }
 
             val msg = if (newPass.isNotEmpty())
-                "Profil & password berhasil diperbarui! ✨"
+                "Profil & password berhasil diperbarui!"
             else
-                "Profil berhasil diperbarui! ✨"
+                "Profil berhasil diperbarui!"
 
             Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
             finish()
@@ -178,7 +178,7 @@ class EditProfileActivity : AppCompatActivity() {
                         db.execSQL("UPDATE users SET name=? WHERE email=?",
                             arrayOf(newName, userEmail))
                 }
-                Toast.makeText(this, "Profil berhasil diperbarui! ✨", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Profil berhasil diperbarui!", Toast.LENGTH_SHORT).show()
                 finish()
             } catch (e2: Exception) {
                 Toast.makeText(this, "Gagal: ${e2.message}", Toast.LENGTH_SHORT).show()

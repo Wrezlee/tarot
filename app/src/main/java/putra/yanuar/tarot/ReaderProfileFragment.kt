@@ -26,7 +26,7 @@ class ReaderProfileFragment : Fragment() {
         db = thisParent.getDbObject()
 
         b.btnEditReaderProfile.setOnClickListener {
-            val i = Intent(thisParent, EditProfileActivity::class.java)
+            val i = Intent(thisParent, EditReaderProfile::class.java)
             i.putExtra("USER_EMAIL", thisParent.getUserEmail())
             startActivity(i)
         }
@@ -53,7 +53,6 @@ class ReaderProfileFragment : Fragment() {
             b.tvReaderProfileName.text  = c.getString(1)
             b.tvReaderProfileEmail.text = c.getString(2)
             b.tvReaderProfileRole.text  = "LEVEL: ${c.getString(3).uppercase()}"
-            b.tvReaderInfoEmail.text    = c.getString(2)
 
             // Load foto profil
             val fotoBase64 = if (!c.isNull(4)) c.getString(4) else null

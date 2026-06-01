@@ -41,6 +41,9 @@
         <activity android:name=".CustomerActivity" />
         <activity android:name=".HistoryActivity" />
         <activity android:name=".EditProfileActivity" />
+
+        <activity android:name=".EditReaderProfile" android:exported="false" />
+
         <activity android:name=".OrderActivity" />
         <activity android:name=".ManageUserActivity" />
         <activity android:name=".AddUserActivity"/>

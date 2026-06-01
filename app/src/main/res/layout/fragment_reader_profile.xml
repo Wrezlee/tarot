@@ -68,7 +68,7 @@
             android:textSize="10sp"
             android:textStyle="bold" />
 
-        <!-- Stats: sesi selesai & testimoni -->
+        <!-- Stats: sesi selesai & total earning -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -156,9 +156,7 @@
             app:strokeColor="#AD88C6"
             app:strokeWidth="1dp" />
 
-        <!-- Divider label -->
-
-        <!-- Info akun card -->
+        <View android:layout_width="match_parent" android:layout_height="40dp" />
 
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>
