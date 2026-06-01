@@ -99,7 +99,7 @@ class ReaderActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedList
         }
 
         // Update greeting
-        b.tvReaderGreeting.text = "Halo, $readerName 👋"
+        b.tvReaderGreeting.text = "Halo, $readerName"
 
         loadStats()
         loadNextBooking()
@@ -452,7 +452,7 @@ class ReaderActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedList
                         db.execSQL("UPDATE reader_notes SET note = ? WHERE id = ?",
                             arrayOf(teks, noteId.toString()))
                     }
-                    Toast.makeText(this, "Catatan tersimpan ✨", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Catatan tersimpan", Toast.LENGTH_SHORT).show()
                 } catch (e: Exception) {
                     Toast.makeText(this, "Gagal simpan: ${e.message}", Toast.LENGTH_SHORT).show()
                 }
@@ -552,7 +552,7 @@ class ReaderActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedList
                         db.execSQL("INSERT INTO questions (booking_id, answer) VALUES (?, ?)",
                             arrayOf(currentBookingId.toString(), jawaban))
                     }
-                    Toast.makeText(this, "Jawaban berhasil dikirim! ✨", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Jawaban berhasil dikirim!", Toast.LENGTH_SHORT).show()
                 } catch (e: Exception) {
                     Toast.makeText(this, "Gagal kirim jawaban: ${e.message}", Toast.LENGTH_SHORT).show()
                 }

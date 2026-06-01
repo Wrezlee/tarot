@@ -37,8 +37,8 @@ class EditReaderProfile : AppCompatActivity() {
         // Popup pilih sumber foto
         b.btnReaderChangePhoto.setOnClickListener { view ->
             val popUp = PopupMenu(this, view)
-            popUp.menu.add(0, 0, 0, "📷  Ambil dari Kamera")
-            popUp.menu.add(0, 1, 1, "🖼️  Pilih dari Galeri")
+            popUp.menu.add(0, 0, 0, "Kamera")
+            popUp.menu.add(0, 1, 1, "Galeri")
             popUp.setOnMenuItemClickListener { item ->
                 when (item.itemId) {
                     0 -> {

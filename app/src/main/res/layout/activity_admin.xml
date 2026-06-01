@@ -190,41 +190,6 @@
 
             </GridLayout>
 
-            <!-- Grafik Paket Terlaris -->
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:layout_marginTop="32dp" android:text="Grafik Paket Terlaris"
-                android:textColor="#7469B6" android:textSize="18sp" android:textStyle="bold" />
-
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:layout_marginTop="4dp" android:text="Top 5 paket dari booking yang selesai"
-                android:textColor="#AD88C6" android:textSize="11sp" android:textStyle="italic" />
-
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent" android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                app:cardBackgroundColor="#FFFFFF" app:cardCornerRadius="16dp"
-                app:cardElevation="2dp" app:strokeColor="#E1AFD1" app:strokeWidth="1dp">
-
-                <ImageView
-                    android:id="@+id/chartTopPackages"
-                    android:layout_width="match_parent"
-                    android:layout_height="200dp"
-                    android:scaleType="fitXY"
-                    android:padding="8dp" />
-
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- Export Laporan -->
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnExportLaporan"
-                android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:layout_marginTop="24dp"
-                android:text="⬇ Export Laporan ke Downloads"
-                android:textStyle="bold"
-                app:backgroundTint="#AD88C6"
-                app:cornerRadius="16dp" />
-
             <View android:layout_width="match_parent" android:layout_height="40dp" />
 
         </LinearLayout>
