@@ -1,139 +1,212 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FFE6E6"
-    android:orientation="vertical"
-    android:padding="24dp">
+    android:fillViewport="true">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="36dp"
-        android:fontFamily="serif"
-        android:text="EDIT PROFILE"
-        android:textColor="#7469B6"
-        android:textSize="28sp"
-        android:textStyle="bold" />
-
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:text="Perbarui identitas mistismu di sini."
-        android:textColor="#AD88C6"
-        android:textSize="12sp" />
+        android:orientation="vertical"
+        android:padding="24dp">
 
-    <!-- Foto Profil yang bisa diklik -->
-    <FrameLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="28dp">
-
-        <com.google.android.material.imageview.ShapeableImageView
-            android:id="@+id/imgProfileEdit"
-            android:layout_width="110dp"
-            android:layout_height="110dp"
-            android:clickable="true"
-            android:focusable="true"
-            android:foreground="?attr/selectableItemBackgroundBorderless"
-            android:scaleType="centerCrop"
-            android:src="@drawable/meow"
-            app:shapeAppearanceOverlay="@style/CircleAppearance"
-            app:strokeColor="#7469B6"
-            app:strokeWidth="2dp" />
-
-        <!-- Badge kamera di pojok kanan bawah -->
         <TextView
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:layout_gravity="bottom|end"
-            android:background="@drawable/bg_button_gradient"
-            android:gravity="center"
-            android:text="📷"
-            android:textSize="14sp" />
-    </FrameLayout>
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="36dp"
+            android:fontFamily="serif"
+            android:text="EDIT PROFILE"
+            android:textColor="#7469B6"
+            android:textSize="28sp"
+            android:textStyle="bold" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="8dp"
-        android:text="Ketuk foto untuk mengubah"
-        android:textColor="#AD88C6"
-        android:textSize="11sp"
-        android:textStyle="italic" />
-
-    <com.google.android.material.card.MaterialCardView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        app:cardBackgroundColor="#FFFFFF"
-        app:cardCornerRadius="16dp"
-        app:cardElevation="0dp"
-        app:strokeColor="#E1AFD1"
-        app:strokeWidth="1dp">
-
-        <LinearLayout
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="20dp">
+            android:layout_marginTop="4dp"
+            android:text="Perbarui identitas mistismu di sini."
+            android:textColor="#AD88C6"
+            android:textSize="12sp" />
 
-            <TextView
+        <!-- ── Foto Profil + tombol edit ala WhatsApp ── -->
+        <FrameLayout
+            android:layout_width="110dp"
+            android:layout_height="110dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="28dp">
+
+            <!-- Avatar -->
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/imgProfileEdit"
+                android:layout_width="110dp"
+                android:layout_height="110dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/meow"
+                app:shapeAppearanceOverlay="@style/CircleAppearance"
+                app:strokeColor="#7469B6"
+                app:strokeWidth="2dp" />
+
+            <!-- Tombol pensil (ala WhatsApp) — pojok kanan bawah -->
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/fabEditPhoto"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Nama Lengkap"
-                android:textColor="#AD88C6"
-                android:textSize="12sp"
-                android:textStyle="bold" />
+                android:layout_gravity="bottom|end"
+                android:layout_margin="0dp"
+                android:contentDescription="Ubah foto profil"
+                android:src="@drawable/ic_edit"
+                app:backgroundTint="#7469B6"
+                app:fabCustomSize="32dp"
+                app:maxImageSize="16dp"
+                app:tint="#FFFFFF"
+                app:elevation="4dp"
+                app:borderWidth="0dp" />
 
-            <EditText
-                android:id="@+id/etEditName"
+        </FrameLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="8dp"
+            android:text="Ketuk ikon pensil untuk mengubah foto"
+            android:textColor="#AD88C6"
+            android:textSize="11sp"
+            android:textStyle="italic" />
+
+        <!-- ── Card form ── -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            app:cardBackgroundColor="#FFFFFF"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="0dp"
+            app:strokeColor="#E1AFD1"
+            app:strokeWidth="1dp">
+
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:background="@android:color/transparent"
-                android:hint="Masukkan nama baru"
-                android:inputType="textPersonName"
-                android:textColor="#251819"
-                android:textSize="16sp" />
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#F3E5F5" />
-
-            <TextView
-                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="Email (Tidak dapat diubah)"
-                android:textColor="#AD88C6"
-                android:textSize="12sp"
-                android:textStyle="bold" />
+                android:orientation="vertical"
+                android:padding="20dp">
 
-            <TextView
-                android:id="@+id/tvStaticEmail"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="user@email.com"
-                android:textColor="#80251819"
-                android:textSize="14sp" />
+                <!-- Nama -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Nama Lengkap"
+                    android:textColor="#AD88C6"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
 
-        </LinearLayout>
-    </com.google.android.material.card.MaterialCardView>
+                <EditText
+                    android:id="@+id/etEditName"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:background="@android:color/transparent"
+                    android:hint="Masukkan nama baru"
+                    android:inputType="textPersonName"
+                    android:textColor="#251819"
+                    android:textSize="16sp" />
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnSaveProfile"
-        android:layout_width="match_parent"
-        android:layout_height="64dp"
-        android:layout_marginTop="32dp"
-        android:text="SIMPAN PERUBAHAN"
-        android:textStyle="bold"
-        app:backgroundTint="#7469B6"
-        app:cornerRadius="16dp" />
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#F3E5F5" />
 
-</LinearLayout>
+                <!-- Email (read-only) -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="Email (Tidak dapat diubah)"
+                    android:textColor="#AD88C6"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvStaticEmail"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="user@email.com"
+                    android:textColor="#80251819"
+                    android:textSize="14sp" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="16dp"
+                    android:background="#F3E5F5" />
+
+                <!-- Password baru -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="Password Baru (kosongkan jika tidak ingin ganti)"
+                    android:textColor="#AD88C6"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
+                <EditText
+                    android:id="@+id/etEditPassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:background="@android:color/transparent"
+                    android:hint="Masukkan password baru"
+                    android:inputType="textPassword"
+                    android:textColor="#251819"
+                    android:textSize="16sp" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#F3E5F5" />
+
+                <!-- Konfirmasi password -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="Konfirmasi Password Baru"
+                    android:textColor="#AD88C6"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
+                <EditText
+                    android:id="@+id/etEditPasswordConfirm"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:background="@android:color/transparent"
+                    android:hint="Ulangi password baru"
+                    android:inputType="textPassword"
+                    android:textColor="#251819"
+                    android:textSize="16sp" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#F3E5F5" />
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnSaveProfile"
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:layout_marginTop="32dp"
+            android:text="SIMPAN PERUBAHAN"
+            android:textStyle="bold"
+            app:backgroundTint="#7469B6"
+            app:cornerRadius="16dp" />
+
+        <View android:layout_width="match_parent" android:layout_height="40dp" />
+
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

@@ -2,7 +2,6 @@ package putra.yanuar.tarot
 
 import android.Manifest
 import android.app.Activity
-import android.content.ContentValues
 import android.content.Intent
 import android.database.sqlite.SQLiteDatabase
 import android.os.Bundle
@@ -34,22 +33,14 @@ class EditProfileActivity : AppCompatActivity() {
 
         loadCurrentData()
 
-        // Klik foto → pilih Galeri atau Kamera (persis seperti Mobile 11a)
-        b.imgProfileEdit.setOnClickListener { view ->
+        // FAB pensil — tampil popup pilih Galeri / Kamera (ala WhatsApp)
+        b.fabEditPhoto.setOnClickListener { view ->
             val popUp = PopupMenu(this, view)
-            popUp.menu.add(0, 0, 0, "Galeri")
-            popUp.menu.add(0, 1, 1, "Kamera")
+            popUp.menu.add(0, 0, 0, "📷  Ambil dari Kamera")
+            popUp.menu.add(0, 1, 1, "🖼️  Pilih dari Galeri")
             popUp.setOnMenuItemClickListener { item ->
                 when (item.itemId) {
-                    0 -> { // Galeri
-                        val intent = Intent()
-                        intent.type = "image/*"
-                        intent.action = Intent.ACTION_GET_CONTENT
-                        @Suppress("DEPRECATION")
-                        startActivityForResult(intent, mediaHelper.getRcGallery())
-                        true
-                    }
-                    1 -> { // Kamera dengan PermissionX
+                    0 -> { // Kamera
                         PermissionX.init(this)
                             .permissions(Manifest.permission.CAMERA)
                             .request { allGranted, _, _ ->
@@ -68,6 +59,14 @@ class EditProfileActivity : AppCompatActivity() {
                                     Toast.makeText(this, "Izin kamera ditolak", Toast.LENGTH_SHORT).show()
                                 }
                             }
+                        true
+                    }
+                    1 -> { // Galeri
+                        val intent = Intent()
+                        intent.type = "image/*"
+                        intent.action = Intent.ACTION_GET_CONTENT
+                        @Suppress("DEPRECATION")
+                        startActivityForResult(intent, mediaHelper.getRcGallery())
                         true
                     }
                     else -> false
@@ -90,7 +89,6 @@ class EditProfileActivity : AppCompatActivity() {
             b.etEditName.setText(cursor.getString(0))
             b.tvStaticEmail.text = cursor.getString(1)
 
-            // Load foto dari kolom foto (Base64) jika ada
             val fotoBase64 = if (!cursor.isNull(2)) cursor.getString(2) else null
             if (!fotoBase64.isNullOrEmpty()) {
                 try {
@@ -119,43 +117,95 @@ class EditProfileActivity : AppCompatActivity() {
     }
 
     fun saveChanges() {
-        val newName = b.etEditName.text.toString().trim()
+        val newName        = b.etEditName.text.toString().trim()
+        val newPass        = b.etEditPassword.text.toString().trim()
+        val confirmPass    = b.etEditPasswordConfirm.text.toString().trim()
 
         if (newName.isEmpty()) {
             Toast.makeText(this, "Nama tidak boleh kosong", Toast.LENGTH_SHORT).show()
             return
         }
 
-        try {
-            if (fotoStr.isNotEmpty()) {
-                // Simpan nama + foto
-                db.execSQL(
-                    "UPDATE users SET name = ?, foto = ? WHERE email = ?",
-                    arrayOf(newName, fotoStr, userEmail)
-                )
-            } else {
-                // Hanya simpan nama
-                db.execSQL(
-                    "UPDATE users SET name = ? WHERE email = ?",
-                    arrayOf(newName, userEmail)
-                )
+        // Validasi password jika diisi
+        if (newPass.isNotEmpty()) {
+            if (newPass.length < 6) {
+                Toast.makeText(this, "Password minimal 6 karakter", Toast.LENGTH_SHORT).show()
+                return
             }
-            Toast.makeText(this, "Profil berhasil diperbarui! ✨", Toast.LENGTH_SHORT).show()
-            finish()
-        } catch (e: Exception) {
-            // Kolom foto belum ada → coba tambahkan dulu
-            try {
-                db.execSQL("ALTER TABLE users ADD COLUMN foto TEXT DEFAULT ''")
-                if (fotoStr.isNotEmpty()) {
+            if (newPass != confirmPass) {
+                Toast.makeText(this, "Konfirmasi password tidak cocok!", Toast.LENGTH_SHORT).show()
+                return
+            }
+        }
+
+        try {
+            // Bangun query dinamis sesuai apa yang diubah
+            when {
+                fotoStr.isNotEmpty() && newPass.isNotEmpty() -> {
+                    db.execSQL(
+                        "UPDATE users SET name = ?, foto = ?, password = ? WHERE email = ?",
+                        arrayOf(newName, fotoStr, newPass, userEmail)
+                    )
+                }
+                fotoStr.isNotEmpty() -> {
                     db.execSQL(
                         "UPDATE users SET name = ?, foto = ? WHERE email = ?",
                         arrayOf(newName, fotoStr, userEmail)
                     )
-                } else {
+                }
+                newPass.isNotEmpty() -> {
+                    db.execSQL(
+                        "UPDATE users SET name = ?, password = ? WHERE email = ?",
+                        arrayOf(newName, newPass, userEmail)
+                    )
+                }
+                else -> {
                     db.execSQL(
                         "UPDATE users SET name = ? WHERE email = ?",
                         arrayOf(newName, userEmail)
                     )
+                }
+            }
+
+            val msg = buildString {
+                append("Profil berhasil diperbarui! ✨")
+                if (newPass.isNotEmpty()) append("\nPassword juga telah diubah.")
+            }
+            Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
+            finish()
+
+        } catch (e: Exception) {
+            // Kolom foto belum ada — tambahkan dulu
+            try {
+                db.execSQL("ALTER TABLE users ADD COLUMN foto TEXT DEFAULT ''")
+            } catch (_: Exception) {}
+
+            try {
+                when {
+                    fotoStr.isNotEmpty() && newPass.isNotEmpty() -> {
+                        db.execSQL(
+                            "UPDATE users SET name = ?, foto = ?, password = ? WHERE email = ?",
+                            arrayOf(newName, fotoStr, newPass, userEmail)
+                        )
+                    }
+                    fotoStr.isNotEmpty() -> {
+                        db.execSQL(
+                            "UPDATE users SET name = ?, foto = ? WHERE email = ?",
+                            arrayOf(newName, fotoStr, userEmail)
+                        )
+                    }
+                    newPass.isNotEmpty() -> {
+                        db.execSQL(
+                            "UPDATE users SET name = ?, password = ? WHERE email = ?",
+                            arrayOf(newName, newPass, userEmail)
+                        )
+                    }
+                    else -> {
+                        db.execSQL(
+                            "UPDATE users SET name = ? WHERE email = ?",
+                            arrayOf(newName, userEmail)
+                        )
+                    }
                 }
                 Toast.makeText(this, "Profil berhasil diperbarui! ✨", Toast.LENGTH_SHORT).show()
                 finish()
