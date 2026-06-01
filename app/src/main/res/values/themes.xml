@@ -9,6 +9,16 @@
 
         <item name="android:statusBarColor">#7469B6</item>
         <item name="android:windowLightStatusBar">false</item>
+
+        <!-- Fix teks SearchView agar terlihat (hitam di background putih) -->
+        <item name="searchViewStyle">@style/TarotSearchViewStyle</item>
+    </style>
+
+    <!-- SearchView: teks query hitam, hint abu, cursor ungu -->
+    <style name="TarotSearchViewStyle" parent="Widget.AppCompat.SearchView">
+        <item name="queryBackground">@null</item>
+        <item name="android:editTextColor">#251819</item>
+        <item name="android:textColorHint">#AD88C6</item>
     </style>
 
     <style name="CustomIndicator" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">

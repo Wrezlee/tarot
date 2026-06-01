@@ -27,6 +27,7 @@
         android:textColor="#AD88C6"
         android:textSize="12sp" />
 
+    <!-- Search + Filter row -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -37,14 +38,24 @@
         android:paddingBottom="8dp"
         android:gravity="center_vertical">
 
-        <androidx.appcompat.widget.SearchView
-            android:id="@+id/searchViewBooking"
+        <LinearLayout
             android:layout_width="0dp"
             android:layout_height="44dp"
             android:layout_weight="1"
-            app:queryHint="Cari nama / paket..."
-            app:iconifiedByDefault="false"
-            app:queryBackground="@null" />
+            android:background="@drawable/bg_search"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <androidx.appcompat.widget.SearchView
+                android:id="@+id/searchViewBooking"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:queryHint="Cari nama / paket..."
+                app:iconifiedByDefault="false"
+                app:queryBackground="@null"
+                app:searchHintIcon="@null"
+                android:background="@null" />
+        </LinearLayout>
 
         <Spinner
             android:id="@+id/spinnerBookingStatus"

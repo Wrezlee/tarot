@@ -31,51 +31,38 @@
             android:textColor="#AD88C6"
             android:textSize="12sp" />
 
-        <!-- ── Foto Profil + tombol edit ala WhatsApp ── -->
-        <FrameLayout
+        <!-- ── Foto Profil ── -->
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/imgProfileEdit"
             android:layout_width="110dp"
             android:layout_height="110dp"
             android:layout_gravity="center_horizontal"
-            android:layout_marginTop="28dp">
+            android:layout_marginTop="28dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/meow"
+            app:shapeAppearanceOverlay="@style/CircleAppearance"
+            app:strokeColor="#7469B6"
+            app:strokeWidth="2dp" />
 
-            <!-- Avatar -->
-            <com.google.android.material.imageview.ShapeableImageView
-                android:id="@+id/imgProfileEdit"
-                android:layout_width="110dp"
-                android:layout_height="110dp"
-                android:scaleType="centerCrop"
-                android:src="@drawable/meow"
-                app:shapeAppearanceOverlay="@style/CircleAppearance"
-                app:strokeColor="#7469B6"
-                app:strokeWidth="2dp" />
-
-            <!-- Tombol pensil (ala WhatsApp) — pojok kanan bawah -->
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/fabEditPhoto"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom|end"
-                android:layout_margin="0dp"
-                android:contentDescription="Ubah foto profil"
-                android:src="@drawable/ic_edit"
-                app:backgroundTint="#7469B6"
-                app:fabCustomSize="32dp"
-                app:maxImageSize="16dp"
-                app:tint="#FFFFFF"
-                app:elevation="4dp"
-                app:borderWidth="0dp" />
-
-        </FrameLayout>
-
-        <TextView
+        <!-- Tombol Edit ala WhatsApp: oval di bawah foto -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnChangePhoto"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="40dp"
             android:layout_gravity="center_horizontal"
-            android:layout_marginTop="8dp"
-            android:text="Ketuk ikon pensil untuk mengubah foto"
-            android:textColor="#AD88C6"
-            android:textSize="11sp"
-            android:textStyle="italic" />
+            android:layout_marginTop="12dp"
+            android:paddingStart="24dp"
+            android:paddingEnd="24dp"
+            android:text="Edit Foto"
+            android:textColor="#FFFFFF"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            app:backgroundTint="#7469B6"
+            app:cornerRadius="100dp"
+            app:icon="@drawable/ic_edit"
+            app:iconTint="#FFFFFF"
+            app:iconSize="16dp"
+            app:iconPadding="6dp" />
 
         <!-- ── Card form ── -->
         <com.google.android.material.card.MaterialCardView
@@ -94,7 +81,6 @@
                 android:orientation="vertical"
                 android:padding="20dp">
 
-                <!-- Nama -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -111,6 +97,7 @@
                     android:hint="Masukkan nama baru"
                     android:inputType="textPersonName"
                     android:textColor="#251819"
+                    android:textColorHint="#AAAAAA"
                     android:textSize="16sp" />
 
                 <View
@@ -118,7 +105,6 @@
                     android:layout_height="1dp"
                     android:background="#F3E5F5" />
 
-                <!-- Email (read-only) -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -143,15 +129,22 @@
                     android:layout_marginTop="16dp"
                     android:background="#F3E5F5" />
 
-                <!-- Password baru -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
-                    android:text="Password Baru (kosongkan jika tidak ingin ganti)"
+                    android:text="Password Baru"
                     android:textColor="#AD88C6"
                     android:textSize="12sp"
                     android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Kosongkan jika tidak ingin mengganti password"
+                    android:textColor="#CCAD88C6"
+                    android:textSize="10sp"
+                    android:textStyle="italic" />
 
                 <EditText
                     android:id="@+id/etEditPassword"
@@ -161,6 +154,7 @@
                     android:hint="Masukkan password baru"
                     android:inputType="textPassword"
                     android:textColor="#251819"
+                    android:textColorHint="#AAAAAA"
                     android:textSize="16sp" />
 
                 <View
@@ -168,7 +162,6 @@
                     android:layout_height="1dp"
                     android:background="#F3E5F5" />
 
-                <!-- Konfirmasi password -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -186,6 +179,7 @@
                     android:hint="Ulangi password baru"
                     android:inputType="textPassword"
                     android:textColor="#251819"
+                    android:textColorHint="#AAAAAA"
                     android:textSize="16sp" />
 
                 <View

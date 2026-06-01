@@ -33,14 +33,14 @@ class EditProfileActivity : AppCompatActivity() {
 
         loadCurrentData()
 
-        // FAB pensil — tampil popup pilih Galeri / Kamera (ala WhatsApp)
-        b.fabEditPhoto.setOnClickListener { view ->
+        // Tombol "Edit Foto" oval di bawah foto — popup pilih sumber
+        b.btnChangePhoto.setOnClickListener { view ->
             val popUp = PopupMenu(this, view)
             popUp.menu.add(0, 0, 0, "📷  Ambil dari Kamera")
             popUp.menu.add(0, 1, 1, "🖼️  Pilih dari Galeri")
             popUp.setOnMenuItemClickListener { item ->
                 when (item.itemId) {
-                    0 -> { // Kamera
+                    0 -> {
                         PermissionX.init(this)
                             .permissions(Manifest.permission.CAMERA)
                             .request { allGranted, _, _ ->
@@ -61,7 +61,7 @@ class EditProfileActivity : AppCompatActivity() {
                             }
                         true
                     }
-                    1 -> { // Galeri
+                    1 -> {
                         val intent = Intent()
                         intent.type = "image/*"
                         intent.action = Intent.ACTION_GET_CONTENT
@@ -117,16 +117,15 @@ class EditProfileActivity : AppCompatActivity() {
     }
 
     fun saveChanges() {
-        val newName        = b.etEditName.text.toString().trim()
-        val newPass        = b.etEditPassword.text.toString().trim()
-        val confirmPass    = b.etEditPasswordConfirm.text.toString().trim()
+        val newName     = b.etEditName.text.toString().trim()
+        val newPass     = b.etEditPassword.text.toString().trim()
+        val confirmPass = b.etEditPasswordConfirm.text.toString().trim()
 
         if (newName.isEmpty()) {
             Toast.makeText(this, "Nama tidak boleh kosong", Toast.LENGTH_SHORT).show()
             return
         }
 
-        // Validasi password jika diisi
         if (newPass.isNotEmpty()) {
             if (newPass.length < 6) {
                 Toast.makeText(this, "Password minimal 6 karakter", Toast.LENGTH_SHORT).show()
@@ -139,73 +138,45 @@ class EditProfileActivity : AppCompatActivity() {
         }
 
         try {
-            // Bangun query dinamis sesuai apa yang diubah
             when {
-                fotoStr.isNotEmpty() && newPass.isNotEmpty() -> {
-                    db.execSQL(
-                        "UPDATE users SET name = ?, foto = ?, password = ? WHERE email = ?",
-                        arrayOf(newName, fotoStr, newPass, userEmail)
-                    )
-                }
-                fotoStr.isNotEmpty() -> {
-                    db.execSQL(
-                        "UPDATE users SET name = ?, foto = ? WHERE email = ?",
-                        arrayOf(newName, fotoStr, userEmail)
-                    )
-                }
-                newPass.isNotEmpty() -> {
-                    db.execSQL(
-                        "UPDATE users SET name = ?, password = ? WHERE email = ?",
-                        arrayOf(newName, newPass, userEmail)
-                    )
-                }
-                else -> {
-                    db.execSQL(
-                        "UPDATE users SET name = ? WHERE email = ?",
-                        arrayOf(newName, userEmail)
-                    )
-                }
+                fotoStr.isNotEmpty() && newPass.isNotEmpty() ->
+                    db.execSQL("UPDATE users SET name=?, foto=?, password=? WHERE email=?",
+                        arrayOf(newName, fotoStr, newPass, userEmail))
+                fotoStr.isNotEmpty() ->
+                    db.execSQL("UPDATE users SET name=?, foto=? WHERE email=?",
+                        arrayOf(newName, fotoStr, userEmail))
+                newPass.isNotEmpty() ->
+                    db.execSQL("UPDATE users SET name=?, password=? WHERE email=?",
+                        arrayOf(newName, newPass, userEmail))
+                else ->
+                    db.execSQL("UPDATE users SET name=? WHERE email=?",
+                        arrayOf(newName, userEmail))
             }
 
-            val msg = buildString {
-                append("Profil berhasil diperbarui! ✨")
-                if (newPass.isNotEmpty()) append("\nPassword juga telah diubah.")
-            }
+            val msg = if (newPass.isNotEmpty())
+                "Profil & password berhasil diperbarui! ✨"
+            else
+                "Profil berhasil diperbarui! ✨"
+
             Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
             finish()
 
         } catch (e: Exception) {
-            // Kolom foto belum ada — tambahkan dulu
-            try {
-                db.execSQL("ALTER TABLE users ADD COLUMN foto TEXT DEFAULT ''")
-            } catch (_: Exception) {}
-
+            try { db.execSQL("ALTER TABLE users ADD COLUMN foto TEXT DEFAULT ''") } catch (_: Exception) {}
             try {
                 when {
-                    fotoStr.isNotEmpty() && newPass.isNotEmpty() -> {
-                        db.execSQL(
-                            "UPDATE users SET name = ?, foto = ?, password = ? WHERE email = ?",
-                            arrayOf(newName, fotoStr, newPass, userEmail)
-                        )
-                    }
-                    fotoStr.isNotEmpty() -> {
-                        db.execSQL(
-                            "UPDATE users SET name = ?, foto = ? WHERE email = ?",
-                            arrayOf(newName, fotoStr, userEmail)
-                        )
-                    }
-                    newPass.isNotEmpty() -> {
-                        db.execSQL(
-                            "UPDATE users SET name = ?, password = ? WHERE email = ?",
-                            arrayOf(newName, newPass, userEmail)
-                        )
-                    }
-                    else -> {
-                        db.execSQL(
-                            "UPDATE users SET name = ? WHERE email = ?",
-                            arrayOf(newName, userEmail)
-                        )
-                    }
+                    fotoStr.isNotEmpty() && newPass.isNotEmpty() ->
+                        db.execSQL("UPDATE users SET name=?, foto=?, password=? WHERE email=?",
+                            arrayOf(newName, fotoStr, newPass, userEmail))
+                    fotoStr.isNotEmpty() ->
+                        db.execSQL("UPDATE users SET name=?, foto=? WHERE email=?",
+                            arrayOf(newName, fotoStr, userEmail))
+                    newPass.isNotEmpty() ->
+                        db.execSQL("UPDATE users SET name=?, password=? WHERE email=?",
+                            arrayOf(newName, newPass, userEmail))
+                    else ->
+                        db.execSQL("UPDATE users SET name=? WHERE email=?",
+                            arrayOf(newName, userEmail))
                 }
                 Toast.makeText(this, "Profil berhasil diperbarui! ✨", Toast.LENGTH_SHORT).show()
                 finish()
