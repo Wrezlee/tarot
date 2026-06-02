@@ -90,8 +90,8 @@ class ManageBookingActivity : AppCompatActivity() {
 
     fun setupFilter() {
         val statusList = arrayOf("Semua","PENDING","PAID","PROCESSING","COMPLETED","CANCELLED")
-        val spinnerAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, statusList)
-        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        val spinnerAdapter = ArrayAdapter(this, R.layout.item_spinner, statusList)
+        spinnerAdapter.setDropDownViewResource(R.layout.item_spinner_dropdown)
         b.spinnerBookingStatus.adapter = spinnerAdapter
 
         b.spinnerBookingStatus.onItemSelectedListener = object : android.widget.AdapterView.OnItemSelectedListener {

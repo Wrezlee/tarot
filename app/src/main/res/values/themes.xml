@@ -10,15 +10,36 @@
         <item name="android:statusBarColor">#7469B6</item>
         <item name="android:windowLightStatusBar">false</item>
 
-        <!-- Fix teks SearchView agar terlihat (hitam di background putih) -->
+        <item name="android:editTextColor">#251819</item>
+        <item name="android:textColorPrimary">#251819</item>
+
         <item name="searchViewStyle">@style/TarotSearchViewStyle</item>
     </style>
 
-    <!-- SearchView: teks query hitam, hint abu, cursor ungu -->
     <style name="TarotSearchViewStyle" parent="Widget.AppCompat.SearchView">
         <item name="queryBackground">@null</item>
         <item name="android:editTextColor">#251819</item>
+        <item name="android:textColor">#251819</item>
         <item name="android:textColorHint">#AD88C6</item>
+        <item name="android:textCursorDrawable">@null</item>
+    </style>
+
+    <style name="TarotSpinnerStyle" parent="Widget.AppCompat.Spinner">
+        <item name="android:textColor">#251819</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+
+    <style name="TarotSpinnerItemStyle" parent="Widget.AppCompat.TextView.SpinnerItem">
+        <item name="android:textColor">#251819</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:padding">8dp</item>
+    </style>
+
+    <style name="TarotSpinnerDropDownStyle" parent="Widget.AppCompat.TextView.SpinnerItem">
+        <item name="android:textColor">#251819</item>
+        <item name="android:textSize">13sp</item>
+        <item name="android:padding">10dp</item>
+        <item name="android:background">#FFFFFF</item>
     </style>
 
     <style name="CustomIndicator" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">

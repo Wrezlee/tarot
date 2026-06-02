@@ -32,7 +32,6 @@
             app:cornerRadius="12dp" />
     </RelativeLayout>
 
-    <!-- Search + Filter row -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -54,6 +53,7 @@
                 android:id="@+id/searchViewUser"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:theme="@style/TarotSearchViewStyle"
                 app:queryHint="Cari nama / email..."
                 app:iconifiedByDefault="false"
                 app:queryBackground="@null"

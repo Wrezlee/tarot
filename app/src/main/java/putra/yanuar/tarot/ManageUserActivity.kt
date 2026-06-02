@@ -70,8 +70,8 @@ class ManageUserActivity : AppCompatActivity() {
 
     fun setupFilter() {
         val roleList = arrayOf("Semua", "ADMIN", "READER", "CUSTOMER")
-        val spinnerAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, roleList)
-        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        val spinnerAdapter = ArrayAdapter(this, R.layout.item_spinner, roleList)
+        spinnerAdapter.setDropDownViewResource(R.layout.item_spinner_dropdown)
         b.spinnerRoleFilter.adapter = spinnerAdapter
 
         b.spinnerRoleFilter.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {

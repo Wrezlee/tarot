@@ -27,7 +27,6 @@
         android:textColor="#AD88C6"
         android:textSize="12sp" />
 
-    <!-- Search + Filter row -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -50,6 +49,7 @@
                 android:id="@+id/searchViewBooking"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:theme="@style/TarotSearchViewStyle"
                 app:queryHint="Cari nama / paket..."
                 app:iconifiedByDefault="false"
                 app:queryBackground="@null"
