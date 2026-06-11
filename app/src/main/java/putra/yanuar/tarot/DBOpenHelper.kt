@@ -89,9 +89,9 @@ class DBOpenHelper(context: Context) : SQLiteOpenHelper(context, "tarot_meow_db"
     }
 
     private fun seedData(db: SQLiteDatabase) {
-        db.execSQL("INSERT INTO users (name, email, password, role, is_online) VALUES ('Admin Meow', 'admin@meow.com', '123', 'admin', 0)")
-        db.execSQL("INSERT INTO users (name, email, password, role, is_online) VALUES ('Mas Ruli', 'reader@meow.com', '123', 'reader', 1)")
-        db.execSQL("INSERT INTO users (name, email, password, role, is_online) VALUES ('Putra Yanuar', 'customer@meow.com', '123', 'customer', 0)")
+        db.execSQL("INSERT INTO users (name, email, password, role, is_online) VALUES ('Admin Meow', 'admin@gmail.com', '123', 'admin', 0)")
+        db.execSQL("INSERT INTO users (name, email, password, role, is_online) VALUES ('Mas Ruli', 'reader@gmail.com', '123', 'reader', 1)")
+        db.execSQL("INSERT INTO users (name, email, password, role, is_online) VALUES ('Putra Yanuar', 'customer@gmail.com', '123', 'customer', 0)")
 
         val packages = arrayOf(
             "('1 Kartu (1 Pertanyaan)', 'tarot', 5000)",
