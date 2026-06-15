@@ -51,7 +51,7 @@
         <activity android:name=".AdminEditTarotActivity"/>
         <activity android:name=".AdminTestimoniActivity"/>
         <activity android:name=".AdminReportActivity"/>
-        <activity android:name=".AdminManageBookingActivity" />
+        <activity android:name=".AdminManagePesananActivity" />
 
         <activity android:name=".ForgotPasswordActivity" android:exported="false" />
 

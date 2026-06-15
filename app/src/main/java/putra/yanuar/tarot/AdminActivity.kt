@@ -78,7 +78,7 @@ class AdminActivity : AppCompatActivity(), View.OnClickListener {
             R.id.btnMenuPackages  -> startActivity(Intent(this, AdminManageTarotActivity::class.java))
             R.id.btnMenuTestimony -> startActivity(Intent(this, AdminTestimoniActivity::class.java))
             R.id.btnMenuReport    -> startActivity(Intent(this, AdminReportActivity::class.java))
-            R.id.btnMenuBooking   -> startActivity(Intent(this, AdminManageBookingActivity::class.java))
+            R.id.btnMenuBooking   -> startActivity(Intent(this, AdminManagePesananActivity::class.java))
         }
     }
 

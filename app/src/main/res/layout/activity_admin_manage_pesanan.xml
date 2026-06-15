@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
         android:fontFamily="serif"
-        android:text="Kelola Booking"
+        android:text="Kelola Pesanan"
         android:textColor="#7469B6"
         android:textSize="24sp"
         android:textStyle="bold" />

@@ -182,9 +182,14 @@
                     <LinearLayout android:padding="20dp" android:gravity="center"
                         android:orientation="vertical" android:layout_width="match_parent" android:layout_height="wrap_content">
                         <TextView android:text="📋" android:textSize="24sp" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-                        <TextView android:text="Kelola Booking" android:layout_marginTop="8dp"
-                            android:textColor="#251819" android:textStyle="bold"
-                            android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:text="Kelola Pesanan"
+                            android:textColor="#251819"
+                            android:textStyle="bold" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 

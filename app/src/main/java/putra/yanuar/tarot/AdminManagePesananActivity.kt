@@ -11,12 +11,11 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
-import putra.yanuar.tarot.databinding.ActivityAdminManageBookingBinding
-import putra.yanuar.tarot.databinding.ItemCustomerBookingBinding
+import putra.yanuar.tarot.databinding.ActivityAdminManagePesananBinding
+import putra.yanuar.tarot.databinding.ItemAdminPesananBinding
 
-class AdminManageBookingActivity : AppCompatActivity() {
-
-    lateinit var b: ActivityAdminManageBookingBinding
+class AdminManagePesananActivity : AppCompatActivity() {
+    lateinit var b: ActivityAdminManagePesananBinding
     lateinit var db: SQLiteDatabase
 
     val listData     = ArrayList<BookingItem>()
@@ -39,7 +38,7 @@ class AdminManageBookingActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        b = ActivityAdminManageBookingBinding.inflate(layoutInflater)
+        b = ActivityAdminManagePesananBinding.inflate(layoutInflater)
         setContentView(b.root)
 
         db = DBOpenHelper(this).writableDatabase
@@ -124,28 +123,44 @@ class AdminManageBookingActivity : AppCompatActivity() {
     }
 
     fun showChangeStatusDialog(item: BookingItem) {
-        val statusOptions = arrayOf("pending","paid","processing","completed","cancelled")
-        val displayOptions = arrayOf("PENDING","PAID","PROCESSING","COMPLETED","CANCELLED")
-        val currentIdx = statusOptions.indexOfFirst { it.equals(item.status, ignoreCase = true) }.coerceAtLeast(0)
+        val statusOptions = arrayOf("pending", "paid", "processing", "completed", "cancelled")
+        val displayOptions = arrayOf("PENDING", "PAID", "PROCESSING", "COMPLETED", "CANCELLED")
+        val currentIdx = statusOptions.indexOfFirst {
+            it.equals(item.status, ignoreCase = true)
+        }.coerceAtLeast(0)
 
-        AlertDialog.Builder(this)
-            .setTitle("Ubah Status Booking #${item.id}")
-            .setMessage("Customer: ${item.customerName}\nPaket: ${item.packageName}")
-            .setSingleChoiceItems(displayOptions, currentIdx) { dialog, which ->
+        var selectedIdx = currentIdx
+
+        val dialog = AlertDialog.Builder(this, androidx.appcompat.R.style.Theme_AppCompat_Light_Dialog_Alert)
+            .setTitle("Booking #${item.id} - ${item.customerName}\n${item.packageName}")
+            .setSingleChoiceItems(displayOptions, currentIdx) { _, which ->
+                selectedIdx = which
+            }
+            .setPositiveButton("Simpan", null)
+            .setNegativeButton("Batal", null)
+            .create()
+
+        dialog.setOnShowListener {
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
                 try {
                     db.execSQL(
                         "UPDATE bookings SET status = ? WHERE id = ?",
-                        arrayOf(statusOptions[which], item.id.toString())
+                        arrayOf(statusOptions[selectedIdx], item.id.toString())
                     )
-                    Toast.makeText(this, "Status diubah ke ${displayOptions[which]}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        this,
+                        "Status diubah ke ${displayOptions[selectedIdx]}",
+                        Toast.LENGTH_SHORT
+                    ).show()
                     dialog.dismiss()
                     loadBookings()
                 } catch (e: Exception) {
                     Toast.makeText(this, "Gagal: ${e.message}", Toast.LENGTH_SHORT).show()
                 }
             }
-            .setNegativeButton("Batal", null)
-            .show()
+        }
+
+        dialog.show()
     }
 
     inner class BookingAdapter : BaseAdapter() {
@@ -155,15 +170,15 @@ class AdminManageBookingActivity : AppCompatActivity() {
 
         override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
             val item = getItem(position)
-            val binding: ItemCustomerBookingBinding
+            val binding: ItemAdminPesananBinding
             val view: View
 
             if (convertView == null) {
-                binding = ItemCustomerBookingBinding.inflate(LayoutInflater.from(this@AdminManageBookingActivity), parent, false)
+                binding = ItemAdminPesananBinding.inflate(LayoutInflater.from(this@AdminManagePesananActivity), parent, false)
                 view = binding.root
                 view.tag = binding
             } else {
-                binding = convertView.tag as ItemCustomerBookingBinding
+                binding = convertView.tag as ItemAdminPesananBinding
                 view = convertView
             }
 
