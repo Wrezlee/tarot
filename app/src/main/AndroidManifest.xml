@@ -2,7 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- Permission baru untuk foto profil -->
     <uses-feature
         android:name="android.hardware.camera"
         android:required="false"/>
@@ -39,23 +38,21 @@
         <activity android:name=".AdminActivity" />
         <activity android:name=".ReaderActivity" />
         <activity android:name=".CustomerActivity" />
-        <activity android:name=".HistoryActivity" />
-        <activity android:name=".EditProfileActivity" />
+        <activity android:name=".ReaderHistoryActivity" />
+        <activity android:name=".CustomerEditProfileActivity" />
+        <activity android:name=".ReaderEditProfileActivity" android:exported="false" />
 
-        <activity android:name=".EditReaderProfile" android:exported="false" />
+        <activity android:name=".CustomerOrderActivity" />
+        <activity android:name=".AdminManageUserActivity" />
+        <activity android:name=".AdminAddUserActivity"/>
+        <activity android:name=".AdminEditUserActivity"/>
+        <activity android:name=".AdminManageTarotActivity"/>
+        <activity android:name=".AdminAddTarotActivity"/>
+        <activity android:name=".AdminEditTarotActivity"/>
+        <activity android:name=".AdminTestimoniActivity"/>
+        <activity android:name=".AdminReportActivity"/>
+        <activity android:name=".AdminManageBookingActivity" />
 
-        <activity android:name=".OrderActivity" />
-        <activity android:name=".ManageUserActivity" />
-        <activity android:name=".AddUserActivity"/>
-        <activity android:name=".EditUserActivity"/>
-        <activity android:name=".ManageTarotActivity"/>
-        <activity android:name=".AddTarotActivity"/>
-        <activity android:name=".EditTarotActivity"/>
-        <activity android:name=".TestimoniActivity"/>
-        <activity android:name=".ReportActivity"/>
-        <activity android:name=".ManageBookingActivity" />
-
-        <activity android:name=".OnboardingActivity" android:exported="false" />
         <activity android:name=".ForgotPasswordActivity" android:exported="false" />
 
     </application>

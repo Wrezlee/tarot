@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import putra.yanuar.tarot.databinding.FragmentReaderHistoryBinding
-import putra.yanuar.tarot.databinding.ItemHistoryBinding
+import putra.yanuar.tarot.databinding.ItemCustomerHistoryBinding
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -169,7 +169,7 @@ class ReaderHistoryFragment : Fragment() {
             }
 
             for (item in historyList) {
-                val binding = ItemHistoryBinding.inflate(layoutInflater, container, false)
+                val binding = ItemCustomerHistoryBinding.inflate(layoutInflater, container, false)
                 binding.tvItemPackage.text  = item.packageName
                 binding.tvItemDate.text     = item.bookingDate
                 binding.tvItemStatus.text   = item.status

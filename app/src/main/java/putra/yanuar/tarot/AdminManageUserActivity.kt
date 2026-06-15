@@ -16,11 +16,12 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
-import putra.yanuar.tarot.databinding.ActivityManageUserBinding
+import putra.yanuar.tarot.databinding.ActivityAdminManageUserBinding
 
-class ManageUserActivity : AppCompatActivity() {
 
-    lateinit var b: ActivityManageUserBinding
+class AdminManageUserActivity : AppCompatActivity() {
+
+    lateinit var b: ActivityAdminManageUserBinding
     lateinit var db: SQLiteDatabase
 
     val listData     = ArrayList<HashMap<String, String>>()
@@ -33,13 +34,13 @@ class ManageUserActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        b = ActivityManageUserBinding.inflate(layoutInflater)
+        b = ActivityAdminManageUserBinding.inflate(layoutInflater)
         setContentView(b.root)
 
         db = DBOpenHelper(this).writableDatabase
 
         b.btnAddUser.setOnClickListener {
-            startActivity(Intent(this, AddUserActivity::class.java))
+            startActivity(Intent(this, AdminAddUserActivity::class.java))
         }
 
         loadUserList()
@@ -117,7 +118,7 @@ class ManageUserActivity : AppCompatActivity() {
     override fun onContextItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.ctx_edit -> {
-                val i = Intent(this, EditUserActivity::class.java)
+                val i = Intent(this, AdminEditUserActivity::class.java)
                 i.putExtra("USER_ID", selectedUserId)
                 startActivity(i)
                 true
@@ -164,8 +165,8 @@ class ManageUserActivity : AppCompatActivity() {
             val tvRole: TextView
 
             if (convertView == null) {
-                view = LayoutInflater.from(this@ManageUserActivity)
-                    .inflate(R.layout.item_user, parent, false)
+                view = LayoutInflater.from(this@AdminManageUserActivity)
+                    .inflate(R.layout.item_admin_user, parent, false)
             } else {
                 view = convertView
             }

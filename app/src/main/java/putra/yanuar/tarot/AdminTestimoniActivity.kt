@@ -13,15 +13,14 @@ import android.widget.BaseAdapter
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import putra.yanuar.tarot.databinding.ActivityTestimoniBinding
-import putra.yanuar.tarot.databinding.ItemTestimoniBinding
+import putra.yanuar.tarot.databinding.ItemAdminTestimoniBinding
 
-class TestimoniActivity : AppCompatActivity() {
+class AdminTestimoniActivity : AppCompatActivity() {
 
     lateinit var b: ActivityTestimoniBinding
     lateinit var db: SQLiteDatabase
     val listData = ArrayList<TestimoniItem>()
 
-    // ID dan posisi yang dipilih saat long-press
     var selectedId = 0
     var selectedPosition = 0
 
@@ -41,7 +40,6 @@ class TestimoniActivity : AppCompatActivity() {
         db = DBOpenHelper(this).writableDatabase
         loadTestimoni()
 
-        // Daftarkan ListView untuk context menu (long press)
         registerForContextMenu(b.lvTestimoni)
     }
 
@@ -79,7 +77,6 @@ class TestimoniActivity : AppCompatActivity() {
         }
     }
 
-    // Context menu muncul saat long-press item ListView
     override fun onCreateContextMenu(
         menu: ContextMenu, v: View, menuInfo: ContextMenu.ContextMenuInfo?
     ) {
@@ -129,17 +126,17 @@ class TestimoniActivity : AppCompatActivity() {
 
         override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
             val item = getItem(position)
-            val binding: ItemTestimoniBinding
+            val binding: ItemAdminTestimoniBinding
             val view: View
 
             if (convertView == null) {
-                binding = ItemTestimoniBinding.inflate(
-                    LayoutInflater.from(this@TestimoniActivity), parent, false
+                binding = ItemAdminTestimoniBinding.inflate(
+                    LayoutInflater.from(this@AdminTestimoniActivity), parent, false
                 )
                 view = binding.root
                 view.tag = binding
             } else {
-                binding = convertView.tag as ItemTestimoniBinding
+                binding = convertView.tag as ItemAdminTestimoniBinding
                 view = convertView
             }
 

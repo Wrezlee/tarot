@@ -10,11 +10,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import putra.yanuar.tarot.databinding.FragmentProfileBinding
+import putra.yanuar.tarot.databinding.FragmentCustomerProfileBinding
 
-class ProfileFragment : Fragment() {
+class CustomerProfileFragment : Fragment() {
 
-    lateinit var b: FragmentProfileBinding
+    lateinit var b: FragmentCustomerProfileBinding
     lateinit var thisParent: CustomerActivity
     lateinit var db: SQLiteDatabase
 
@@ -22,20 +22,20 @@ class ProfileFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        b = FragmentProfileBinding.inflate(inflater, container, false)
+        b = FragmentCustomerProfileBinding.inflate(inflater, container, false)
 
         thisParent = activity as CustomerActivity
         db = thisParent.getDbObject()
 
         b.btnEditProfile.setOnClickListener {
-            val i = Intent(thisParent, EditProfileActivity::class.java)
+            val i = Intent(thisParent, CustomerEditProfileActivity::class.java)
             i.putExtra("USER_EMAIL", thisParent.userEmail)
             startActivity(i)
         }
 
         b.btnHistory.setOnClickListener {
             try {
-                val i = Intent(thisParent, HistoryActivity::class.java)
+                val i = Intent(thisParent, ReaderHistoryActivity::class.java)
                 i.putExtra("USER_EMAIL", thisParent.userEmail)
                 startActivity(i)
             } catch (e: Exception) {
@@ -61,7 +61,6 @@ class ProfileFragment : Fragment() {
             b.tvProfileEmail.text = c.getString(2)
             b.tvProfileRole.text  = "LEVEL: ${c.getString(3).uppercase()}"
 
-            // Load foto profil dari Base64 jika ada
             val fotoBase64 = if (!c.isNull(4)) c.getString(4) else null
             if (!fotoBase64.isNullOrEmpty()) {
                 try {
@@ -78,8 +77,7 @@ class ProfileFragment : Fragment() {
             val cRitual = db.rawQuery(
                 """SELECT COUNT(*) FROM bookings 
                    WHERE email = ? 
-                   AND (status = 'done' OR status = 'DONE'
-                        OR status = 'completed' OR status = 'COMPLETED')""",
+                   AND UPPER(status) IN ('DONE', 'COMPLETED')""",
                 arrayOf(emailLogin)
             )
             if (cRitual.moveToFirst()) {

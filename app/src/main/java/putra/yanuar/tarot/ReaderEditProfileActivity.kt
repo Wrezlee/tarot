@@ -11,21 +11,21 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.github.dhaval2404.imagepicker.ImagePicker
 import com.permissionx.guolindev.PermissionX
-import putra.yanuar.tarot.databinding.ActivityEditReaderProfileBinding
+import putra.yanuar.tarot.databinding.ActivityReaderEditProfileBinding
 import java.io.File
 
-class EditReaderProfile : AppCompatActivity() {
+class ReaderEditProfileActivity : AppCompatActivity() {
 
-    lateinit var b: ActivityEditReaderProfileBinding
+    lateinit var b: ActivityReaderEditProfileBinding
     lateinit var db: SQLiteDatabase
     lateinit var mediaHelper: MediaHelper
 
     var userEmail: String = ""
-    var fotoStr: String = ""   // Base64 foto baru (kosong = tidak ganti)
+    var fotoStr: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        b = ActivityEditReaderProfileBinding.inflate(layoutInflater)
+        b = ActivityReaderEditProfileBinding.inflate(layoutInflater)
         setContentView(b.root)
 
         db = DBOpenHelper(this).writableDatabase
@@ -34,7 +34,6 @@ class EditReaderProfile : AppCompatActivity() {
 
         loadCurrentData()
 
-        // Popup pilih sumber foto
         b.btnReaderChangePhoto.setOnClickListener { view ->
             val popUp = PopupMenu(this, view)
             popUp.menu.add(0, 0, 0, "Kamera")
@@ -179,7 +178,7 @@ class EditReaderProfile : AppCompatActivity() {
                         db.execSQL("UPDATE users SET name=? WHERE email=?",
                             arrayOf(newName, userEmail))
                 }
-                Toast.makeText(this, "Profil berhasil diperbarui! ✨", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Profil berhasil diperbarui!", Toast.LENGTH_SHORT).show()
                 finish()
             } catch (e2: Exception) {
                 Toast.makeText(this, "Gagal: ${e2.message}", Toast.LENGTH_SHORT).show()

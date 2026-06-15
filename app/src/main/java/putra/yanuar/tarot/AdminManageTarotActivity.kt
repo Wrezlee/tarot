@@ -15,22 +15,22 @@ import com.android.volley.toolbox.JsonArrayRequest
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import org.json.JSONObject
-import putra.yanuar.tarot.databinding.ActivityManageTarotBinding
+import putra.yanuar.tarot.databinding.ActivityAdminManageTarotBinding
 
-class ManageTarotActivity : AppCompatActivity() {
+class AdminManageTarotActivity : AppCompatActivity() {
 
-    lateinit var b: ActivityManageTarotBinding
+    lateinit var b: ActivityAdminManageTarotBinding
     val listData = ArrayList<HashMap<String, String>>()
 
     private val BASE_URL = "http://10.114.14.139:8000/api/"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        b = ActivityManageTarotBinding.inflate(layoutInflater)
+        b = ActivityAdminManageTarotBinding.inflate(layoutInflater)
         setContentView(b.root)
 
         b.btnAddTarot.setOnClickListener {
-            startActivity(Intent(this, AddTarotActivity::class.java))
+            startActivity(Intent(this, AdminAddTarotActivity::class.java))
         }
 
         loadTarotList()
@@ -63,7 +63,7 @@ class ManageTarotActivity : AppCompatActivity() {
                 val adapter = object : SimpleAdapter(
                     this,
                     listData,
-                    R.layout.item_tarot,
+                    R.layout.item_admin_paket,
                     arrayOf("name", "desc", "price"),
                     intArrayOf(
                         R.id.tvTarotName,
@@ -126,7 +126,7 @@ class ManageTarotActivity : AppCompatActivity() {
                 R.id.menu_edit -> {
 
                     val intent =
-                        Intent(this, EditTarotActivity::class.java)
+                        Intent(this, AdminEditTarotActivity::class.java)
 
                     intent.putExtra("TAROT_ID", id)
 

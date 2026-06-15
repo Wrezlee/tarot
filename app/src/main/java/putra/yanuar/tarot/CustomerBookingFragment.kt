@@ -9,11 +9,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import putra.yanuar.tarot.databinding.FragmentBookingBinding
 
-class BookingFragment : Fragment(), View.OnClickListener {
+import putra.yanuar.tarot.databinding.FragmentCustomerBookingBinding
 
-    lateinit var b: FragmentBookingBinding
+class CustomerBookingFragment : Fragment(), View.OnClickListener {
+
+    lateinit var b: FragmentCustomerBookingBinding
     lateinit var thisParent: CustomerActivity
     lateinit var db: SQLiteDatabase
 
@@ -21,11 +22,13 @@ class BookingFragment : Fragment(), View.OnClickListener {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        b = FragmentBookingBinding.inflate(inflater, container, false)
+
+        b = FragmentCustomerBookingBinding.inflate(inflater, container, false)
 
         thisParent = activity as CustomerActivity
         db = thisParent.getDbObject()
 
+        // Setup listener tombol
         b.btnKonfirmasiWA.setOnClickListener(this)
         b.btnOrderSekarang.setOnClickListener(this)
         b.btnTiktok.setOnClickListener(this)
@@ -37,10 +40,11 @@ class BookingFragment : Fragment(), View.OnClickListener {
 
     override fun onClick(p0: View?) {
         when (p0?.id) {
-            R.id.btnKonfirmasiWA -> openWhatsApp()
-            R.id.btnTiktok -> openTiktok()
-            R.id.btnOrderSekarang -> {
-                val intent = Intent(thisParent, OrderActivity::class.java)
+
+            b.btnKonfirmasiWA.id -> openWhatsApp()
+            b.btnTiktok.id -> openTiktok()
+            b.btnOrderSekarang.id -> {
+                val intent = Intent(thisParent, CustomerOrderActivity::class.java)
                 intent.putExtra("USER_EMAIL", thisParent.userEmail)
                 startActivity(intent)
             }
@@ -57,6 +61,7 @@ class BookingFragment : Fragment(), View.OnClickListener {
                     val price = cursor.getInt(1)
                     val formattedPrice = "Rp$price"
 
+                    // Mapping nama paket dari database ke ID TextView di XML
                     when (name) {
                         "1 Kartu (1 Pertanyaan)" -> b.tvHarga1K.text = formattedPrice
                         "3 Kartu (1 Pertanyaan)" -> b.tvHarga3K.text = formattedPrice

@@ -34,7 +34,6 @@ class ReaderActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedList
     private var currentBookingId: Int = 0
     private var isProcessing: Boolean = false
 
-    // ── Public accessors dipakai Fragment ──────────────────────────────────
     fun getDbObject(): SQLiteDatabase = db
     fun getReaderId(): Int = readerId
     fun getUserEmail(): String = userEmail

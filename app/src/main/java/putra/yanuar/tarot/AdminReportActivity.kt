@@ -3,16 +3,17 @@ package putra.yanuar.tarot
 import android.database.sqlite.SQLiteDatabase
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import putra.yanuar.tarot.databinding.ActivityReportBinding
+import putra.yanuar.tarot.databinding.ActivityAdminReportBinding
 
-class ReportActivity : AppCompatActivity() {
 
-    lateinit var b: ActivityReportBinding
+class AdminReportActivity : AppCompatActivity() {
+
+    lateinit var b: ActivityAdminReportBinding
     lateinit var db: SQLiteDatabase
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        b = ActivityReportBinding.inflate(layoutInflater)
+        b = ActivityAdminReportBinding.inflate(layoutInflater)
         setContentView(b.root)
 
         db = DBOpenHelper(this).readableDatabase
@@ -21,7 +22,6 @@ class ReportActivity : AppCompatActivity() {
 
     fun loadReport() {
         try {
-            // Total pendapatan hanya dari booking yang sudah selesai (done/completed)
             val cursorTotal = db.rawQuery(
                 "SELECT SUM(total_price) FROM bookings WHERE status IN ('done','DONE','completed','COMPLETED')", null
             )
@@ -31,14 +31,12 @@ class ReportActivity : AppCompatActivity() {
             }
             cursorTotal.close()
 
-            // Jumlah total booking
             val cursorCount = db.rawQuery("SELECT COUNT(*) FROM bookings", null)
             if (cursorCount.moveToFirst()) {
                 b.tvReportTotalBooking.text = cursorCount.getInt(0).toString()
             }
             cursorCount.close()
 
-            // Booking selesai
             val cursorDone = db.rawQuery(
                 "SELECT COUNT(*) FROM bookings WHERE status IN ('done','DONE','completed','COMPLETED')", null
             )
@@ -47,7 +45,6 @@ class ReportActivity : AppCompatActivity() {
             }
             cursorDone.close()
 
-            // Booking pending/paid (belum selesai)
             val cursorPending = db.rawQuery(
                 "SELECT COUNT(*) FROM bookings WHERE status IN ('paid','PAID','pending','PENDING')", null
             )
@@ -56,7 +53,6 @@ class ReportActivity : AppCompatActivity() {
             }
             cursorPending.close()
 
-            // Paket terlaris (hanya dari booking yang sudah selesai)
             val cursorTop = db.rawQuery(
                 "SELECT package_name, COUNT(*) as total FROM bookings WHERE status IN ('done','DONE','completed','COMPLETED') GROUP BY package_name ORDER BY total DESC LIMIT 1", null
             )

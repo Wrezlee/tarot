@@ -11,20 +11,20 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.github.dhaval2404.imagepicker.ImagePicker
 import com.permissionx.guolindev.PermissionX
-import putra.yanuar.tarot.databinding.ActivityEditProfileBinding
+import putra.yanuar.tarot.databinding.ActivityCustomerEditProfileBinding
 import java.io.File
 
-class EditProfileActivity : AppCompatActivity() {
+class CustomerEditProfileActivity : AppCompatActivity() {
 
-    lateinit var b: ActivityEditProfileBinding
+    lateinit var b: ActivityCustomerEditProfileBinding
     lateinit var db: SQLiteDatabase
     lateinit var mediaHelper: MediaHelper
     var userEmail: String = ""
-    var fotoStr: String = ""   // Base64 foto baru (kosong = tidak ganti)
+    var fotoStr: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        b = ActivityEditProfileBinding.inflate(layoutInflater)
+        b = ActivityCustomerEditProfileBinding.inflate(layoutInflater)
         setContentView(b.root)
 
         db = DBOpenHelper(this).writableDatabase
@@ -33,7 +33,6 @@ class EditProfileActivity : AppCompatActivity() {
 
         loadCurrentData()
 
-        // Tombol "Edit Foto" oval di bawah foto — popup pilih sumber
         b.btnChangePhoto.setOnClickListener { view ->
             val popUp = PopupMenu(this, view)
             popUp.menu.add(0, 0, 0, "Kamera")

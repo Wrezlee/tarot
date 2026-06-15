@@ -4,17 +4,18 @@ import android.database.sqlite.SQLiteDatabase
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import putra.yanuar.tarot.databinding.ActivityEditUserBinding
+import putra.yanuar.tarot.databinding.ActivityAdminEditUserBinding
 
-class EditUserActivity : AppCompatActivity() {
 
-    lateinit var b: ActivityEditUserBinding
+class AdminEditUserActivity : AppCompatActivity() {
+
+    lateinit var b: ActivityAdminEditUserBinding
     lateinit var db: SQLiteDatabase
     var userId: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        b = ActivityEditUserBinding.inflate(layoutInflater)
+        b = ActivityAdminEditUserBinding.inflate(layoutInflater)
         setContentView(b.root)
 
         db = DBOpenHelper(this).writableDatabase

@@ -12,11 +12,5 @@ class SplashActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         supportActionBar?.hide()
         setContentView(R.layout.activity_splash)
-
-        Handler(Looper.getMainLooper()).postDelayed({
-            // Arahkan ke Onboarding (di sana dicek apakah sudah pernah onboarding)
-            startActivity(Intent(this, OnboardingActivity::class.java))
-            finish()
-        }, 1000)
     }
 }

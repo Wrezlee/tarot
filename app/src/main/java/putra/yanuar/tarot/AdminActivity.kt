@@ -74,11 +74,11 @@ class AdminActivity : AppCompatActivity(), View.OnClickListener {
 
     override fun onClick(p0: View?) {
         when (p0?.id) {
-            R.id.btnMenuUser      -> startActivity(Intent(this, ManageUserActivity::class.java))
-            R.id.btnMenuPackages  -> startActivity(Intent(this, ManageTarotActivity::class.java))
-            R.id.btnMenuTestimony -> startActivity(Intent(this, TestimoniActivity::class.java))
-            R.id.btnMenuReport    -> startActivity(Intent(this, ReportActivity::class.java))
-            R.id.btnMenuBooking   -> startActivity(Intent(this, ManageBookingActivity::class.java))
+            R.id.btnMenuUser      -> startActivity(Intent(this, AdminManageUserActivity::class.java))
+            R.id.btnMenuPackages  -> startActivity(Intent(this, AdminManageTarotActivity::class.java))
+            R.id.btnMenuTestimony -> startActivity(Intent(this, AdminTestimoniActivity::class.java))
+            R.id.btnMenuReport    -> startActivity(Intent(this, AdminReportActivity::class.java))
+            R.id.btnMenuBooking   -> startActivity(Intent(this, AdminManageBookingActivity::class.java))
         }
     }
 

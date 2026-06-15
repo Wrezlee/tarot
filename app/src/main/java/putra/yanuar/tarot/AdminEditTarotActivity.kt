@@ -4,21 +4,27 @@ import android.os.Bundle
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.android.volley.Request
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
-import putra.yanuar.tarot.databinding.ActivityAddTarotBinding
+import org.json.JSONObject
+import putra.yanuar.tarot.databinding.ActivityAdminEditTarotBinding
 
-class AddTarotActivity : AppCompatActivity() {
 
-    lateinit var b: ActivityAddTarotBinding
+class AdminEditTarotActivity : AppCompatActivity() {
+
+    lateinit var b: ActivityAdminEditTarotBinding
+    var tarotId: String = ""
 
     private val BASE_URL = "http://10.114.14.139:8000/api/"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        b = ActivityAddTarotBinding.inflate(layoutInflater)
+        b = ActivityAdminEditTarotBinding.inflate(layoutInflater)
         setContentView(b.root)
+
+        tarotId = intent.getStringExtra("TAROT_ID") ?: ""
 
         val daftarKategori = arrayOf(
             "tarot",
@@ -39,12 +45,54 @@ class AddTarotActivity : AppCompatActivity() {
             b.actvCategory.showDropDown()
         }
 
+        if (tarotId.isNotEmpty()) {
+            loadData()
+        }
+
         b.btnSaveTarot.setOnClickListener {
-            saveData()
+            updateData()
         }
     }
 
-    private fun saveData() {
+    private fun loadData() {
+
+        val queue = Volley.newRequestQueue(this)
+
+        val request = StringRequest(
+            Request.Method.GET,
+            BASE_URL + "packages/$tarotId",
+
+            { response ->
+
+                val obj = JSONObject(response)
+
+                b.etTarotName.setText(
+                    obj.getString("name")
+                )
+
+                b.actvCategory.setText(
+                    obj.getString("category"),
+                    false
+                )
+
+                b.etTarotPrice.setText(
+                    obj.getInt("price").toString()
+                )
+            },
+
+            {
+                Toast.makeText(
+                    this,
+                    "Gagal load data",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        )
+
+        queue.add(request)
+    }
+
+    private fun updateData() {
 
         val name = b.etTarotName.text.toString().trim()
         val category = b.actvCategory.text.toString().trim()
@@ -57,7 +105,7 @@ class AddTarotActivity : AppCompatActivity() {
         ) {
             Toast.makeText(
                 this,
-                "Harap lengkapi semua kolom!",
+                "Lengkapi semua kolom",
                 Toast.LENGTH_SHORT
             ).show()
             return
@@ -66,13 +114,13 @@ class AddTarotActivity : AppCompatActivity() {
         val queue = Volley.newRequestQueue(this)
 
         val request = object : StringRequest(
-            Method.POST,
-            BASE_URL + "packages",
+            Method.PUT,
+            BASE_URL + "packages/$tarotId",
 
             {
                 Toast.makeText(
                     this,
-                    "Paket $name berhasil disimpan ",
+                    "Paket berhasil diperbarui ",
                     Toast.LENGTH_SHORT
                 ).show()
 
@@ -82,7 +130,7 @@ class AddTarotActivity : AppCompatActivity() {
             {
                 Toast.makeText(
                     this,
-                    "Gagal simpan data",
+                    "Gagal update",
                     Toast.LENGTH_SHORT
                 ).show()
             }

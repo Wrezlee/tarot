@@ -23,8 +23,8 @@ class CustomerActivity : AppCompatActivity(),
     lateinit var b: ActivityCustomerBinding
     lateinit var db: SQLiteDatabase
     lateinit var ft: FragmentTransaction
-    lateinit var fragBooking: BookingFragment
-    lateinit var fragProfile: ProfileFragment
+    lateinit var fragBooking: CustomerBookingFragment
+    lateinit var fragProfile: CustomerProfileFragment
     lateinit var userEmail: String
 
     fun getDbObject(): SQLiteDatabase = db
@@ -37,8 +37,8 @@ class CustomerActivity : AppCompatActivity(),
 
         userEmail = intent.getStringExtra("USER_EMAIL") ?: ""
 
-        fragBooking = BookingFragment()
-        fragProfile = ProfileFragment()
+        fragBooking = CustomerBookingFragment()
+        fragProfile = CustomerProfileFragment()
         db = DBOpenHelper(this).writableDatabase
 
         setSupportActionBar(b.toolbarCustomer)
@@ -151,7 +151,7 @@ class CustomerActivity : AppCompatActivity(),
         dateCards.forEachIndexed { i, card ->
             card.setOnClickListener {
                 val dateStr = "${dateDays[i]}/${dateMonths[i]}/${dateYears[i]}"
-                val intent = Intent(this, OrderActivity::class.java)
+                val intent = Intent(this, CustomerOrderActivity::class.java)
                 intent.putExtra("USER_EMAIL", userEmail)
                 intent.putExtra("SELECTED_DATE", dateStr)
                 startActivity(intent)
@@ -284,7 +284,7 @@ class CustomerActivity : AppCompatActivity(),
 
                 if (isOnline) {
                     card.setOnClickListener {
-                        val intent = Intent(this, OrderActivity::class.java)
+                        val intent = Intent(this, CustomerOrderActivity::class.java)
                         intent.putExtra("USER_EMAIL", userEmail)
                         intent.putExtra("READER_NAME", readerName)
                         intent.putExtra("READER_ID", readerId)

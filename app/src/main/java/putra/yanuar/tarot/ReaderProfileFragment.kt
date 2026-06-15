@@ -26,7 +26,7 @@ class ReaderProfileFragment : Fragment() {
         db = thisParent.getDbObject()
 
         b.btnEditReaderProfile.setOnClickListener {
-            val i = Intent(thisParent, EditReaderProfile::class.java)
+            val i = Intent(thisParent, ReaderEditProfileActivity::class.java)
             i.putExtra("USER_EMAIL", thisParent.getUserEmail())
             startActivity(i)
         }
@@ -54,7 +54,6 @@ class ReaderProfileFragment : Fragment() {
             b.tvReaderProfileEmail.text = c.getString(2)
             b.tvReaderProfileRole.text  = "LEVEL: ${c.getString(3).uppercase()}"
 
-            // Load foto profil
             val fotoBase64 = if (!c.isNull(4)) c.getString(4) else null
             if (!fotoBase64.isNullOrEmpty()) {
                 try {
@@ -68,7 +67,6 @@ class ReaderProfileFragment : Fragment() {
                 b.imgReaderAvatar.setImageResource(R.drawable.meow)
             }
 
-            // Total sesi selesai
             val cSesi = db.rawQuery(
                 "SELECT COUNT(*) FROM bookings WHERE reader_id = ? AND status IN ('completed','COMPLETED','done','DONE')",
                 arrayOf(readerId.toString())
@@ -76,7 +74,6 @@ class ReaderProfileFragment : Fragment() {
             if (cSesi.moveToFirst()) b.tvReaderTotalSessions.text = cSesi.getInt(0).toString()
             cSesi.close()
 
-            // Total earning
             val cEarn = db.rawQuery(
                 "SELECT SUM(total_price) FROM bookings WHERE reader_id = ? AND status IN ('completed','COMPLETED','done','DONE')",
                 arrayOf(readerId.toString())

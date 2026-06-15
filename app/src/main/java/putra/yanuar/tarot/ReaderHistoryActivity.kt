@@ -14,12 +14,14 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
-import putra.yanuar.tarot.databinding.ActivityHistoryBinding
-import putra.yanuar.tarot.databinding.ItemHistoryBinding
 
-class HistoryActivity : AppCompatActivity() {
+import putra.yanuar.tarot.databinding.ActivityReaderHistoryBinding
+import putra.yanuar.tarot.databinding.ItemCustomerHistoryBinding
 
-    lateinit var b: ActivityHistoryBinding
+
+class ReaderHistoryActivity : AppCompatActivity() {
+
+    lateinit var b: ActivityReaderHistoryBinding
     lateinit var db: SQLiteDatabase
     lateinit var userEmail: String
 
@@ -45,7 +47,7 @@ class HistoryActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        b = ActivityHistoryBinding.inflate(layoutInflater)
+        b = ActivityReaderHistoryBinding.inflate(layoutInflater)
         setContentView(b.root)
 
         db = DBOpenHelper(this).writableDatabase
@@ -310,15 +312,15 @@ class HistoryActivity : AppCompatActivity() {
 
         override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
             val item = getItem(position)
-            val binding: ItemHistoryBinding
+            val binding: ItemCustomerHistoryBinding
             val view: View
 
             if (convertView == null) {
-                binding = ItemHistoryBinding.inflate(LayoutInflater.from(this@HistoryActivity), parent, false)
+                binding = ItemCustomerHistoryBinding.inflate(LayoutInflater.from(this@ReaderHistoryActivity), parent, false)
                 view = binding.root
                 view.tag = binding
             } else {
-                binding = convertView.tag as ItemHistoryBinding
+                binding = convertView.tag as ItemCustomerHistoryBinding
                 view = convertView
             }
 

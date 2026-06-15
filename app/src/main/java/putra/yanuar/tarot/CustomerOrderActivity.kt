@@ -7,19 +7,19 @@ import android.os.Bundle
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import putra.yanuar.tarot.databinding.ActivityOrderBinding
+import putra.yanuar.tarot.databinding.ActivityCustomerOrderBinding
 import java.util.Calendar
 
-class OrderActivity : AppCompatActivity() {
+class CustomerOrderActivity : AppCompatActivity() {
 
-    lateinit var b: ActivityOrderBinding
+    lateinit var b: ActivityCustomerOrderBinding
     lateinit var db: SQLiteDatabase
     var selectedDate = ""
     var selectedTime = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        b = ActivityOrderBinding.inflate(layoutInflater)
+        b = ActivityCustomerOrderBinding.inflate(layoutInflater)
         setContentView(b.root)
 
         db = DBOpenHelper(this).writableDatabase

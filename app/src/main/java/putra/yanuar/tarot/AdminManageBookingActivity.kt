@@ -7,17 +7,16 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.BaseAdapter
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
-import putra.yanuar.tarot.databinding.ActivityManageBookingBinding
-import putra.yanuar.tarot.databinding.ItemBookingBinding
+import putra.yanuar.tarot.databinding.ActivityAdminManageBookingBinding
+import putra.yanuar.tarot.databinding.ItemCustomerBookingBinding
 
-class ManageBookingActivity : AppCompatActivity() {
+class AdminManageBookingActivity : AppCompatActivity() {
 
-    lateinit var b: ActivityManageBookingBinding
+    lateinit var b: ActivityAdminManageBookingBinding
     lateinit var db: SQLiteDatabase
 
     val listData     = ArrayList<BookingItem>()
@@ -40,7 +39,7 @@ class ManageBookingActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        b = ActivityManageBookingBinding.inflate(layoutInflater)
+        b = ActivityAdminManageBookingBinding.inflate(layoutInflater)
         setContentView(b.root)
 
         db = DBOpenHelper(this).writableDatabase
@@ -156,15 +155,15 @@ class ManageBookingActivity : AppCompatActivity() {
 
         override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
             val item = getItem(position)
-            val binding: ItemBookingBinding
+            val binding: ItemCustomerBookingBinding
             val view: View
 
             if (convertView == null) {
-                binding = ItemBookingBinding.inflate(LayoutInflater.from(this@ManageBookingActivity), parent, false)
+                binding = ItemCustomerBookingBinding.inflate(LayoutInflater.from(this@AdminManageBookingActivity), parent, false)
                 view = binding.root
                 view.tag = binding
             } else {
-                binding = convertView.tag as ItemBookingBinding
+                binding = convertView.tag as ItemCustomerBookingBinding
                 view = convertView
             }
 
