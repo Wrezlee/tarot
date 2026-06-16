@@ -166,8 +166,8 @@ class ReaderActivity : AppCompatActivity() {
 
     private fun launchScanner() {
         val options = ScanOptions().apply {
-            setPrompt("Arahkan ke QR Tiket customer 🔮")
-            setBeepEnabled(true)
+            setPrompt("Arahkan ke QR Tiket customer")
+            setBeepEnabled(false)
             setOrientationLocked(true)
             setBarcodeImageEnabled(false)
         }
@@ -220,7 +220,7 @@ class ReaderActivity : AppCompatActivity() {
         date: String, time: String, payment: String, totalPrice: Int
     ) {
         AlertDialog.Builder(this)
-            .setTitle("✅ Tiket Terverifikasi!")
+            .setTitle("Tiket Terverifikasi!")
             .setMessage(
                 "Customer  : $customerName\n" +
                         "Paket     : $pkgName\n" +
@@ -231,18 +231,14 @@ class ReaderActivity : AppCompatActivity() {
             )
             .setPositiveButton("🔮 Mulai Ramalan") { _, _ ->
                 db.execSQL("UPDATE bookings SET status = 'processing' WHERE id = ?", arrayOf(bookingId))
-                verifiedBookingId = ""
-                Toast.makeText(this, "Sesi dimulai! 🔮", Toast.LENGTH_SHORT).show()
-                refreshDashboard()
-            }
-            .setNeutralButton("Lihat Detail Dulu") { _, _ ->
                 verifiedBookingId = bookingId
                 binding.tvNextCustomerName.text = customerName
                 binding.tvNextPackageName.text  = " $pkgName"
                 binding.tvNextBookingDate.text  = " $date"
                 binding.tvNextBookingTime.text  = time
                 binding.btnStartReading.visibility = View.VISIBLE
-                Toast.makeText(this, "Tiket valid ✅  Tap 'Mulai Ramalan' saat siap", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, "Sesi dimulai! 🔮", Toast.LENGTH_SHORT).show()
+                refreshDashboard()
             }
             .setNegativeButton("Batal", null)
             .show()
