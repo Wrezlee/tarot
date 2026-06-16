@@ -48,7 +48,7 @@ class CustomerActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedLi
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_cust_profil, menu)
         menu?.findItem(R.id.menu_music)?.title =
-            if (MusicManager.isMuted()) " Musik OFF" else " Musik ON"
+            if (MusicManager.isMuted()) "Musik OFF" else "Musik ON"
         return true
     }
 
@@ -58,7 +58,7 @@ class CustomerActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedLi
             R.id.menu_cust_logout -> { logout(); true }
             R.id.menu_music -> {
                 val nowMuted = MusicManager.toggleMute()
-                item.title = if (nowMuted) " Musik OFF" else " Musik ON"
+                item.title = if (nowMuted) "Musik OFF" else "Musik ON"
                 true
             }
             else -> super.onOptionsItemSelected(item)
@@ -229,7 +229,6 @@ class CustomerActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedLi
                         cornerRadius = 100f
                     }
                 }
-                // ── Tombol "Lihat Lokasi" — GPS reader ──
                 val tvLihatLokasi = TextView(this).apply {
                     text = "📍 Lihat Lokasi"
                     setTextColor(0xFF7469B6.toInt())

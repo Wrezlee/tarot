@@ -27,7 +27,6 @@ class ReaderEditProfileActivity : AppCompatActivity() {
     var lat: Double = 0.0
     var lng: Double = 0.0
 
-    // Deklarasi AirLocation — sama persis pola dari mobile12a
     private val airLocation = AirLocation(this, object : AirLocation.Callback {
         override fun onFailure(locationFailedEnum: AirLocation.LocationFailedEnum) {
             Toast.makeText(this@ReaderEditProfileActivity, "Gagal mengambil lokasi GPS", Toast.LENGTH_SHORT).show()

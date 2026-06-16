@@ -34,7 +34,7 @@ class AdminActivity : AppCompatActivity(), View.OnClickListener {
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.admin_menu_option, menu)
         menu?.findItem(R.id.menu_music)?.title =
-            if (MusicManager.isMuted()) " Musik OFF" else " Musik ON"
+            if (MusicManager.isMuted()) "Musik OFF" else "Musik ON"
         return true
     }
 
@@ -44,7 +44,7 @@ class AdminActivity : AppCompatActivity(), View.OnClickListener {
             R.id.menu_logout -> { logout(); true }
             R.id.menu_music -> {
                 val nowMuted = MusicManager.toggleMute()
-                item.title = if (nowMuted) " Musik OFF" else " Musik ON"
+                item.title = if (nowMuted) "Musik OFF" else "Musik ON"
                 true
             }
             else -> super.onOptionsItemSelected(item)

@@ -48,6 +48,7 @@
                 android:textColor="#AD88C6"
                 android:textSize="12sp"
                 android:textStyle="bold" />
+
             <EditText
                 android:id="@+id/etName"
                 android:layout_width="match_parent"
@@ -56,8 +57,13 @@
                 android:hint="Masukkan nama lengkap"
                 android:inputType="textPersonName"
                 android:textColor="#251819"
+                android:textColorHint="#9E9E9E"
                 android:textSize="16sp" />
-            <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#F3E5F5" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#F3E5F5" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -67,6 +73,7 @@
                 android:textColor="#AD88C6"
                 android:textSize="12sp"
                 android:textStyle="bold" />
+
             <EditText
                 android:id="@+id/etEmail"
                 android:layout_width="match_parent"
@@ -75,8 +82,13 @@
                 android:hint="user@email.com"
                 android:inputType="textEmailAddress"
                 android:textColor="#251819"
+                android:textColorHint="#9E9E9E"
                 android:textSize="16sp" />
-            <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#F3E5F5" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#F3E5F5" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -86,16 +98,22 @@
                 android:textColor="#AD88C6"
                 android:textSize="12sp"
                 android:textStyle="bold" />
+
             <EditText
                 android:id="@+id/etPassword"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:background="@android:color/transparent"
                 android:hint="Minimal 6 karakter"
-                android:inputType="text"
+                android:inputType="textPassword"
                 android:textColor="#251819"
+                android:textColorHint="#9E9E9E"
                 android:textSize="16sp" />
-            <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#F3E5F5" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#F3E5F5" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -105,16 +123,39 @@
                 android:textColor="#AD88C6"
                 android:textSize="12sp"
                 android:textStyle="bold" />
+
             <RadioGroup
                 android:id="@+id/rgRole"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:textColor="#251819"
                 android:orientation="horizontal">
-                <RadioButton android:id="@+id/rbAdmin" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Admin" android:textSize="13sp" />
-                <RadioButton android:id="@+id/rbReader" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Reader" android:textSize="13sp" />
-                <RadioButton android:id="@+id/rbCustomer" android:layout_width="wrap_content" android:layout_height="wrap_content" android:checked="true" android:text="Customer" android:textSize="13sp" />
+
+                <RadioButton
+                    android:id="@+id/rbAdmin"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Admin"
+                    android:textColor="#251819"
+                    android:textSize="13sp" />
+
+                <RadioButton
+                    android:id="@+id/rbReader"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Reader"
+                    android:textColor="#251819"
+                    android:textSize="13sp" />
+
+                <RadioButton
+                    android:id="@+id/rbCustomer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    android:text="Customer"
+                    android:textColor="#251819"
+                    android:textSize="13sp" />
+
             </RadioGroup>
 
         </LinearLayout>

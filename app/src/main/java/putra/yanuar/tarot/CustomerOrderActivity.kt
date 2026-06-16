@@ -55,7 +55,6 @@ class CustomerOrderActivity : AppCompatActivity() {
         selectedReaderName = intent.getStringExtra("READER_NAME")  ?: ""
         selectedDate       = intent.getStringExtra("SELECTED_DATE") ?: ""
 
-        // Resolve userId & userName dari email
         if (userEmail.isNotEmpty()) {
             val c = db.rawQuery("SELECT id, name FROM users WHERE email = ?", arrayOf(userEmail))
             if (c.moveToFirst()) {
@@ -215,7 +214,6 @@ class CustomerOrderActivity : AppCompatActivity() {
         val notes = binding.etNotes.text.toString().trim()
 
         try {
-            // Insert ke tabel bookings (struktur DBOpenHelper)
             db.execSQL(
                 """INSERT INTO bookings
                    (user_id, reader_id, reader_name, package_name, booking_date, booking_time,
@@ -235,7 +233,6 @@ class CustomerOrderActivity : AppCompatActivity() {
                 )
             )
 
-            // Ambil ID yang baru di-insert
             val cursor = db.rawQuery("SELECT last_insert_rowid()", null)
             var newId = "0"
             if (cursor.moveToFirst()) newId = cursor.getLong(0).toString()
@@ -246,7 +243,6 @@ class CustomerOrderActivity : AppCompatActivity() {
                 return
             }
 
-            // Build & simpan QR content
             val qrContent = QrHelper.buildQrContent(
                 bookingId    = newId,
                 customerId   = currentUserId,
@@ -256,7 +252,6 @@ class CustomerOrderActivity : AppCompatActivity() {
                 time         = selectedTime
             )
 
-            // Simpan qr_content — tambahkan kolom jika belum ada
             try {
                 db.execSQL("ALTER TABLE bookings ADD COLUMN qr_content TEXT DEFAULT ''")
             } catch (_: Exception) {}
@@ -288,7 +283,7 @@ class CustomerOrderActivity : AppCompatActivity() {
             .setView(dialogBinding.root)
             .setTitle("🎉 Pesanan Berhasil!")
             .setCancelable(false)
-            .setPositiveButton("💾 Simpan ke Galeri") { dialog, _ ->
+            .setPositiveButton("Simpan ke Galeri") { dialog, _ ->
                 saveQrToGallery(qrBitmap, bookingId)
                 dialog.dismiss()
                 finish()
