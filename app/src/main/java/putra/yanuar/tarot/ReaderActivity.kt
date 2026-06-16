@@ -26,15 +26,12 @@ class ReaderActivity : AppCompatActivity() {
     private var readerName: String = ""
     private var userEmail:  String = ""
 
-    // Booking yang sudah ter-verifikasi QR
     private var verifiedBookingId: String = ""
 
-    // ── Public getter untuk fragment ─────────────────────────────────────────
     fun getDbObject(): SQLiteDatabase = db
     fun getReaderId(): Int            = readerId
     fun getUserEmail(): String        = userEmail
 
-    // ── ZXing scan launcher ──────────────────────────────────────────────────
     private val scanLauncher = registerForActivityResult(ScanContract()) { result: ScanIntentResult ->
         if (result.contents != null) {
             handleQrScanResult(result.contents)
@@ -52,7 +49,6 @@ class ReaderActivity : AppCompatActivity() {
 
         userEmail  = intent.getStringExtra("USER_EMAIL") ?: ""
 
-        // Resolve readerId & readerName dari email
         if (userEmail.isNotEmpty()) {
             val c = db.rawQuery("SELECT id, name FROM users WHERE email = ?", arrayOf(userEmail))
             if (c.moveToFirst()) {
@@ -62,13 +58,11 @@ class ReaderActivity : AppCompatActivity() {
             c.close()
         }
 
-        // Fallback jika dikirim langsung
         if (readerId == 0) {
             readerId   = intent.getStringExtra("USER_ID")?.toIntOrNull()   ?: 0
             readerName = intent.getStringExtra("USER_NAME") ?: ""
         }
 
-        // Toggle status online
         try {
             db.execSQL("UPDATE users SET is_online = 1 WHERE id = ?", arrayOf(readerId.toString()))
         } catch (_: Exception) {}
@@ -185,7 +179,6 @@ class ReaderActivity : AppCompatActivity() {
             return
         }
 
-        // Ambil booking dari DB lokal
         val cursor = db.rawQuery("SELECT id, status, package_name, booking_date, booking_time, payment_method, total_price FROM bookings WHERE id = ?", arrayOf(data.bookingId))
         if (!cursor.moveToFirst()) {
             cursor.close()
@@ -264,7 +257,6 @@ class ReaderActivity : AppCompatActivity() {
         binding.tvReaderGreeting.text  = "Dashboard Reader"
         binding.tvReaderSubtitle.text  = "Halo, $readerName 🔮"
 
-        // Next booking
         val cNext = db.rawQuery(
             """SELECT b.id, u.name, b.email, b.package_name, b.booking_date, b.booking_time
                FROM bookings b

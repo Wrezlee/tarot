@@ -43,7 +43,6 @@ class CustomerActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedLi
         b.navbarCustomer.setOnItemSelectedListener(this)
         setupDates()
         loadReaders()
-        updateBookingBadge()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -97,31 +96,6 @@ class CustomerActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedLi
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
         finish()
-    }
-
-    fun updateBookingBadge() {
-        try {
-            var userId = 0
-            val c = db.rawQuery("SELECT id FROM users WHERE email = ?", arrayOf(userEmail))
-            if (c.moveToFirst()) userId = c.getInt(0)
-            c.close()
-            val cursor = db.rawQuery(
-                "SELECT COUNT(*) FROM bookings WHERE user_id = ? AND status IN ('paid','PAID','pending','PENDING','processing','PROCESSING')",
-                arrayOf(userId.toString())
-            )
-            var count = 0
-            if (cursor.moveToFirst()) count = cursor.getInt(0)
-            cursor.close()
-            val badge = b.navbarCustomer.getOrCreateBadge(R.id.itemBooking)
-            if (count > 0) {
-                badge.isVisible = true
-                badge.number = count
-            } else {
-                badge.isVisible = false
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
     }
 
     private fun setupDates() {
@@ -330,7 +304,6 @@ class CustomerActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedLi
     override fun onResume() {
         super.onResume()
         loadReaders()
-        updateBookingBadge()
         MusicManager.resume()
     }
 
