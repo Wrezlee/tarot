@@ -1,166 +1,288 @@
 package putra.yanuar.tarot
 
-import android.app.DatePickerDialog
-import android.app.TimePickerDialog
-import android.database.sqlite.SQLiteDatabase
+import android.Manifest
+import android.content.ContentValues
+import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.os.Build
 import android.os.Bundle
-import android.widget.ArrayAdapter
-import android.widget.Toast
+import android.os.Environment
+import android.provider.MediaStore
+import android.view.View
+import android.widget.*
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import com.putra.yanuar.tarot.DatabaseHelper
+import com.putra.yanuar.tarot.QrHelper
+
 import putra.yanuar.tarot.databinding.ActivityCustomerOrderBinding
-import java.util.Calendar
+import java.io.File
+import java.io.FileOutputStream
+import java.text.SimpleDateFormat
+import java.util.*
 
 class CustomerOrderActivity : AppCompatActivity() {
 
-    lateinit var b: ActivityCustomerOrderBinding
-    lateinit var db: SQLiteDatabase
-    var selectedDate = ""
-    var selectedTime = ""
+    // ── ViewBinding ──────────────────────────────────────────────────────────
+    private lateinit var binding: ActivityCustomerOrderBinding
 
+    // ── Database ─────────────────────────────────────────────────────────────
+    private lateinit var db: DatabaseHelper
+
+    // ── State ────────────────────────────────────────────────────────────────
+    private var selectedDate: String = ""
+    private var selectedTime: String = ""
+    private var selectedReaderId: String = ""
+    private var selectedReaderName: String = ""
+    private var currentUserId: String = ""
+    private var currentUserName: String = ""
+    private var packageList: List<com.putra.yanuar.tarot.TarotPackage> = emptyList()
+
+    // ─────────────────────────────────────────────────────────────────────────
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        b = ActivityCustomerOrderBinding.inflate(layoutInflater)
-        setContentView(b.root)
+        binding = ActivityCustomerOrderBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        db = DBOpenHelper(this).writableDatabase
-        val emailUser    = intent.getStringExtra("USER_EMAIL") ?: ""
-        val selectedDateFromIntent = intent.getStringExtra("SELECTED_DATE") ?: ""
-        val readerName   = intent.getStringExtra("READER_NAME") ?: ""
-        val readerId     = intent.getIntExtra("READER_ID", 0)
+        db = DatabaseHelper(this)
 
-        setupSpinner()
+        // Ambil data dari Intent (dikirim oleh CustomerActivity)
+        currentUserId   = intent.getStringExtra("USER_ID")   ?: ""
+        currentUserName = intent.getStringExtra("USER_NAME")  ?: ""
+        selectedReaderId   = intent.getStringExtra("READER_ID")   ?: ""
+        selectedReaderName = intent.getStringExtra("READER_NAME") ?: ""
 
-        // Isi tanggal otomatis jika dari klik kartu tanggal
-        if (selectedDateFromIntent.isNotEmpty()) {
-            selectedDate = selectedDateFromIntent
-            b.btnSetDate.text = selectedDate
+        if (selectedReaderName.isNotEmpty()) {
+            binding.tvSelectedReader.visibility = View.VISIBLE
+            binding.tvSelectedReader.text = "Reader: $selectedReaderName"
         }
 
-        // Tampilkan nama reader jika dari klik kartu reader
-        if (readerName.isNotEmpty()) {
-            b.tvSelectedReader.visibility = android.view.View.VISIBLE
-            b.tvSelectedReader.text = "Reader: $readerName"
-        }
-
-        b.btnSetDate.setOnClickListener {
-            val c = Calendar.getInstance()
-            DatePickerDialog(this, { _, year, month, day ->
-                selectedDate = "$day/${month + 1}/$year"
-                b.btnSetDate.text = selectedDate
-            }, c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH)).show()
-        }
-
-        b.btnSetTime.setOnClickListener {
-            val c = Calendar.getInstance()
-            TimePickerDialog(this, { _, hour, minute ->
-                selectedTime = String.format("%02d:%02d", hour, minute)
-                b.btnSetTime.text = selectedTime
-            }, c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE), true).show()
-        }
-
-        b.btnConfirmOrder.setOnClickListener {
-            saveOrder(emailUser)
-        }
+        setupPackageSpinner()
+        setupDateTimePicker()
+        setupConfirmButton()
     }
 
-    fun setupSpinner() {
-        val listPaket = ArrayList<String>()
-        listPaket.add("--- Pilih Paket Ritual ---")
-
-        try {
-            val cursor = db.rawQuery("SELECT name, price FROM tarot_packages", null)
-            var currentCategory = ""
-
-            if (cursor.moveToFirst()) {
-                do {
-                    val name = cursor.getString(0)
-                    val price = cursor.getInt(1)
-
-                    val category = when {
-                        name.contains("Kartu")   -> "🔮 REGULER TAROT"
-                        name.contains("Telapak") -> "✋ PALM READING"
-                        name.contains("Chat")    -> "💬 INTERAKTIF CHAT"
-                        name.contains("Call")    -> "📞 INTERAKTIF CALL"
-                        else                     -> "✨ LAINNYA"
-                    }
-
-                    if (category != currentCategory) {
-                        listPaket.add(category)
-                        currentCategory = category
-                    }
-                    listPaket.add("      $name - Rp$price")
-                } while (cursor.moveToNext())
-            }
-            cursor.close()
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-
-        val adapter = ArrayAdapter(this, R.layout.item_spinner, listPaket)
+    // ── Setup Spinner Paket ───────────────────────────────────────────────────
+    private fun setupPackageSpinner() {
+        packageList = db.getAllTarotPackages()          // sesuaikan nama method DB-mu
+        val names = packageList.map { it.name }
+        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, names)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        b.spPaket.adapter = adapter
+        binding.spPaket.adapter = adapter
     }
 
-    fun saveOrder(email: String) {
-        val paketRaw = b.spPaket.selectedItem?.toString() ?: ""
+    // ── Date & Time Picker ────────────────────────────────────────────────────
+    private fun setupDateTimePicker() {
+        binding.btnSetDate.setOnClickListener {
+            val cal = Calendar.getInstance()
+            android.app.DatePickerDialog(
+                this,
+                { _, y, m, d ->
+                    selectedDate = "%04d-%02d-%02d".format(y, m + 1, d)
+                    binding.btnSetDate.text = selectedDate
+                },
+                cal.get(Calendar.YEAR),
+                cal.get(Calendar.MONTH),
+                cal.get(Calendar.DAY_OF_MONTH)
+            ).show()
+        }
 
-        if (paketRaw.contains("---") || paketRaw.contains("🔮") ||
-            paketRaw.contains("✋") || paketRaw.contains("💬") || paketRaw.contains("📞")) {
-            Toast.makeText(this, "Silakan pilih paket ritual yang tersedia!", Toast.LENGTH_SHORT).show()
+        binding.btnSetTime.setOnClickListener {
+            val cal = Calendar.getInstance()
+            android.app.TimePickerDialog(
+                this,
+                { _, h, min ->
+                    selectedTime = "%02d:%02d".format(h, min)
+                    binding.btnSetTime.text = selectedTime
+                },
+                cal.get(Calendar.HOUR_OF_DAY),
+                cal.get(Calendar.MINUTE),
+                true
+            ).show()
+        }
+    }
+
+    // ── Tombol Konfirmasi ─────────────────────────────────────────────────────
+    private fun setupConfirmButton() {
+        binding.btnConfirmOrder.setOnClickListener {
+            saveOrder()
+        }
+    }
+
+    // ── Simpan Order ke Database → Generate QR ────────────────────────────────
+    private fun saveOrder() {
+        // Validasi input
+        val selectedPkgIndex = binding.spPaket.selectedItemPosition
+        if (packageList.isEmpty() || selectedPkgIndex < 0) {
+            Toast.makeText(this, "Pilih paket terlebih dahulu", Toast.LENGTH_SHORT).show()
+            return
+        }
+        if (selectedDate.isEmpty()) {
+            Toast.makeText(this, "Pilih tanggal sesi", Toast.LENGTH_SHORT).show()
+            return
+        }
+        if (selectedTime.isEmpty()) {
+            Toast.makeText(this, "Pilih jam sesi", Toast.LENGTH_SHORT).show()
             return
         }
 
-        val paketClean = paketRaw.trim().split(" - ")[0]
+        val pkg = packageList[selectedPkgIndex]
 
-        val paymentId = b.rgPayment.checkedRadioButtonId
-        if (paymentId == -1 || selectedDate == "" || selectedTime == "") {
-            Toast.makeText(this, "Lengkapi jadwal dan metode pembayaran!", Toast.LENGTH_SHORT).show()
+        // Metode pembayaran
+        val payment = when (binding.rgPayment.checkedRadioButtonId) {
+            R.id.rbTransfer -> "Transfer"
+            R.id.rbShopee   -> "Dana/ShopeePay"
+            else             -> "Transfer"
+        }
+
+        // Layanan tambahan
+        var totalPrice = pkg.price
+        val addons = mutableListOf<String>()
+        if (binding.cbOracle.isChecked)    { totalPrice += 10000; addons.add("Oracle Card") }
+        if (binding.cbFastTrack.isChecked) { totalPrice += 30000; addons.add("Fast Track") }
+
+        val notes = binding.etNotes.text.toString().trim()
+
+        // Build objek booking
+        val booking = Booking(
+            id             = "",                // akan diisi DB (auto-increment atau UUID)
+            customerId     = currentUserId,
+            customerName   = currentUserName,
+            readerId       = selectedReaderId,
+            readerName     = selectedReaderName,
+            packageId      = pkg.id,
+            packageName    = pkg.name,
+            paymentMethod  = payment,
+            totalPrice     = totalPrice,
+            date           = selectedDate,
+            time           = selectedTime,
+            notes          = notes,
+            status         = "PENDING",
+            qrContent      = ""                 // akan diisi setelah insert
+        )
+
+        // Insert ke database — db.insertBooking harus kembalikan ID (Long / String)
+        val newId = db.insertBooking(booking)
+
+        if (newId <= 0L) {
+            Toast.makeText(this, "Gagal menyimpan pesanan", Toast.LENGTH_SHORT).show()
             return
         }
 
-        val payment = if (b.rbTransfer.isChecked) "Transfer" else "Dana/ShopeePay"
+        val bookingId = newId.toString()
 
-        var totalPrice = 0
-        try {
-            val parts = paketRaw.split("Rp")
-            if (parts.size > 1) totalPrice = parts[1].trim().toInt()
-        } catch (e: Exception) { totalPrice = 0 }
+        // Build & simpan QR content
+        val qrContent = QrHelper.buildQrContent(
+            bookingId    = bookingId,
+            customerId   = currentUserId,
+            customerName = currentUserName,
+            packageName  = pkg.name,
+            date         = selectedDate,
+            time         = selectedTime
+        )
+        db.updateBookingQr(bookingId, qrContent)
 
-        if (b.cbOracle.isChecked) totalPrice += 10000
-        if (b.cbFastTrack.isChecked) totalPrice += 30000
+        // Tampilkan dialog tiket QR
+        showQrTicketDialog(bookingId, pkg.name, qrContent)
+    }
 
-        val notes = b.etNotes.text.toString()
-        val readerName = intent.getStringExtra("READER_NAME") ?: ""
-        val readerId = intent.getIntExtra("READER_ID", 0)
+    // ── Dialog Tiket QR ───────────────────────────────────────────────────────
+    private fun showQrTicketDialog(bookingId: String, packageName: String, qrContent: String) {
+        val qrBitmap = QrHelper.generateQr(qrContent, sizePx = 600)
 
-        try {
-            var userId = 0
-            val cursor = db.rawQuery("SELECT id FROM users WHERE email = ?", arrayOf(email))
-            if (cursor.moveToFirst()) userId = cursor.getInt(0)
-            cursor.close()
+        val dialogView = layoutInflater.inflate(R.layout.dialog_qr_ticket, null)
+        dialogView.findViewById<android.widget.ImageView>(R.id.imgDialogQr)
+            .setImageBitmap(qrBitmap)
+        dialogView.findViewById<android.widget.TextView>(R.id.tvDialogBookingId)
+            .text = "#$bookingId"
+        dialogView.findViewById<android.widget.TextView>(R.id.tvDialogPackage)
+            .text = packageName
+        dialogView.findViewById<android.widget.TextView>(R.id.tvDialogSchedule)
+            .text = "$selectedDate  $selectedTime"
 
-            val sql = """
-                INSERT INTO bookings (user_id, reader_id, reader_name, email, package_name, payment_method, booking_date, booking_time, notes, status, total_price) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """.trimIndent()
-
-            db.execSQL(sql, arrayOf(
-                userId, readerId, readerName, email, paketClean, payment, selectedDate, selectedTime, notes, "paid", totalPrice
-            ))
-
-            val cursorId = db.rawQuery("SELECT last_insert_rowid()", null)
-            if (cursorId.moveToFirst()) {
-                val lastBookingId = cursorId.getInt(0)
-                db.execSQL("INSERT INTO questions (booking_id, question) VALUES (?, ?)",
-                    arrayOf(lastBookingId, notes))
+        AlertDialog.Builder(this)
+            .setView(dialogView)
+            .setTitle("🎉 Pesanan Berhasil!")
+            .setCancelable(false)
+            .setPositiveButton("💾 Simpan ke Galeri") { dialog, _ ->
+                saveQrToGallery(qrBitmap, bookingId)
+                dialog.dismiss()
+                finish()
             }
-            cursorId.close()
+            .setNegativeButton("Tutup") { dialog, _ ->
+                dialog.dismiss()
+                finish()
+            }
+            .show()
+    }
 
-            Toast.makeText(this, "Ritual berhasil dipesan! ✨", Toast.LENGTH_LONG).show()
-            finish()
-
-        } catch (e: Exception) {
-            Toast.makeText(this, "Gagal: ${e.message}", Toast.LENGTH_LONG).show()
+    // ── Simpan QR ke Galeri ───────────────────────────────────────────────────
+    private fun saveQrToGallery(bitmap: Bitmap, bookingId: String) {
+        // Minta permission jika perlu (Android < Q)
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q &&
+            ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            != PackageManager.PERMISSION_GRANTED
+        ) {
+            // Simpan bitmap di field sementara, lalu minta permission
+            pendingQrBitmap   = bitmap
+            pendingBookingId  = bookingId
+            requestPermissions(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), REQ_STORAGE)
+            return
         }
+        doSaveQr(bitmap, bookingId)
+    }
+
+    private var pendingQrBitmap:  Bitmap? = null
+    private var pendingBookingId: String  = ""
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == REQ_STORAGE &&
+            grantResults.firstOrNull() == PackageManager.PERMISSION_GRANTED
+        ) {
+            pendingQrBitmap?.let { doSaveQr(it, pendingBookingId) }
+        } else {
+            Toast.makeText(this, "Izin storage ditolak", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun doSaveQr(bitmap: Bitmap, bookingId: String) {
+        val filename = "TarotMeow_$bookingId.png"
+        try {
+            val fos = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                val cv = ContentValues().apply {
+                    put(MediaStore.Images.Media.DISPLAY_NAME, filename)
+                    put(MediaStore.Images.Media.MIME_TYPE, "image/png")
+                    put(
+                        MediaStore.Images.Media.RELATIVE_PATH,
+                        Environment.DIRECTORY_PICTURES + "/TarotMeow"
+                    )
+                }
+                val uri = contentResolver.insert(
+                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI, cv
+                ) ?: throw Exception("Gagal membuat URI")
+                contentResolver.openOutputStream(uri)
+            } else {
+                val dir = File(
+                    Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
+                    "TarotMeow"
+                )
+                dir.mkdirs()
+                FileOutputStream(File(dir, filename))
+            }
+            fos?.use { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }
+            Toast.makeText(this, "QR disimpan ke Galeri 📸", Toast.LENGTH_SHORT).show()
+        } catch (e: Exception) {
+            Toast.makeText(this, "Gagal menyimpan: ${e.message}", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    companion object {
+        private const val REQ_STORAGE = 201
     }
 }

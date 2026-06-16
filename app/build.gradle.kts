@@ -53,6 +53,8 @@ dependencies {
     implementation("com.guolindev.permissionx:permissionx:1.8.1")
     implementation("com.github.dhaval2404:imagepicker:2.1")
     implementation("com.google.android.material:material:1.13.0")
+    implementation("com.journeyapps:zxing-android-embedded:4.3.0")
+    implementation("com.google.zxing:core:3.5.2")
 
 
     testImplementation(libs.junit)

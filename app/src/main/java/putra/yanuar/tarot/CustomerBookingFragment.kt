@@ -9,7 +9,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-
 import putra.yanuar.tarot.databinding.FragmentCustomerBookingBinding
 
 class CustomerBookingFragment : Fragment(), View.OnClickListener {

@@ -17,7 +17,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- HOME FRAGMENT (NestedScrollView langsung, bukan FrameLayout) -->
+    <!-- HOME FRAGMENT -->
     <androidx.core.widget.NestedScrollView
         android:id="@+id/scrollReaderHome"
         android:layout_width="0dp"
@@ -141,6 +141,61 @@
                 </com.google.android.material.card.MaterialCardView>
             </LinearLayout>
 
+            <!-- ═══ SCAN QR BANNER ═══ -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:cardBackgroundColor="#AD88C6"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="4dp"
+                app:strokeWidth="0dp">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="16dp">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:text="VERIFIKASI TIKET"
+                            android:textColor="#F3E5F5"
+                            android:textSize="10sp"
+                            android:textStyle="bold"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+
+                        <TextView
+                            android:text="Scan QR untuk mulai sesi"
+                            android:textColor="#FFFFFF"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+                    </LinearLayout>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnScanQr"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:text="📷  Scan QR"
+                        android:textColor="#7469B6"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        app:backgroundTint="#FFFFFF"
+                        app:cornerRadius="100dp" />
+
+                </RelativeLayout>
+            </com.google.android.material.card.MaterialCardView>
+            <!-- ═══════════════════════ -->
+
             <!-- Antrean Aktif -->
             <TextView
                 android:layout_width="wrap_content"
@@ -206,6 +261,8 @@
                         android:textColor="#AD88C6"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content" />
+
+                    <!-- Mulai Ramalan — muncul setelah QR di-scan & terverifikasi -->
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnStartReading"
                         android:layout_width="match_parent"
@@ -215,6 +272,7 @@
                         android:visibility="gone"
                         app:cornerRadius="12dp"
                         app:backgroundTint="#7469B6" />
+
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 

@@ -17,6 +17,7 @@
         android:orientation="vertical"
         android:padding="16dp">
 
+        <!-- ── Baris 1: Nama paket + status ── -->
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
@@ -25,6 +26,8 @@
                 android:id="@+id/tvItemPackage"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_toStartOf="@+id/tvItemStatus"
+                android:layout_marginEnd="8dp"
                 android:text="9 Kartu Deep Reading"
                 android:textColor="#7469B6"
                 android:textStyle="bold" />
@@ -42,6 +45,7 @@
                 android:textSize="10sp" />
         </RelativeLayout>
 
+        <!-- Tanggal -->
         <TextView
             android:id="@+id/tvItemDate"
             android:layout_width="wrap_content"
@@ -51,12 +55,24 @@
             android:textColor="#80251819"
             android:textSize="11sp" />
 
+        <!-- Reader -->
+        <TextView
+            android:id="@+id/tvItemReader"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:text="Reader: -"
+            android:textColor="#7469B6"
+            android:textSize="11sp"
+            android:textStyle="bold" />
+
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginVertical="12dp"
             android:background="#FFE6E6" />
 
+        <!-- Pertanyaan & jawaban -->
         <TextView
             android:id="@+id/tvItemQuestion"
             android:layout_width="match_parent"
@@ -75,16 +91,7 @@
             android:textColor="#AD88C6"
             android:textSize="12sp" />
 
-        <TextView
-            android:id="@+id/tvItemReader"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="Reader: -"
-            android:textColor="#7469B6"
-            android:textSize="11sp"
-            android:textStyle="bold" />
-
+        <!-- Tombol aksi -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnCancelOrder"
             style="@style/Widget.Material3.Button.TextButton"
@@ -122,6 +129,7 @@
             app:backgroundTint="#F3E5F5"
             app:cornerRadius="8dp" />
 
+        <!-- Ulasan terkirim -->
         <LinearLayout
             android:id="@+id/layoutUlasanTerkirim"
             android:layout_width="match_parent"
@@ -161,6 +169,68 @@
                 android:lineSpacingExtra="2dp" />
 
         </LinearLayout>
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- QR TICKET — tampil untuk semua status kecuali CANCELLED -->
+        <!-- ═══════════════════════════════════════════ -->
+        <LinearLayout
+            android:id="@+id/layoutQrTicket"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/bg_border_rounded"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:visibility="gone">
+
+            <!-- Label -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_status_rounded"
+                android:backgroundTint="#7469B6"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="4dp"
+                android:text="🎫  TIKET SESI"
+                android:textColor="#FFFFFF"
+                android:textSize="10sp"
+                android:textStyle="bold" />
+
+            <!-- QR Image -->
+            <ImageView
+                android:id="@+id/imgQrCode"
+                android:layout_width="140dp"
+                android:layout_height="140dp"
+                android:layout_marginTop="12dp"
+                android:contentDescription="QR Code Booking" />
+
+            <!-- Booking ID -->
+            <TextView
+                android:id="@+id/tvQrBookingId"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:fontFamily="monospace"
+                android:textColor="#AD88C6"
+                android:textSize="10sp" />
+
+            <!-- Tombol simpan ke galeri -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSaveQr"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:layout_marginTop="8dp"
+                android:paddingHorizontal="20dp"
+                android:text="💾  Simpan QR"
+                android:textColor="#FFFFFF"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                app:backgroundTint="#AD88C6"
+                app:cornerRadius="100dp" />
+
+        </LinearLayout>
+        <!-- ═══════════════════════════════════════════ -->
 
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>
