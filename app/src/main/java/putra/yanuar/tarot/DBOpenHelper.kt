@@ -4,7 +4,7 @@ import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 
-class DBOpenHelper(context: Context) : SQLiteOpenHelper(context, "tarot_meow_db", null, 6) {
+class DBOpenHelper(context: Context) : SQLiteOpenHelper(context, "tarot_meow_db", null, 7) {
 
     override fun onCreate(db: SQLiteDatabase) {
         db.execSQL("""
@@ -37,7 +37,8 @@ class DBOpenHelper(context: Context) : SQLiteOpenHelper(context, "tarot_meow_db"
                 user_id INTEGER, reader_id INTEGER DEFAULT 0, reader_name TEXT,
                 package_name TEXT, type TEXT, booking_date TEXT, booking_time TEXT,
                 name TEXT, email TEXT, phone TEXT, payment_method TEXT,
-                status TEXT DEFAULT 'pending', total_price INTEGER, notes TEXT
+                status TEXT DEFAULT 'pending', total_price INTEGER, notes TEXT,
+                qr_content TEXT DEFAULT ''
             )
         """)
 
@@ -70,10 +71,10 @@ class DBOpenHelper(context: Context) : SQLiteOpenHelper(context, "tarot_meow_db"
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
         if (oldVersion < 4) {
-            try { db.execSQL("ALTER TABLE users ADD COLUMN foto TEXT DEFAULT ''") } catch (e: Exception) {}
+            try { db.execSQL("ALTER TABLE users ADD COLUMN foto TEXT DEFAULT ''") } catch (_: Exception) {}
         }
         if (oldVersion < 5) {
-            try { db.execSQL("ALTER TABLE testimonials ADD COLUMN rating INTEGER DEFAULT 0") } catch (e: Exception) {}
+            try { db.execSQL("ALTER TABLE testimonials ADD COLUMN rating INTEGER DEFAULT 0") } catch (_: Exception) {}
         }
         if (oldVersion < 6) {
             try {
@@ -84,7 +85,11 @@ class DBOpenHelper(context: Context) : SQLiteOpenHelper(context, "tarot_meow_db"
                         note TEXT, created_at TEXT DEFAULT (datetime('now','localtime'))
                     )
                 """)
-            } catch (e: Exception) {}
+            } catch (_: Exception) {}
+        }
+        if (oldVersion < 7) {
+            // Tambah kolom qr_content jika belum ada
+            try { db.execSQL("ALTER TABLE bookings ADD COLUMN qr_content TEXT DEFAULT ''") } catch (_: Exception) {}
         }
     }
 

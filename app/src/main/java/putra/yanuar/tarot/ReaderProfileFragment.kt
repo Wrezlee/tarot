@@ -13,21 +13,35 @@ import putra.yanuar.tarot.databinding.FragmentReaderProfileBinding
 
 class ReaderProfileFragment : Fragment() {
 
-    lateinit var b: FragmentReaderProfileBinding
-    lateinit var thisParent: ReaderActivity
-    lateinit var db: SQLiteDatabase
+    private lateinit var b: FragmentReaderProfileBinding
+    private lateinit var db: SQLiteDatabase
+    private var readerId: Int = 0
+
+    companion object {
+        private const val ARG_READER_ID = "reader_id"
+
+        fun newInstance(readerId: Int): ReaderProfileFragment {
+            val fragment = ReaderProfileFragment()
+            val args = Bundle()
+            args.putInt(ARG_READER_ID, readerId)
+            fragment.arguments = args
+            return fragment
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         b = FragmentReaderProfileBinding.inflate(inflater, container, false)
-        thisParent = activity as ReaderActivity
-        db = thisParent.getDbObject()
+
+        readerId = arguments?.getInt(ARG_READER_ID) ?: 0
+        db = DBOpenHelper(requireContext()).writableDatabase
 
         b.btnEditReaderProfile.setOnClickListener {
-            val i = Intent(thisParent, ReaderEditProfileActivity::class.java)
-            i.putExtra("USER_EMAIL", thisParent.getUserEmail())
+            val email = getUserEmail()
+            val i = Intent(requireContext(), ReaderEditProfileActivity::class.java)
+            i.putExtra("USER_EMAIL", email)
             startActivity(i)
         }
 
@@ -40,19 +54,24 @@ class ReaderProfileFragment : Fragment() {
         loadProfileData()
     }
 
-    private fun loadProfileData() {
-        val email = thisParent.getUserEmail()
+    private fun getUserEmail(): String {
+        val c = db.rawQuery("SELECT email FROM users WHERE id = ?", arrayOf(readerId.toString()))
+        val email = if (c.moveToFirst()) c.getString(0) ?: "" else ""
+        c.close()
+        return email
+    }
 
+    private fun loadProfileData() {
         val c = db.rawQuery(
-            "SELECT id, name, email, role, foto FROM users WHERE email = ?",
-            arrayOf(email)
+            "SELECT id, name, email, role, foto FROM users WHERE id = ?",
+            arrayOf(readerId.toString())
         )
 
         if (c.moveToFirst()) {
-            val readerId = c.getInt(0)
-            b.tvReaderProfileName.text  = c.getString(1)
-            b.tvReaderProfileEmail.text = c.getString(2)
-            b.tvReaderProfileRole.text  = "LEVEL: ${c.getString(3).uppercase()}"
+            val id = c.getInt(0)
+            b.tvReaderProfileName.text  = c.getString(1) ?: "Reader"
+            b.tvReaderProfileEmail.text = c.getString(2) ?: ""
+            b.tvReaderProfileRole.text  = "LEVEL: ${(c.getString(3) ?: "reader").uppercase()}"
 
             val fotoBase64 = if (!c.isNull(4)) c.getString(4) else null
             if (!fotoBase64.isNullOrEmpty()) {
@@ -60,7 +79,7 @@ class ReaderProfileFragment : Fragment() {
                     val bytes = Base64.decode(fotoBase64, Base64.DEFAULT)
                     val bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
                     b.imgReaderAvatar.setImageBitmap(bmp)
-                } catch (e: Exception) {
+                } catch (_: Exception) {
                     b.imgReaderAvatar.setImageResource(R.drawable.meow)
                 }
             } else {
@@ -69,14 +88,14 @@ class ReaderProfileFragment : Fragment() {
 
             val cSesi = db.rawQuery(
                 "SELECT COUNT(*) FROM bookings WHERE reader_id = ? AND status IN ('completed','COMPLETED','done','DONE')",
-                arrayOf(readerId.toString())
+                arrayOf(id.toString())
             )
             if (cSesi.moveToFirst()) b.tvReaderTotalSessions.text = cSesi.getInt(0).toString()
             cSesi.close()
 
             val cEarn = db.rawQuery(
                 "SELECT SUM(total_price) FROM bookings WHERE reader_id = ? AND status IN ('completed','COMPLETED','done','DONE')",
-                arrayOf(readerId.toString())
+                arrayOf(id.toString())
             )
             if (cEarn.moveToFirst()) b.tvReaderTotalEarning.text = "Rp${cEarn.getInt(0)}"
             cEarn.close()

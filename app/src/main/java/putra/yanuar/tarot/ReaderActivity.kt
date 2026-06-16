@@ -2,39 +2,39 @@ package putra.yanuar.tarot
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.database.sqlite.SQLiteDatabase
 import android.os.Bundle
+import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import putra.yanuar.tarot.databinding.ActivityReaderBinding
-import putra.yanuar.tarot.QrHelper
-import putra.yanuar.tarot.Booking
 import com.journeyapps.barcodescanner.ScanContract
 import com.journeyapps.barcodescanner.ScanIntentResult
 import com.journeyapps.barcodescanner.ScanOptions
-import com.putra.yanuar.tarot.DatabaseHelper
+import putra.yanuar.tarot.databinding.ActivityReaderBinding
 
 class ReaderActivity : AppCompatActivity() {
 
-    // ── ViewBinding ──────────────────────────────────────────────────────────
     private lateinit var binding: ActivityReaderBinding
+    private lateinit var db: SQLiteDatabase
 
-    // ── Database ─────────────────────────────────────────────────────────────
-    private lateinit var db: DatabaseHelper
-
-    // ── State ────────────────────────────────────────────────────────────────
-    private var readerId:   String = ""
+    private var readerId:   Int    = 0
     private var readerName: String = ""
+    private var userEmail:  String = ""
 
-    // Booking yang sedang aktif / sudah ter-verifikasi QR
-    private var verifiedBooking: Booking? = null
+    // Booking yang sudah ter-verifikasi QR
+    private var verifiedBookingId: String = ""
 
-    // ── ZXing scan launcher ───────────────────────────────────────────────────
+    // ── Public getter untuk fragment ─────────────────────────────────────────
+    fun getDbObject(): SQLiteDatabase = db
+    fun getReaderId(): Int            = readerId
+    fun getUserEmail(): String        = userEmail
+
+    // ── ZXing scan launcher ──────────────────────────────────────────────────
     private val scanLauncher = registerForActivityResult(ScanContract()) { result: ScanIntentResult ->
         if (result.contents != null) {
             handleQrScanResult(result.contents)
@@ -43,16 +43,35 @@ class ReaderActivity : AppCompatActivity() {
         }
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityReaderBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        db = DatabaseHelper(this)
+        db = DBOpenHelper(this).writableDatabase
 
-        readerId   = intent.getStringExtra("USER_ID")   ?: ""
-        readerName = intent.getStringExtra("USER_NAME") ?: ""
+        userEmail  = intent.getStringExtra("USER_EMAIL") ?: ""
+
+        // Resolve readerId & readerName dari email
+        if (userEmail.isNotEmpty()) {
+            val c = db.rawQuery("SELECT id, name FROM users WHERE email = ?", arrayOf(userEmail))
+            if (c.moveToFirst()) {
+                readerId   = c.getInt(0)
+                readerName = c.getString(1) ?: ""
+            }
+            c.close()
+        }
+
+        // Fallback jika dikirim langsung
+        if (readerId == 0) {
+            readerId   = intent.getStringExtra("USER_ID")?.toIntOrNull()   ?: 0
+            readerName = intent.getStringExtra("USER_NAME") ?: ""
+        }
+
+        // Toggle status online
+        try {
+            db.execSQL("UPDATE users SET is_online = 1 WHERE id = ?", arrayOf(readerId.toString()))
+        } catch (_: Exception) {}
 
         setupToolbar()
         setupBottomNav()
@@ -61,13 +80,11 @@ class ReaderActivity : AppCompatActivity() {
         refreshDashboard()
     }
 
-    // ── Toolbar ───────────────────────────────────────────────────────────────
     private fun setupToolbar() {
         setSupportActionBar(binding.toolbarReader)
         supportActionBar?.title = "Dashboard Reader"
     }
 
-    // ── Bottom Navigation ─────────────────────────────────────────────────────
     private fun setupBottomNav() {
         binding.navbarReader.setOnItemSelectedListener { item ->
             when (item.itemId) {
@@ -100,36 +117,23 @@ class ReaderActivity : AppCompatActivity() {
         }
     }
 
-    // ── Tombol Scan QR ────────────────────────────────────────────────────────
     private fun setupScanButton() {
         binding.btnScanQr.setOnClickListener {
             checkCameraPermissionThenScan()
         }
     }
 
-    // ── Tombol Mulai Ramalan ─────────────────────────────────────────────────
     private fun setupStartReadingButton() {
         binding.btnStartReading.setOnClickListener {
-            val booking = verifiedBooking ?: return@setOnClickListener
-            AlertDialog.Builder(this)
-                .setTitle("🔮 Mulai Sesi?")
-                .setMessage("Kamu akan memulai ramalan untuk:\n\n" +
-                        "Customer : ${booking.customerName}\n" +
-                        "Paket    : ${booking.packageName}\n" +
-                        "Jadwal   : ${booking.date}  ${booking.time}")
-                .setPositiveButton("Mulai Sekarang") { _, _ ->
-                    db.updateBookingStatus(booking.id, "ON_PROGRESS")
-                    Toast.makeText(this, "Sesi dimulai! 🔮", Toast.LENGTH_SHORT).show()
-                    binding.btnStartReading.visibility = View.GONE
-                    verifiedBooking = null
-                    refreshDashboard()
-                }
-                .setNegativeButton("Batal", null)
-                .show()
+            if (verifiedBookingId.isEmpty()) return@setOnClickListener
+            db.execSQL("UPDATE bookings SET status = 'processing' WHERE id = ?", arrayOf(verifiedBookingId))
+            Toast.makeText(this, "Sesi dimulai! 🔮", Toast.LENGTH_SHORT).show()
+            binding.btnStartReading.visibility = View.GONE
+            verifiedBookingId = ""
+            refreshDashboard()
         }
     }
 
-    // ── Check Kamera & Launch Scanner ─────────────────────────────────────────
     private fun checkCameraPermissionThenScan() {
         when {
             ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
@@ -140,36 +144,26 @@ class ReaderActivity : AppCompatActivity() {
                     .setTitle("Izin Kamera Dibutuhkan")
                     .setMessage("Untuk scan QR tiket customer, aplikasi butuh akses kamera.")
                     .setPositiveButton("Izinkan") { _, _ ->
-                        ActivityCompat.requestPermissions(
-                            this, arrayOf(Manifest.permission.CAMERA), REQ_CAMERA
-                        )
+                        ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA), REQ_CAMERA)
                     }
                     .setNegativeButton("Batal", null)
                     .show()
             }
 
-            else -> ActivityCompat.requestPermissions(
-                this, arrayOf(Manifest.permission.CAMERA), REQ_CAMERA
-            )
+            else -> ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA), REQ_CAMERA)
         }
     }
 
     override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
+        requestCode: Int, permissions: Array<out String>, grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == REQ_CAMERA &&
             grantResults.firstOrNull() == PackageManager.PERMISSION_GRANTED
-        ) {
-            launchScanner()
-        } else {
-            Toast.makeText(this, "Izin kamera ditolak ", Toast.LENGTH_SHORT).show()
-        }
+        ) launchScanner()
+        else Toast.makeText(this, "Izin kamera ditolak", Toast.LENGTH_SHORT).show()
     }
 
-    // ── Launch ZXing Scanner ──────────────────────────────────────────────────
     private fun launchScanner() {
         val options = ScanOptions().apply {
             setPrompt("Arahkan ke QR Tiket customer 🔮")
@@ -180,100 +174,115 @@ class ReaderActivity : AppCompatActivity() {
         scanLauncher.launch(options)
     }
 
-    // ── Handle Hasil Scan ─────────────────────────────────────────────────────
     private fun handleQrScanResult(raw: String) {
         val data = QrHelper.parseQrContent(raw)
 
         if (data == null) {
             AlertDialog.Builder(this)
-                .setTitle(" QR Tidak Valid")
+                .setTitle("QR Tidak Valid")
                 .setMessage("Format QR tidak dikenali. Pastikan customer scan QR dari aplikasi Tarot Meow.")
-                .setPositiveButton("OK", null)
-                .show()
+                .setPositiveButton("OK", null).show()
             return
         }
 
-        // Cek booking di database
-        val booking = db.getBookingById(data.bookingId)
-
-        if (booking == null) {
+        // Ambil booking dari DB lokal
+        val cursor = db.rawQuery("SELECT id, status, package_name, booking_date, booking_time, payment_method, total_price FROM bookings WHERE id = ?", arrayOf(data.bookingId))
+        if (!cursor.moveToFirst()) {
+            cursor.close()
             AlertDialog.Builder(this)
-                .setTitle(" Booking Tidak Ditemukan")
+                .setTitle("Booking Tidak Ditemukan")
                 .setMessage("ID Booking #${data.bookingId} tidak ada di sistem.")
-                .setPositiveButton("OK", null)
-                .show()
+                .setPositiveButton("OK", null).show()
             return
         }
 
-        // Cek status booking — hanya PENDING atau PAID yang boleh di-scan
-        if (booking.status.uppercase() !in listOf("PENDING", "PAID", "CONFIRMED")) {
+        val status     = cursor.getString(1)?.uppercase() ?: "PENDING"
+        val pkgName    = cursor.getString(2) ?: "-"
+        val date       = cursor.getString(3) ?: "-"
+        val time       = cursor.getString(4) ?: "--:--"
+        val payment    = cursor.getString(5) ?: "-"
+        val totalPrice = cursor.getInt(6)
+        cursor.close()
+
+        if (status !in listOf("PENDING", "PAID", "CONFIRMED")) {
             AlertDialog.Builder(this)
                 .setTitle("⚠ Status Tidak Valid")
-                .setMessage(
-                    "Booking ini berstatus: ${booking.status}\n\n" +
-                            "Hanya booking PENDING / PAID yang bisa dimulai."
-                )
-                .setPositiveButton("OK", null)
-                .show()
+                .setMessage("Booking ini berstatus: $status\n\nHanya booking PENDING / PAID yang bisa dimulai.")
+                .setPositiveButton("OK", null).show()
             return
         }
 
-        // Verifikasi berhasil — tampilkan detail & konfirmasi
-        showVerifiedDialog(booking)
+        showVerifiedDialog(data.bookingId, data.customerName, pkgName, date, time, payment, totalPrice)
     }
 
-    // ── Dialog Setelah Verifikasi Berhasil ───────────────────────────────────
-    private fun showVerifiedDialog(booking: Booking) {
+    private fun showVerifiedDialog(
+        bookingId: String, customerName: String, pkgName: String,
+        date: String, time: String, payment: String, totalPrice: Int
+    ) {
         AlertDialog.Builder(this)
-            .setTitle(" Tiket Terverifikasi!")
+            .setTitle("✅ Tiket Terverifikasi!")
             .setMessage(
-                "Customer  : ${booking.customerName}\n" +
-                        "Paket     : ${booking.packageName}\n" +
-                        "Jadwal    : ${booking.date}  ${booking.time}\n" +
-                        "Bayar     : ${booking.paymentMethod}\n" +
-                        "Total     : Rp${"%,d".format(booking.totalPrice)}\n\n" +
+                "Customer  : $customerName\n" +
+                        "Paket     : $pkgName\n" +
+                        "Jadwal    : $date  $time\n" +
+                        "Bayar     : $payment\n" +
+                        "Total     : Rp${"%,d".format(totalPrice)}\n\n" +
                         "Mulai sesi ramalan sekarang?"
             )
             .setPositiveButton("🔮 Mulai Ramalan") { _, _ ->
-                // Update status ke ON_PROGRESS langsung dari sini
-                db.updateBookingStatus(booking.id, "ON_PROGRESS")
-                verifiedBooking = null
+                db.execSQL("UPDATE bookings SET status = 'processing' WHERE id = ?", arrayOf(bookingId))
+                verifiedBookingId = ""
                 Toast.makeText(this, "Sesi dimulai! 🔮", Toast.LENGTH_SHORT).show()
                 refreshDashboard()
             }
             .setNeutralButton("Lihat Detail Dulu") { _, _ ->
-                // Simpan booking, tampilkan tombol Mulai Ramalan di card
-                verifiedBooking = booking
-                updateNextBookingCard(booking)
+                verifiedBookingId = bookingId
+                binding.tvNextCustomerName.text = customerName
+                binding.tvNextPackageName.text  = " $pkgName"
+                binding.tvNextBookingDate.text  = " $date"
+                binding.tvNextBookingTime.text  = time
                 binding.btnStartReading.visibility = View.VISIBLE
-                Toast.makeText(
-                    this,
-                    "Tiket valid  Tap 'Mulai Ramalan' saat siap",
-                    Toast.LENGTH_LONG
-                ).show()
+                Toast.makeText(this, "Tiket valid ✅  Tap 'Mulai Ramalan' saat siap", Toast.LENGTH_LONG).show()
             }
             .setNegativeButton("Batal", null)
             .show()
     }
 
-    // ── Refresh Dashboard ─────────────────────────────────────────────────────
     private fun refreshDashboard() {
-        // Hitung statistik
-        val pending   = db.countBookingsByReaderAndStatus(readerId, "PENDING")
-        val onProgress = db.countBookingsByReaderAndStatus(readerId, "ON_PROGRESS")
-        val done      = db.countBookingsByReaderAndStatus(readerId, "DONE")
+        val cPending = db.rawQuery(
+            "SELECT COUNT(*) FROM bookings WHERE reader_id = ? AND status IN ('pending','PENDING','paid','PAID')",
+            arrayOf(readerId.toString())
+        )
+        val pending = if (cPending.moveToFirst()) cPending.getInt(0) else 0
+        cPending.close()
 
-        binding.tvPendingCount.text   = (pending + onProgress).toString()
+        val cDone = db.rawQuery(
+            "SELECT COUNT(*) FROM bookings WHERE reader_id = ? AND status IN ('completed','COMPLETED','done','DONE')",
+            arrayOf(readerId.toString())
+        )
+        val done = if (cDone.moveToFirst()) cDone.getInt(0) else 0
+        cDone.close()
+
+        binding.tvPendingCount.text   = pending.toString()
         binding.tvCompletedCount.text = done.toString()
-
-        // Nama reader di subtitle
         binding.tvReaderGreeting.text  = "Dashboard Reader"
-        binding.tvReaderSubtitle.text  = "Halo, $readerName "
+        binding.tvReaderSubtitle.text  = "Halo, $readerName 🔮"
 
-        // Next booking (paling awal yang PENDING)
-        val nextBooking = db.getNextBookingForReader(readerId)
-        if (nextBooking != null) {
-            updateNextBookingCard(nextBooking)
+        // Next booking
+        val cNext = db.rawQuery(
+            """SELECT b.id, u.name, b.email, b.package_name, b.booking_date, b.booking_time
+               FROM bookings b
+               LEFT JOIN users u ON b.email = u.email
+               WHERE b.reader_id = ? AND b.status IN ('pending','PENDING','paid','PAID','confirmed','CONFIRMED')
+               ORDER BY b.booking_date ASC, b.booking_time ASC LIMIT 1""",
+            arrayOf(readerId.toString())
+        )
+        if (cNext.moveToFirst()) {
+            val custName = cNext.getString(1)?.takeIf { it.isNotEmpty() } ?: cNext.getString(2) ?: "-"
+            binding.tvNextCustomerName.text = custName
+            binding.tvNextBookingTime.text  = cNext.getString(5) ?: "--:--"
+            binding.tvNextBookingDate.text  = " ${cNext.getString(4) ?: ""}"
+            binding.tvNextPackageName.text  = " ${cNext.getString(3) ?: ""}"
         } else {
             binding.tvNextCustomerName.text = "Belum Ada Antrean"
             binding.tvNextBookingTime.text  = "--:--"
@@ -281,29 +290,51 @@ class ReaderActivity : AppCompatActivity() {
             binding.tvNextPackageName.text  = "Siap melayani sesi baru"
             binding.btnStartReading.visibility = View.GONE
         }
+        cNext.close()
     }
 
-    private fun updateNextBookingCard(booking: Booking) {
-        binding.tvNextCustomerName.text = booking.customerName
-        binding.tvNextBookingTime.text  = booking.time
-        binding.tvNextBookingDate.text  = " ${booking.date}"
-        binding.tvNextPackageName.text  = " ${booking.packageName}"
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.reader_menu_option, menu)
+        menu?.findItem(R.id.menu_music)?.title =
+            if (MusicManager.isMuted()) " Musik OFF" else " Musik ON"
+        return true
     }
 
-    // ── Options menu (logout, musik, about) ──────────────────────────────────
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.menu_logout -> {
                 AlertDialog.Builder(this)
                     .setTitle("Logout")
                     .setMessage("Yakin ingin keluar?")
-                    .setPositiveButton("Ya") { _, _ -> finish() }
+                    .setPositiveButton("Ya") { _, _ ->
+                        try { db.execSQL("UPDATE users SET is_online = 0 WHERE id = ?", arrayOf(readerId.toString())) } catch (_: Exception) {}
+                        val intent = android.content.Intent(this, MainActivity::class.java)
+                        intent.flags = android.content.Intent.FLAG_ACTIVITY_NEW_TASK or android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        startActivity(intent)
+                        finish()
+                    }
                     .setNegativeButton("Batal", null)
                     .show()
                 true
             }
+            R.id.menu_music -> {
+                val nowMuted = MusicManager.toggleMute()
+                item.title = if (nowMuted) " Musik OFF" else " Musik ON"
+                true
+            }
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        refreshDashboard()
+        MusicManager.resume()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        MusicManager.pause()
     }
 
     companion object {

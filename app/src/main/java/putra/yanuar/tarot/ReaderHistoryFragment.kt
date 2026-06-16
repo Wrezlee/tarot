@@ -15,29 +15,30 @@ import java.util.Locale
 
 class ReaderHistoryFragment : Fragment() {
 
-    lateinit var b: FragmentReaderHistoryBinding
-    lateinit var thisParent: ReaderActivity
-    lateinit var db: SQLiteDatabase
+    private lateinit var b: FragmentReaderHistoryBinding
+    private lateinit var db: SQLiteDatabase
+    private var readerId: Int = 0
 
-    data class ReaderHistoryItem(
-        val id: Int,
-        val customerName: String,
-        val packageName: String,
-        val bookingDate: String,
-        val status: String,
-        val question: String,
-        val answer: String
-    )
+    companion object {
+        private const val ARG_READER_ID = "reader_id"
 
-    private val historyList = ArrayList<ReaderHistoryItem>()
+        fun newInstance(readerId: Int): ReaderHistoryFragment {
+            val fragment = ReaderHistoryFragment()
+            val args = Bundle()
+            args.putInt(ARG_READER_ID, readerId)
+            fragment.arguments = args
+            return fragment
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         b = FragmentReaderHistoryBinding.inflate(inflater, container, false)
-        thisParent = activity as ReaderActivity
-        db = thisParent.getDbObject()
+
+        readerId = arguments?.getInt(ARG_READER_ID) ?: 0
+        db = DBOpenHelper(requireContext()).writableDatabase
 
         loadEarnings()
         loadStats()
@@ -55,7 +56,6 @@ class ReaderHistoryFragment : Fragment() {
 
     private fun loadEarnings() {
         try {
-            val readerId = thisParent.getReaderId()
             val today = SimpleDateFormat("d/M/yyyy", Locale.getDefault())
                 .format(Calendar.getInstance().time)
 
@@ -71,13 +71,11 @@ class ReaderHistoryFragment : Fragment() {
                 arrayOf(readerId.toString())
             )
 
-            var totalAll = 0
-            var totalToday = 0
-            var totalWeek = 0
+            var totalAll = 0; var totalToday = 0; var totalWeek = 0
             val sdf = SimpleDateFormat("d/M/yyyy", Locale.getDefault())
 
             while (cursor.moveToNext()) {
-                val price = cursor.getInt(0)
+                val price   = cursor.getInt(0)
                 val dateStr = cursor.getString(1) ?: ""
                 totalAll += price
                 try {
@@ -86,7 +84,7 @@ class ReaderHistoryFragment : Fragment() {
                         if (dateStr == today) totalToday += price
                         if (!bookingDate.before(startOfWeek)) totalWeek += price
                     }
-                } catch (ex: Exception) { ex.printStackTrace() }
+                } catch (_: Exception) {}
             }
             cursor.close()
 
@@ -100,8 +98,6 @@ class ReaderHistoryFragment : Fragment() {
 
     private fun loadStats() {
         try {
-            val readerId = thisParent.getReaderId()
-
             val cDone = db.rawQuery(
                 "SELECT COUNT(*) FROM bookings WHERE status IN ('completed','COMPLETED','done','DONE') AND reader_id = ?",
                 arrayOf(readerId.toString())
@@ -110,7 +106,7 @@ class ReaderHistoryFragment : Fragment() {
             cDone.close()
 
             val cPending = db.rawQuery(
-                "SELECT COUNT(*) FROM bookings WHERE status IN ('paid','PAID') AND (reader_id = ? OR reader_id = 0)",
+                "SELECT COUNT(*) FROM bookings WHERE status IN ('paid','PAID','pending','PENDING') AND reader_id = ?",
                 arrayOf(readerId.toString())
             )
             if (cPending.moveToFirst()) b.tvStatsPending.text = cPending.getInt(0).toString()
@@ -123,8 +119,6 @@ class ReaderHistoryFragment : Fragment() {
 
     private fun loadHistory() {
         try {
-            val readerId = thisParent.getReaderId()
-
             val cursor = db.rawQuery(
                 """SELECT b.id, u.name, b.email, b.package_name, b.booking_date, b.status, q.question, q.answer
                    FROM bookings b
@@ -136,28 +130,11 @@ class ReaderHistoryFragment : Fragment() {
                 arrayOf(readerId.toString())
             )
 
-            historyList.clear()
-            while (cursor.moveToNext()) {
-                val customerName = cursor.getString(1)?.takeIf { it.isNotEmpty() }
-                    ?: cursor.getString(2) ?: "-"
-                historyList.add(
-                    ReaderHistoryItem(
-                        id           = cursor.getInt(0),
-                        customerName = customerName,
-                        packageName  = cursor.getString(3) ?: "-",
-                        bookingDate  = cursor.getString(4) ?: "-",
-                        status       = (cursor.getString(5) ?: "").uppercase(),
-                        question     = "Q: " + (cursor.getString(6) ?: "Tidak ada pertanyaan"),
-                        answer       = "A: " + (cursor.getString(7) ?: "Belum dijawab")
-                    )
-                )
-            }
-            cursor.close()
-
             val container = b.containerReaderHistory
             container.removeAllViews()
 
-            if (historyList.isEmpty()) {
+            if (!cursor.moveToFirst()) {
+                cursor.close()
                 val tvEmpty = TextView(requireContext()).apply {
                     text = "Belum ada sesi yang selesai"
                     setTextColor(0xFFAD88C6.toInt())
@@ -168,19 +145,28 @@ class ReaderHistoryFragment : Fragment() {
                 return
             }
 
-            for (item in historyList) {
+            do {
+                val customerName = cursor.getString(1)?.takeIf { it.isNotEmpty() }
+                    ?: cursor.getString(2) ?: "-"
+                val status   = (cursor.getString(5) ?: "").uppercase()
+                val question = "Q: " + (cursor.getString(6) ?: "Tidak ada pertanyaan")
+                val answer   = "A: " + (cursor.getString(7) ?: "Belum dijawab")
+
                 val binding = ItemCustomerHistoryBinding.inflate(layoutInflater, container, false)
-                binding.tvItemPackage.text  = item.packageName
-                binding.tvItemDate.text     = item.bookingDate
-                binding.tvItemStatus.text   = item.status
-                binding.tvItemQuestion.text = item.question
-                binding.tvItemAnswer.text   = item.answer
-                binding.tvItemReader.text   = "Customer: ${item.customerName}"
+                binding.tvItemPackage.text  = cursor.getString(3) ?: "-"
+                binding.tvItemDate.text     = cursor.getString(4) ?: "-"
+                binding.tvItemStatus.text   = status
+                binding.tvItemQuestion.text = question
+                binding.tvItemAnswer.text   = answer
+                binding.tvItemReader.text   = "Customer: $customerName"
                 binding.btnCancelOrder.visibility  = View.GONE
                 binding.btnTulisUlasan.visibility  = View.GONE
                 binding.btnShareRamalan.visibility = View.GONE
+                binding.layoutQrTicket.visibility  = View.GONE
                 container.addView(binding.root)
-            }
+            } while (cursor.moveToNext())
+
+            cursor.close()
         } catch (e: Exception) {
             e.printStackTrace()
         }
