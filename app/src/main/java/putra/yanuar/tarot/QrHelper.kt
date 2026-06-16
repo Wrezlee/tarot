@@ -8,11 +8,6 @@ import com.google.zxing.qrcode.QRCodeWriter
 
 object QrHelper {
 
-    /**
-     * Generate QR code bitmap dengan warna brand #7469B6
-     * @param content  string yang di-encode
-     * @param sizePx   ukuran bitmap px (default 400)
-     */
     fun generateQr(content: String, sizePx: Int = 400): Bitmap {
         val hints = mapOf(
             EncodeHintType.MARGIN to 1,
@@ -32,10 +27,6 @@ object QrHelper {
         return bitmap
     }
 
-    /**
-     * Format isi QR:
-     * "TAROT-MEOW|bookingId|customerId|customerName|packageName|date|time"
-     */
     fun buildQrContent(
         bookingId: String,
         customerId: String,
@@ -54,9 +45,7 @@ object QrHelper {
         val time: String
     )
 
-    /**
-     * Parse hasil scan kamera. Return null jika format tidak valid.
-     */
+
     fun parseQrContent(raw: String): QrData? {
         return try {
             val parts = raw.split("|")

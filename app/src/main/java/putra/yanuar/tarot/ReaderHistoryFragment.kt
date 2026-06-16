@@ -57,57 +57,99 @@ class ReaderHistoryFragment : Fragment() {
 
     private fun loadEarnings() {
         try {
-            val today = SimpleDateFormat("d/M/yyyy", Locale.getDefault())
-                .format(Calendar.getInstance().time)
+            // Format tanggal yang sama persis dengan yang disimpan di DB
+            // CustomerOrderActivity: "%d/%d/%d".format(d, m + 1, y) → "17/6/2026"
+            val sdf = SimpleDateFormat("d/M/yyyy", Locale.getDefault())
 
-            val cal = Calendar.getInstance()
-            val dayOfWeek = cal.get(Calendar.DAY_OF_WEEK)
-            cal.add(Calendar.DAY_OF_MONTH, -(dayOfWeek - Calendar.MONDAY))
-            val startOfWeek = cal.time
+            val calToday = Calendar.getInstance()
+            val todayStr = sdf.format(calToday.time)
 
+            // Hitung start of week (Senin) dengan cara yang aman
+            val calWeekStart = Calendar.getInstance()
+            // Set ke hari Senin minggu ini
+            calWeekStart.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
+            // Jika hari ini Minggu (DAY_OF_WEEK=1), mundur 6 hari ke Senin lalu
+            if (calToday.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY) {
+                calWeekStart.add(Calendar.DAY_OF_MONTH, -6)
+            }
+            // Reset ke jam 00:00:00 supaya perbandingan akurat
+            calWeekStart.set(Calendar.HOUR_OF_DAY, 0)
+            calWeekStart.set(Calendar.MINUTE, 0)
+            calWeekStart.set(Calendar.SECOND, 0)
+            calWeekStart.set(Calendar.MILLISECOND, 0)
+
+            // Ambil semua booking selesai milik reader ini (termasuk reader_id=0)
             val cursor = db.rawQuery(
                 """SELECT total_price, booking_date FROM bookings
-                   WHERE reader_id = ?
+                   WHERE (reader_id = ? OR reader_id = 0 OR reader_id IS NULL)
                    AND status IN ('completed','COMPLETED','done','DONE')""",
                 arrayOf(readerId.toString())
             )
 
-            var totalAll = 0; var totalToday = 0; var totalWeek = 0
-            val sdf = SimpleDateFormat("d/M/yyyy", Locale.getDefault())
+            var totalAll = 0
+            var totalToday = 0
+            var totalWeek = 0
 
             while (cursor.moveToNext()) {
                 val price   = cursor.getInt(0)
                 val dateStr = cursor.getString(1) ?: ""
                 totalAll += price
+
                 try {
+                    // Cek apakah tanggal booking = hari ini
+                    if (dateStr == todayStr) {
+                        totalToday += price
+                    }
+
+                    // Cek apakah tanggal booking dalam minggu ini
                     val bookingDate = sdf.parse(dateStr)
                     if (bookingDate != null) {
-                        if (dateStr == today) totalToday += price
-                        if (!bookingDate.before(startOfWeek)) totalWeek += price
+                        val calBooking = Calendar.getInstance()
+                        calBooking.time = bookingDate
+                        // Booking minggu ini jika >= Senin minggu ini
+                        if (!calBooking.before(calWeekStart)) {
+                            totalWeek += price
+                        }
                     }
-                } catch (_: Exception) {}
+                } catch (_: Exception) {
+                    // Skip jika format tanggal tidak valid
+                }
             }
             cursor.close()
 
-            b.tvEarningTotal.text = "Rp $totalAll"
-            b.tvEarningToday.text = "Rp $totalToday"
-            b.tvEarningWeek.text  = "Rp $totalWeek"
+            b.tvEarningTotal.text = "Rp ${formatRupiah(totalAll)}"
+            b.tvEarningToday.text = "Rp ${formatRupiah(totalToday)}"
+            b.tvEarningWeek.text  = "Rp ${formatRupiah(totalWeek)}"
+
         } catch (e: Exception) {
             e.printStackTrace()
+            b.tvEarningTotal.text = "Rp 0"
+            b.tvEarningToday.text = "Rp 0"
+            b.tvEarningWeek.text  = "Rp 0"
         }
+    }
+
+    // Format angka dengan titik ribuan: 130000 → "130.000"
+    private fun formatRupiah(amount: Int): String {
+        return String.format(Locale.getDefault(), "%,d", amount).replace(',', '.')
     }
 
     private fun loadStats() {
         try {
+            // FIX: sertakan reader_id=0 supaya konsisten dengan loadEarnings dan loadHistory
             val cDone = db.rawQuery(
-                "SELECT COUNT(*) FROM bookings WHERE status IN ('completed','COMPLETED','done','DONE') AND reader_id = ?",
+                """SELECT COUNT(*) FROM bookings 
+                   WHERE status IN ('completed','COMPLETED','done','DONE') 
+                   AND (reader_id = ? OR reader_id = 0 OR reader_id IS NULL)""",
                 arrayOf(readerId.toString())
             )
             if (cDone.moveToFirst()) b.tvStatsDone.text = cDone.getInt(0).toString()
             cDone.close()
 
             val cPending = db.rawQuery(
-                "SELECT COUNT(*) FROM bookings WHERE status IN ('paid','PAID','pending','PENDING') AND reader_id = ?",
+                """SELECT COUNT(*) FROM bookings 
+                   WHERE status IN ('paid','PAID','pending','PENDING') 
+                   AND (reader_id = ? OR reader_id = 0 OR reader_id IS NULL)""",
                 arrayOf(readerId.toString())
             )
             if (cPending.moveToFirst()) b.tvStatsPending.text = cPending.getInt(0).toString()
@@ -120,15 +162,15 @@ class ReaderHistoryFragment : Fragment() {
 
     private fun loadHistory() {
         try {
-            // Ambil semua booking milik reader ini (selesai & sedang proses)
+            // Tampilkan semua status kecuali cancelled, termasuk booking reader_id=0
             val cursor = db.rawQuery(
                 """SELECT b.id, u.name, b.email, b.package_name, b.booking_date,
                           b.booking_time, b.status, b.notes, b.answer, b.total_price
                    FROM bookings b
                    LEFT JOIN users u ON b.email = u.email
-                   WHERE b.reader_id = ?
-                   AND b.status IN ('completed','COMPLETED','done','DONE','processing','PROCESSING')
-                   ORDER BY b.id DESC LIMIT 30""",
+                   WHERE (b.reader_id = ? OR b.reader_id = 0 OR b.reader_id IS NULL)
+                   AND b.status NOT IN ('cancelled','CANCELLED')
+                   ORDER BY b.id DESC LIMIT 50""",
                 arrayOf(readerId.toString())
             )
 
@@ -138,7 +180,7 @@ class ReaderHistoryFragment : Fragment() {
             if (!cursor.moveToFirst()) {
                 cursor.close()
                 val tvEmpty = TextView(requireContext()).apply {
-                    text = "Belum ada sesi yang selesai"
+                    text = "Belum ada booking"
                     setTextColor(0xFFAD88C6.toInt())
                     textSize = 13f
                     setPadding(0, 16.dpToPx(), 0, 16.dpToPx())
@@ -159,12 +201,10 @@ class ReaderHistoryFragment : Fragment() {
                 val answer       = cursor.getString(8) ?: ""
                 val totalPrice   = cursor.getInt(9)
 
-                // Gunakan ItemReaderHistoryBinding — bukan ItemCustomerHistoryBinding
                 val itemBinding = ItemReaderHistoryBinding.inflate(
                     layoutInflater, container, false
                 )
 
-                // Isi data ke view
                 itemBinding.tvReaderItemPackage.text      = packageName
                 itemBinding.tvReaderItemCustomerName.text = customerName
                 itemBinding.tvReaderItemDate.text         = "📅 $date   ⏰ $time"
@@ -172,12 +212,13 @@ class ReaderHistoryFragment : Fragment() {
                     if (notes.isNotEmpty()) "Q: $notes" else "Q: Tidak ada pertanyaan"
                 itemBinding.tvReaderItemAnswer.text       =
                     if (answer.isNotEmpty()) "A: $answer" else "A: Belum ada jawaban."
-                itemBinding.tvReaderItemEarning.text      = "Rp$totalPrice"
+                itemBinding.tvReaderItemEarning.text      = "Rp ${formatRupiah(totalPrice)}"
 
-                // Warna badge status
                 val (bgColor, textColor) = when (status) {
                     "COMPLETED", "DONE" -> Pair(0xFFE8F5E9.toInt(), 0xFF388E3C.toInt())
                     "PROCESSING"        -> Pair(0xFFE3F2FD.toInt(), 0xFF1565C0.toInt())
+                    "PAID"              -> Pair(0xFFFFF3E0.toInt(), 0xFFE65100.toInt())
+                    "PENDING"           -> Pair(0xFFF3E5F5.toInt(), 0xFFAD88C6.toInt())
                     else                -> Pair(0xFFF3E5F5.toInt(), 0xFFAD88C6.toInt())
                 }
                 itemBinding.tvReaderItemStatus.text = status
@@ -185,16 +226,13 @@ class ReaderHistoryFragment : Fragment() {
                     android.content.res.ColorStateList.valueOf(bgColor)
                 itemBinding.tvReaderItemStatus.setTextColor(textColor)
 
-                // Tampilkan input jawaban hanya saat status PROCESSING
                 if (status == "PROCESSING") {
                     itemBinding.layoutInputJawaban.visibility = View.VISIBLE
 
-                    // Pra-isi jawaban yang sudah ada (jika ada)
                     if (answer.isNotEmpty()) {
                         itemBinding.etReaderAnswer.setText(answer)
                     }
 
-                    // Tombol Simpan Jawaban
                     itemBinding.btnKirimJawaban.setOnClickListener {
                         val newAnswer = itemBinding.etReaderAnswer.text.toString().trim()
                         if (newAnswer.isEmpty()) {
@@ -213,7 +251,6 @@ class ReaderHistoryFragment : Fragment() {
                         }
                     }
 
-                    // Tombol Tandai Selesai
                     itemBinding.btnTandaiSelesai.setOnClickListener {
                         val newAnswer = itemBinding.etReaderAnswer.text.toString().trim()
                         if (newAnswer.isEmpty()) {
@@ -226,7 +263,7 @@ class ReaderHistoryFragment : Fragment() {
                                 arrayOf(newAnswer, bookingId.toString())
                             )
                             Toast.makeText(requireContext(), "Sesi selesai! 🔮", Toast.LENGTH_SHORT).show()
-                            // Refresh list
+                            // Refresh semua data termasuk pendapatan
                             loadEarnings()
                             loadStats()
                             loadHistory()

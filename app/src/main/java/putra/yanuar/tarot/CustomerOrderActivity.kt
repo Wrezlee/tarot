@@ -27,7 +27,8 @@ class CustomerOrderActivity : AppCompatActivity() {
 
     private var selectedDate: String = ""
     private var selectedTime: String = ""
-    private var selectedReaderId: String = ""
+    // FIX: simpan sebagai Int supaya konsisten dengan tabel users.id (INTEGER)
+    private var selectedReaderId: Int = 0
     private var selectedReaderName: String = ""
     private var currentUserId: String = ""
     private var currentUserName: String = ""
@@ -51,9 +52,15 @@ class CustomerOrderActivity : AppCompatActivity() {
         db = DBOpenHelper(this).writableDatabase
 
         userEmail          = intent.getStringExtra("USER_EMAIL")   ?: ""
-        selectedReaderId   = intent.getStringExtra("READER_ID")?.toString()   ?: ""
+        // FIX: parse reader_id sebagai Int langsung
+        selectedReaderId   = intent.getIntExtra("READER_ID", 0)
         selectedReaderName = intent.getStringExtra("READER_NAME")  ?: ""
         selectedDate       = intent.getStringExtra("SELECTED_DATE") ?: ""
+
+        // Fallback jika dikirim sebagai String
+        if (selectedReaderId == 0) {
+            selectedReaderId = intent.getStringExtra("READER_ID")?.toIntOrNull() ?: 0
+        }
 
         if (userEmail.isNotEmpty()) {
             val c = db.rawQuery("SELECT id, name FROM users WHERE email = ?", arrayOf(userEmail))
@@ -118,16 +125,16 @@ class CustomerOrderActivity : AppCompatActivity() {
 
     private fun updateLokasiButtonVisibility(position: Int) {
         val pkg = packageList.getOrNull(position)
-        val show = pkg?.isOffline == true && selectedReaderId.isNotEmpty()
+        val show = pkg?.isOffline == true && selectedReaderId != 0
         binding.btnLihatLokasiReader.visibility = if (show) View.VISIBLE else View.GONE
     }
 
     private fun openReaderLocation() {
-        if (selectedReaderId.isEmpty()) {
+        if (selectedReaderId == 0) {
             Toast.makeText(this, "Pilih reader terlebih dahulu", Toast.LENGTH_SHORT).show()
             return
         }
-        val c = db.rawQuery("SELECT name, lat, lng FROM users WHERE id = ?", arrayOf(selectedReaderId))
+        val c = db.rawQuery("SELECT name, lat, lng FROM users WHERE id = ?", arrayOf(selectedReaderId.toString()))
         if (c.moveToFirst()) {
             val name = c.getString(0) ?: selectedReaderName
             val lat  = c.getDouble(1)
@@ -214,6 +221,10 @@ class CustomerOrderActivity : AppCompatActivity() {
         val notes = binding.etNotes.text.toString().trim()
 
         try {
+            // FIX: reader_id disimpan sebagai nilai asli (bukan string "0" kosong)
+            // Jika tidak ada reader yang dipilih, simpan 0 secara eksplisit
+            val readerIdToSave = if (selectedReaderId > 0) selectedReaderId.toString() else "0"
+
             db.execSQL(
                 """INSERT INTO bookings
                    (user_id, reader_id, reader_name, package_name, booking_date, booking_time,
@@ -221,7 +232,7 @@ class CustomerOrderActivity : AppCompatActivity() {
                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?)""",
                 arrayOf(
                     currentUserId,
-                    selectedReaderId.ifEmpty { "0" },
+                    readerIdToSave,
                     selectedReaderName,
                     pkg.name,
                     selectedDate,

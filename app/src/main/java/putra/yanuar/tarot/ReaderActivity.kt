@@ -26,15 +26,12 @@ class ReaderActivity : AppCompatActivity() {
     private var readerName: String = ""
     private var userEmail:  String = ""
 
-    // Booking yang sudah ter-verifikasi QR
     private var verifiedBookingId: String = ""
 
-    // ── Public getter untuk fragment ─────────────────────────────────────────
     fun getDbObject(): SQLiteDatabase = db
     fun getReaderId(): Int            = readerId
     fun getUserEmail(): String        = userEmail
 
-    // ── ZXing scan launcher ──────────────────────────────────────────────────
     private val scanLauncher = registerForActivityResult(ScanContract()) { result: ScanIntentResult ->
         if (result.contents != null) {
             handleQrScanResult(result.contents)
@@ -52,7 +49,6 @@ class ReaderActivity : AppCompatActivity() {
 
         userEmail  = intent.getStringExtra("USER_EMAIL") ?: ""
 
-        // Resolve readerId & readerName dari email
         if (userEmail.isNotEmpty()) {
             val c = db.rawQuery("SELECT id, name FROM users WHERE email = ?", arrayOf(userEmail))
             if (c.moveToFirst()) {
@@ -62,13 +58,11 @@ class ReaderActivity : AppCompatActivity() {
             c.close()
         }
 
-        // Fallback jika dikirim langsung
         if (readerId == 0) {
             readerId   = intent.getStringExtra("USER_ID")?.toIntOrNull()   ?: 0
             readerName = intent.getStringExtra("USER_NAME") ?: ""
         }
 
-        // Toggle status online
         try {
             db.execSQL("UPDATE users SET is_online = 1 WHERE id = ?", arrayOf(readerId.toString()))
         } catch (_: Exception) {}
@@ -126,8 +120,16 @@ class ReaderActivity : AppCompatActivity() {
     private fun setupStartReadingButton() {
         binding.btnStartReading.setOnClickListener {
             if (verifiedBookingId.isEmpty()) return@setOnClickListener
-            db.execSQL("UPDATE bookings SET status = 'processing' WHERE id = ?", arrayOf(verifiedBookingId))
-            Toast.makeText(this, "Sesi dimulai! 🔮", Toast.LENGTH_SHORT).show()
+
+            // FIX: Update status ke processing saat tombol ditekan
+            try {
+                db.execSQL("UPDATE bookings SET status = 'processing' WHERE id = ?", arrayOf(verifiedBookingId))
+                Toast.makeText(this, "Sesi dimulai! 🔮", Toast.LENGTH_SHORT).show()
+            } catch (e: Exception) {
+                Toast.makeText(this, "Gagal memulai sesi: ${e.message}", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
             binding.btnStartReading.visibility = View.GONE
             verifiedBookingId = ""
             refreshDashboard()
@@ -157,7 +159,7 @@ class ReaderActivity : AppCompatActivity() {
     override fun onRequestPermissionsResult(
         requestCode: Int, permissions: Array<out String>, grantResults: IntArray
     ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)`
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == REQ_CAMERA &&
             grantResults.firstOrNull() == PackageManager.PERMISSION_GRANTED
         ) launchScanner()
@@ -185,7 +187,6 @@ class ReaderActivity : AppCompatActivity() {
             return
         }
 
-        // Ambil booking dari DB lokal
         val cursor = db.rawQuery(
             "SELECT id, status, package_name, booking_date, booking_time, payment_method, total_price FROM bookings WHERE id = ?",
             arrayOf(data.bookingId)
@@ -230,35 +231,30 @@ class ReaderActivity : AppCompatActivity() {
                         "Jadwal    : $date  $time\n" +
                         "Bayar     : $payment\n" +
                         "Total     : Rp${"%,d".format(totalPrice)}\n\n" +
-                        "Mulai sesi ramalan sekarang?"
+                        "Tampilkan di antrean untuk mulai sesi?"
             )
-            // PERUBAHAN: "Mulai Ramalan" sekarang juga menampilkan detail di card
-            // sebelum memulai sesi (sama seperti "Lihat Detail Dulu" sebelumnya),
-            // kemudian langsung set status processing.
-            // Tombol "Lihat Detail Dulu" dihapus.
-            .setPositiveButton("🔮 Mulai Ramalan") { _, _ ->
-                // Tampilkan detail di card antrean aktif
+            // FIX: Tombol hanya menampilkan ke card antrean, TIDAK langsung update DB.
+            // Update DB dilakukan saat reader klik "Mulai Ramalan" di card antrean.
+            .setPositiveButton("🔮 Tampilkan Antrean") { _, _ ->
                 verifiedBookingId = bookingId
                 binding.tvNextCustomerName.text = customerName
                 binding.tvNextPackageName.text  = " $pkgName"
                 binding.tvNextBookingDate.text  = " $date"
                 binding.tvNextBookingTime.text  = time
+                // Tampilkan tombol "Mulai Ramalan" supaya reader bisa klik
                 binding.btnStartReading.visibility = View.VISIBLE
-
-                // Langsung mulai sesi
-                db.execSQL("UPDATE bookings SET status = 'processing' WHERE id = ?", arrayOf(bookingId))
-                verifiedBookingId = ""
-                binding.btnStartReading.visibility = View.GONE
-                Toast.makeText(this, "Sesi dimulai! 🔮", Toast.LENGTH_SHORT).show()
-                refreshDashboard()
+                Toast.makeText(this, "Tekan 'Mulai Ramalan' untuk memulai sesi", Toast.LENGTH_LONG).show()
             }
             .setNegativeButton("Batal", null)
             .show()
     }
 
     private fun refreshDashboard() {
+        // FIX: Query tidak filter reader_id=0, juga include booking tanpa reader yang ditugaskan
         val cPending = db.rawQuery(
-            "SELECT COUNT(*) FROM bookings WHERE reader_id = ? AND status IN ('pending','PENDING','paid','PAID')",
+            """SELECT COUNT(*) FROM bookings 
+               WHERE status IN ('pending','PENDING','paid','PAID')
+               AND (reader_id = ? OR reader_id = 0 OR reader_id IS NULL)""",
             arrayOf(readerId.toString())
         )
         val pending = if (cPending.moveToFirst()) cPending.getInt(0) else 0
@@ -276,13 +272,14 @@ class ReaderActivity : AppCompatActivity() {
         binding.tvReaderGreeting.text  = "Dashboard Reader"
         binding.tvReaderSubtitle.text  = "Halo, $readerName 🔮"
 
-        // PERUBAHAN: Next booking langsung tampil otomatis tanpa perlu scan QR dulu.
-        // Query mencakup semua status aktif termasuk 'confirmed'.
+        // FIX: Query antrean aktif juga include booking tanpa reader_id (reader_id=0)
+        // supaya semua booking customer yang belum assign reader tetap tampil
         val cNext = db.rawQuery(
             """SELECT b.id, u.name, b.email, b.package_name, b.booking_date, b.booking_time
                FROM bookings b
                LEFT JOIN users u ON b.email = u.email
-               WHERE b.reader_id = ? AND b.status IN ('pending','PENDING','paid','PAID','confirmed','CONFIRMED')
+               WHERE b.status IN ('pending','PENDING','paid','PAID','confirmed','CONFIRMED')
+               AND (b.reader_id = ? OR b.reader_id = 0 OR b.reader_id IS NULL)
                ORDER BY b.booking_date ASC, b.booking_time ASC LIMIT 1""",
             arrayOf(readerId.toString())
         )
@@ -292,15 +289,15 @@ class ReaderActivity : AppCompatActivity() {
             binding.tvNextBookingTime.text  = cNext.getString(5) ?: "--:--"
             binding.tvNextBookingDate.text  = " ${cNext.getString(4) ?: ""}"
             binding.tvNextPackageName.text  = " ${cNext.getString(3) ?: ""}"
-            // Tampilkan data antrean tapi btnStartReading tetap tersembunyi —
-            // hanya muncul setelah reader scan QR dan konfirmasi mulai.
-            // (btnStartReading tidak diubah di sini agar tidak override state dari dialog)
         } else {
             binding.tvNextCustomerName.text = "Belum Ada Antrean"
             binding.tvNextBookingTime.text  = "--:--"
             binding.tvNextBookingDate.text  = ""
             binding.tvNextPackageName.text  = "Siap melayani sesi baru"
-            binding.btnStartReading.visibility = View.GONE
+            // Jangan hide btnStartReading di sini supaya tidak override state dari dialog
+            if (verifiedBookingId.isEmpty()) {
+                binding.btnStartReading.visibility = View.GONE
+            }
         }
         cNext.close()
     }
