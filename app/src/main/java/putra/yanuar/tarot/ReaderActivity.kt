@@ -3,13 +3,10 @@ package putra.yanuar.tarot
 import android.Manifest
 import android.content.pm.PackageManager
 import android.database.sqlite.SQLiteDatabase
-import android.graphics.Color
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.LinearLayout
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -19,8 +16,6 @@ import com.journeyapps.barcodescanner.ScanContract
 import com.journeyapps.barcodescanner.ScanIntentResult
 import com.journeyapps.barcodescanner.ScanOptions
 import putra.yanuar.tarot.databinding.ActivityReaderBinding
-import java.text.SimpleDateFormat
-import java.util.*
 
 class ReaderActivity : AppCompatActivity() {
 
@@ -31,12 +26,15 @@ class ReaderActivity : AppCompatActivity() {
     private var readerName: String = ""
     private var userEmail:  String = ""
 
+    // Booking yang sudah ter-verifikasi QR
     private var verifiedBookingId: String = ""
 
+    // ── Public getter untuk fragment ─────────────────────────────────────────
     fun getDbObject(): SQLiteDatabase = db
     fun getReaderId(): Int            = readerId
     fun getUserEmail(): String        = userEmail
 
+    // ── ZXing scan launcher ──────────────────────────────────────────────────
     private val scanLauncher = registerForActivityResult(ScanContract()) { result: ScanIntentResult ->
         if (result.contents != null) {
             handleQrScanResult(result.contents)
@@ -52,8 +50,9 @@ class ReaderActivity : AppCompatActivity() {
 
         db = DBOpenHelper(this).writableDatabase
 
-        userEmail = intent.getStringExtra("USER_EMAIL") ?: ""
+        userEmail  = intent.getStringExtra("USER_EMAIL") ?: ""
 
+        // Resolve readerId & readerName dari email
         if (userEmail.isNotEmpty()) {
             val c = db.rawQuery("SELECT id, name FROM users WHERE email = ?", arrayOf(userEmail))
             if (c.moveToFirst()) {
@@ -63,11 +62,13 @@ class ReaderActivity : AppCompatActivity() {
             c.close()
         }
 
+        // Fallback jika dikirim langsung
         if (readerId == 0) {
-            readerId   = intent.getStringExtra("USER_ID")?.toIntOrNull() ?: 0
+            readerId   = intent.getStringExtra("USER_ID")?.toIntOrNull()   ?: 0
             readerName = intent.getStringExtra("USER_NAME") ?: ""
         }
 
+        // Toggle status online
         try {
             db.execSQL("UPDATE users SET is_online = 1 WHERE id = ?", arrayOf(readerId.toString()))
         } catch (_: Exception) {}
@@ -125,11 +126,8 @@ class ReaderActivity : AppCompatActivity() {
     private fun setupStartReadingButton() {
         binding.btnStartReading.setOnClickListener {
             if (verifiedBookingId.isEmpty()) return@setOnClickListener
-            db.execSQL(
-                "UPDATE bookings SET status = 'processing' WHERE id = ?",
-                arrayOf(verifiedBookingId)
-            )
-            Toast.makeText(this, "Sesi dimulai! Customer masuk antrean aktif.", Toast.LENGTH_SHORT).show()
+            db.execSQL("UPDATE bookings SET status = 'processing' WHERE id = ?", arrayOf(verifiedBookingId))
+            Toast.makeText(this, "Sesi dimulai! 🔮", Toast.LENGTH_SHORT).show()
             binding.btnStartReading.visibility = View.GONE
             verifiedBookingId = ""
             refreshDashboard()
@@ -159,7 +157,7 @@ class ReaderActivity : AppCompatActivity() {
     override fun onRequestPermissionsResult(
         requestCode: Int, permissions: Array<out String>, grantResults: IntArray
     ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)`
         if (requestCode == REQ_CAMERA &&
             grantResults.firstOrNull() == PackageManager.PERMISSION_GRANTED
         ) launchScanner()
@@ -168,8 +166,8 @@ class ReaderActivity : AppCompatActivity() {
 
     private fun launchScanner() {
         val options = ScanOptions().apply {
-            setPrompt("Arahkan ke QR Tiket customer")
-            setBeepEnabled(false)
+            setPrompt("Arahkan ke QR Tiket customer 🔮")
+            setBeepEnabled(true)
             setOrientationLocked(true)
             setBarcodeImageEnabled(false)
         }
@@ -187,6 +185,7 @@ class ReaderActivity : AppCompatActivity() {
             return
         }
 
+        // Ambil booking dari DB lokal
         val cursor = db.rawQuery(
             "SELECT id, status, package_name, booking_date, booking_time, payment_method, total_price FROM bookings WHERE id = ?",
             arrayOf(data.bookingId)
@@ -224,7 +223,7 @@ class ReaderActivity : AppCompatActivity() {
         date: String, time: String, payment: String, totalPrice: Int
     ) {
         AlertDialog.Builder(this)
-            .setTitle("Tiket Terverifikasi!")
+            .setTitle("✅ Tiket Terverifikasi!")
             .setMessage(
                 "Customer  : $customerName\n" +
                         "Paket     : $pkgName\n" +
@@ -233,13 +232,24 @@ class ReaderActivity : AppCompatActivity() {
                         "Total     : Rp${"%,d".format(totalPrice)}\n\n" +
                         "Mulai sesi ramalan sekarang?"
             )
-            .setPositiveButton("Mulai Ramalan") { _, _ ->
-                db.execSQL(
-                    "UPDATE bookings SET status = 'processing' WHERE id = ?",
-                    arrayOf(bookingId)
-                )
+            // PERUBAHAN: "Mulai Ramalan" sekarang juga menampilkan detail di card
+            // sebelum memulai sesi (sama seperti "Lihat Detail Dulu" sebelumnya),
+            // kemudian langsung set status processing.
+            // Tombol "Lihat Detail Dulu" dihapus.
+            .setPositiveButton("🔮 Mulai Ramalan") { _, _ ->
+                // Tampilkan detail di card antrean aktif
                 verifiedBookingId = bookingId
-                Toast.makeText(this, "$customerName masuk antrean aktif!", Toast.LENGTH_SHORT).show()
+                binding.tvNextCustomerName.text = customerName
+                binding.tvNextPackageName.text  = " $pkgName"
+                binding.tvNextBookingDate.text  = " $date"
+                binding.tvNextBookingTime.text  = time
+                binding.btnStartReading.visibility = View.VISIBLE
+
+                // Langsung mulai sesi
+                db.execSQL("UPDATE bookings SET status = 'processing' WHERE id = ?", arrayOf(bookingId))
+                verifiedBookingId = ""
+                binding.btnStartReading.visibility = View.GONE
+                Toast.makeText(this, "Sesi dimulai! 🔮", Toast.LENGTH_SHORT).show()
                 refreshDashboard()
             }
             .setNegativeButton("Batal", null)
@@ -247,14 +257,8 @@ class ReaderActivity : AppCompatActivity() {
     }
 
     private fun refreshDashboard() {
-        refreshStats()
-        refreshAntreanAktif()
-        refreshCalendar()
-    }
-
-    private fun refreshStats() {
         val cPending = db.rawQuery(
-            "SELECT COUNT(*) FROM bookings WHERE reader_id = ? AND status IN ('pending','PENDING','paid','PAID','confirmed','CONFIRMED')",
+            "SELECT COUNT(*) FROM bookings WHERE reader_id = ? AND status IN ('pending','PENDING','paid','PAID')",
             arrayOf(readerId.toString())
         )
         val pending = if (cPending.moveToFirst()) cPending.getInt(0) else 0
@@ -269,33 +273,11 @@ class ReaderActivity : AppCompatActivity() {
 
         binding.tvPendingCount.text   = pending.toString()
         binding.tvCompletedCount.text = done.toString()
-        binding.tvReaderGreeting.text = "Dashboard Reader"
-        binding.tvReaderSubtitle.text = "Halo, $readerName 🌙"
-    }
-    private fun refreshAntreanAktif() {
+        binding.tvReaderGreeting.text  = "Dashboard Reader"
+        binding.tvReaderSubtitle.text  = "Halo, $readerName 🔮"
 
-        val cProcessing = db.rawQuery(
-            """SELECT b.id, u.name, b.email, b.package_name, b.booking_date, b.booking_time
-               FROM bookings b
-               LEFT JOIN users u ON b.email = u.email
-               WHERE b.reader_id = ? AND b.status IN ('processing','PROCESSING')
-               ORDER BY b.booking_date ASC, b.booking_time ASC""",
-            arrayOf(readerId.toString())
-        )
-
-        if (cProcessing.moveToFirst()) {
-            val custName = cProcessing.getString(1)?.takeIf { it.isNotEmpty() }
-                ?: cProcessing.getString(2) ?: "-"
-            binding.tvNextCustomerName.text = "🔮 $custName (Sedang Berlangsung)"
-            binding.tvNextBookingTime.text  = cProcessing.getString(5) ?: "--:--"
-            binding.tvNextBookingDate.text  = " ${cProcessing.getString(4) ?: ""}"
-            binding.tvNextPackageName.text  = " ${cProcessing.getString(3) ?: ""}"
-            binding.btnStartReading.visibility = View.GONE
-            cProcessing.close()
-            return
-        }
-        cProcessing.close()
-
+        // PERUBAHAN: Next booking langsung tampil otomatis tanpa perlu scan QR dulu.
+        // Query mencakup semua status aktif termasuk 'confirmed'.
         val cNext = db.rawQuery(
             """SELECT b.id, u.name, b.email, b.package_name, b.booking_date, b.booking_time
                FROM bookings b
@@ -304,19 +286,15 @@ class ReaderActivity : AppCompatActivity() {
                ORDER BY b.booking_date ASC, b.booking_time ASC LIMIT 1""",
             arrayOf(readerId.toString())
         )
-
         if (cNext.moveToFirst()) {
-            val custName = cNext.getString(1)?.takeIf { it.isNotEmpty() }
-                ?: cNext.getString(2) ?: "-"
+            val custName = cNext.getString(1)?.takeIf { it.isNotEmpty() } ?: cNext.getString(2) ?: "-"
             binding.tvNextCustomerName.text = custName
             binding.tvNextBookingTime.text  = cNext.getString(5) ?: "--:--"
             binding.tvNextBookingDate.text  = " ${cNext.getString(4) ?: ""}"
             binding.tvNextPackageName.text  = " ${cNext.getString(3) ?: ""}"
-
-            // Tampilkan tombol mulai jika booking ini sudah di-scan sebelumnya
-            if (verifiedBookingId == cNext.getString(0)) {
-                binding.btnStartReading.visibility = View.VISIBLE
-            }
+            // Tampilkan data antrean tapi btnStartReading tetap tersembunyi —
+            // hanya muncul setelah reader scan QR dan konfirmasi mulai.
+            // (btnStartReading tidak diubah di sini agar tidak override state dari dialog)
         } else {
             binding.tvNextCustomerName.text = "Belum Ada Antrean"
             binding.tvNextBookingTime.text  = "--:--"
@@ -325,148 +303,6 @@ class ReaderActivity : AppCompatActivity() {
             binding.btnStartReading.visibility = View.GONE
         }
         cNext.close()
-    }
-
-
-    private fun refreshCalendar() {
-        val container = binding.containerCalendar
-        container.removeAllViews()
-
-        val cal = Calendar.getInstance()
-        cal.set(Calendar.HOUR_OF_DAY, 0)
-        cal.set(Calendar.MINUTE, 0)
-        cal.set(Calendar.SECOND, 0)
-        cal.set(Calendar.MILLISECOND, 0)
-        val dow = cal.get(Calendar.DAY_OF_WEEK)
-        val offsetToMonday = if (dow == Calendar.SUNDAY) -6 else -(dow - Calendar.MONDAY)
-        cal.add(Calendar.DAY_OF_MONTH, offsetToMonday)
-        val startOfWeek = cal.clone() as Calendar
-        cal.add(Calendar.DAY_OF_MONTH, 6)
-        val endOfWeek = cal.clone() as Calendar
-
-        val sdfDb   = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-        val sdfDisp = SimpleDateFormat("EEE, d MMM", Locale("id"))
-
-        val startStr = sdfDb.format(startOfWeek.time)
-        val endStr   = sdfDb.format(endOfWeek.time)
-
-        val cursor = db.rawQuery(
-            """SELECT b.booking_date, b.booking_time, u.name, b.email,
-                      b.package_name, b.status, b.total_price
-               FROM bookings b
-               LEFT JOIN users u ON b.email = u.email
-               WHERE b.reader_id = ?
-                 AND b.booking_date >= ?
-                 AND b.booking_date <= ?
-               ORDER BY b.booking_date ASC, b.booking_time ASC""",
-            arrayOf(readerId.toString(), startStr, endStr)
-        )
-
-        if (!cursor.moveToFirst()) {
-            cursor.close()
-            val tvEmpty = TextView(this).apply {
-                text = "Tidak ada booking minggu ini"
-                setTextColor(Color.parseColor("#AD88C6"))
-                textSize = 13f
-                setPadding(0, 8, 0, 8)
-            }
-            container.addView(tvEmpty)
-            return
-        }
-
-        val grouped = LinkedHashMap<String, MutableList<Array<String>>>()
-        do {
-            val date    = cursor.getString(0) ?: continue
-            val time    = cursor.getString(1) ?: "--:--"
-            val name    = cursor.getString(2)?.takeIf { it.isNotEmpty() } ?: cursor.getString(3) ?: "-"
-            val pkg     = cursor.getString(4) ?: "-"
-            val status  = cursor.getString(5) ?: "-"
-            val price   = cursor.getInt(6)
-            grouped.getOrPut(date) { mutableListOf() }
-                .add(arrayOf(time, name, pkg, status, price.toString()))
-        } while (cursor.moveToNext())
-        cursor.close()
-
-        val dp = resources.displayMetrics.density
-
-        for ((date, items) in grouped) {
-            val parsedDate = try { sdfDb.parse(date) } catch (_: Exception) { null }
-            val displayDate = if (parsedDate != null) sdfDisp.format(parsedDate) else date
-
-            val tvDate = TextView(this).apply {
-                text = displayDate
-                setTextColor(Color.parseColor("#7469B6"))
-                textSize = 13f
-                setTypeface(null, android.graphics.Typeface.BOLD)
-                setPadding(0, (12 * dp).toInt(), 0, 4)
-            }
-            container.addView(tvDate)
-
-            for ((idx, item) in items.withIndex()) {
-                val (time, custName, pkg, status, priceStr) = item
-
-                val statusColor = when (status.lowercase()) {
-                    "processing"          -> "#FF9800"
-                    "completed", "done"   -> "#4CAF50"
-                    "cancelled"           -> "#F44336"
-                    else                  -> "#AD88C6"
-                }
-
-                val row = LinearLayout(this).apply {
-                    orientation = LinearLayout.HORIZONTAL
-                    setPadding(
-                        (12 * dp).toInt(), (10 * dp).toInt(),
-                        (12 * dp).toInt(), (10 * dp).toInt()
-                    )
-                    background = ContextCompat.getDrawable(
-                        this@ReaderActivity,
-                        android.R.drawable.dialog_holo_light_frame
-                    )
-                    val lp = LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT
-                    ).apply {
-                        setMargins(0, (4 * dp).toInt(), 0, (4 * dp).toInt())
-                    }
-                    layoutParams = lp
-                }
-
-                val tvTime = TextView(this).apply {
-                    text = time
-                    setTextColor(Color.parseColor("#7469B6"))
-                    textSize = 12f
-                    setTypeface(null, android.graphics.Typeface.BOLD)
-                    layoutParams = LinearLayout.LayoutParams(
-                        (52 * dp).toInt(), LinearLayout.LayoutParams.WRAP_CONTENT
-                    )
-                }
-
-                val tvInfo = TextView(this).apply {
-                    text = "$custName\n$pkg"
-                    setTextColor(Color.parseColor("#251819"))
-                    textSize = 12f
-                    layoutParams = LinearLayout.LayoutParams(
-                        0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f
-                    )
-                }
-
-                val tvStatus = TextView(this).apply {
-                    text = status.replaceFirstChar { it.uppercase() }
-                    setTextColor(Color.parseColor(statusColor))
-                    textSize = 11f
-                    setTypeface(null, android.graphics.Typeface.BOLD)
-                    layoutParams = LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.WRAP_CONTENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT
-                    )
-                }
-
-                row.addView(tvTime)
-                row.addView(tvInfo)
-                row.addView(tvStatus)
-                container.addView(row)
-            }
-        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -483,15 +319,9 @@ class ReaderActivity : AppCompatActivity() {
                     .setTitle("Logout")
                     .setMessage("Yakin ingin keluar?")
                     .setPositiveButton("Ya") { _, _ ->
-                        try {
-                            db.execSQL(
-                                "UPDATE users SET is_online = 0 WHERE id = ?",
-                                arrayOf(readerId.toString())
-                            )
-                        } catch (_: Exception) {}
+                        try { db.execSQL("UPDATE users SET is_online = 0 WHERE id = ?", arrayOf(readerId.toString())) } catch (_: Exception) {}
                         val intent = android.content.Intent(this, MainActivity::class.java)
-                        intent.flags = android.content.Intent.FLAG_ACTIVITY_NEW_TASK or
-                                android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        intent.flags = android.content.Intent.FLAG_ACTIVITY_NEW_TASK or android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK
                         startActivity(intent)
                         finish()
                     }
@@ -501,7 +331,7 @@ class ReaderActivity : AppCompatActivity() {
             }
             R.id.menu_music -> {
                 val nowMuted = MusicManager.toggleMute()
-                item.title = if (nowMuted) "Musik OFF" else "Musik ON"
+                item.title = if (nowMuted) " Musik OFF" else " Musik ON"
                 true
             }
             else -> super.onOptionsItemSelected(item)
