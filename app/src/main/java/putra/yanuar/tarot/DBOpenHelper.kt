@@ -4,7 +4,7 @@ import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 
-class DBOpenHelper(context: Context) : SQLiteOpenHelper(context, "tarot_meow_db", null, 7) {
+class DBOpenHelper(context: Context) : SQLiteOpenHelper(context, "tarot_meow_db", null, 8) {
 
     override fun onCreate(db: SQLiteDatabase) {
         db.execSQL("""
@@ -38,6 +38,7 @@ class DBOpenHelper(context: Context) : SQLiteOpenHelper(context, "tarot_meow_db"
                 package_name TEXT, type TEXT, booking_date TEXT, booking_time TEXT,
                 name TEXT, email TEXT, phone TEXT, payment_method TEXT,
                 status TEXT DEFAULT 'pending', total_price INTEGER, notes TEXT,
+                answer TEXT DEFAULT '',
                 qr_content TEXT DEFAULT ''
             )
         """)
@@ -88,8 +89,10 @@ class DBOpenHelper(context: Context) : SQLiteOpenHelper(context, "tarot_meow_db"
             } catch (_: Exception) {}
         }
         if (oldVersion < 7) {
-            // Tambah kolom qr_content jika belum ada
             try { db.execSQL("ALTER TABLE bookings ADD COLUMN qr_content TEXT DEFAULT ''") } catch (_: Exception) {}
+        }
+        if (oldVersion < 8) {
+            try { db.execSQL("ALTER TABLE bookings ADD COLUMN answer TEXT DEFAULT ''") } catch (_: Exception) {}
         }
     }
 
