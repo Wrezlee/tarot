@@ -35,7 +35,7 @@ class CustomerProfileFragment : Fragment() {
 
         b.btnHistory.setOnClickListener {
             try {
-                val i = Intent(thisParent, ReaderHistoryActivity::class.java)
+                val i = Intent(thisParent, CustomerHistoryActivity::class.java)
                 i.putExtra("USER_EMAIL", thisParent.userEmail)
                 startActivity(i)
             } catch (e: Exception) {

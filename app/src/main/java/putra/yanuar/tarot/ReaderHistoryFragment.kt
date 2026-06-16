@@ -6,9 +6,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import putra.yanuar.tarot.databinding.FragmentReaderHistoryBinding
-import putra.yanuar.tarot.databinding.ItemCustomerHistoryBinding
+import putra.yanuar.tarot.databinding.ItemReaderHistoryBinding
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -119,14 +120,15 @@ class ReaderHistoryFragment : Fragment() {
 
     private fun loadHistory() {
         try {
+            // Ambil semua booking milik reader ini (selesai & sedang proses)
             val cursor = db.rawQuery(
-                """SELECT b.id, u.name, b.email, b.package_name, b.booking_date, b.status, q.question, q.answer
+                """SELECT b.id, u.name, b.email, b.package_name, b.booking_date,
+                          b.booking_time, b.status, b.notes, b.answer, b.total_price
                    FROM bookings b
                    LEFT JOIN users u ON b.email = u.email
-                   LEFT JOIN questions q ON b.id = q.booking_id
                    WHERE b.reader_id = ?
-                   AND b.status IN ('completed','COMPLETED','done','DONE')
-                   ORDER BY b.id DESC LIMIT 20""",
+                   AND b.status IN ('completed','COMPLETED','done','DONE','processing','PROCESSING')
+                   ORDER BY b.id DESC LIMIT 30""",
                 arrayOf(readerId.toString())
             )
 
@@ -146,24 +148,98 @@ class ReaderHistoryFragment : Fragment() {
             }
 
             do {
+                val bookingId    = cursor.getInt(0)
                 val customerName = cursor.getString(1)?.takeIf { it.isNotEmpty() }
                     ?: cursor.getString(2) ?: "-"
-                val status   = (cursor.getString(5) ?: "").uppercase()
-                val question = "Q: " + (cursor.getString(6) ?: "Tidak ada pertanyaan")
-                val answer   = "A: " + (cursor.getString(7) ?: "Belum dijawab")
+                val packageName  = cursor.getString(3) ?: "-"
+                val date         = cursor.getString(4) ?: "-"
+                val time         = cursor.getString(5) ?: "--:--"
+                val status       = (cursor.getString(6) ?: "").uppercase()
+                val notes        = cursor.getString(7) ?: ""
+                val answer       = cursor.getString(8) ?: ""
+                val totalPrice   = cursor.getInt(9)
 
-                val binding = ItemCustomerHistoryBinding.inflate(layoutInflater, container, false)
-                binding.tvItemPackage.text  = cursor.getString(3) ?: "-"
-                binding.tvItemDate.text     = cursor.getString(4) ?: "-"
-                binding.tvItemStatus.text   = status
-                binding.tvItemQuestion.text = question
-                binding.tvItemAnswer.text   = answer
-                binding.tvItemReader.text   = "Customer: $customerName"
-                binding.btnCancelOrder.visibility  = View.GONE
-                binding.btnTulisUlasan.visibility  = View.GONE
-                binding.btnShareRamalan.visibility = View.GONE
-                binding.layoutQrTicket.visibility  = View.GONE
-                container.addView(binding.root)
+                // Gunakan ItemReaderHistoryBinding — bukan ItemCustomerHistoryBinding
+                val itemBinding = ItemReaderHistoryBinding.inflate(
+                    layoutInflater, container, false
+                )
+
+                // Isi data ke view
+                itemBinding.tvReaderItemPackage.text      = packageName
+                itemBinding.tvReaderItemCustomerName.text = customerName
+                itemBinding.tvReaderItemDate.text         = "📅 $date   ⏰ $time"
+                itemBinding.tvReaderItemQuestion.text     =
+                    if (notes.isNotEmpty()) "Q: $notes" else "Q: Tidak ada pertanyaan"
+                itemBinding.tvReaderItemAnswer.text       =
+                    if (answer.isNotEmpty()) "A: $answer" else "A: Belum ada jawaban."
+                itemBinding.tvReaderItemEarning.text      = "Rp$totalPrice"
+
+                // Warna badge status
+                val (bgColor, textColor) = when (status) {
+                    "COMPLETED", "DONE" -> Pair(0xFFE8F5E9.toInt(), 0xFF388E3C.toInt())
+                    "PROCESSING"        -> Pair(0xFFE3F2FD.toInt(), 0xFF1565C0.toInt())
+                    else                -> Pair(0xFFF3E5F5.toInt(), 0xFFAD88C6.toInt())
+                }
+                itemBinding.tvReaderItemStatus.text = status
+                itemBinding.tvReaderItemStatus.backgroundTintList =
+                    android.content.res.ColorStateList.valueOf(bgColor)
+                itemBinding.tvReaderItemStatus.setTextColor(textColor)
+
+                // Tampilkan input jawaban hanya saat status PROCESSING
+                if (status == "PROCESSING") {
+                    itemBinding.layoutInputJawaban.visibility = View.VISIBLE
+
+                    // Pra-isi jawaban yang sudah ada (jika ada)
+                    if (answer.isNotEmpty()) {
+                        itemBinding.etReaderAnswer.setText(answer)
+                    }
+
+                    // Tombol Simpan Jawaban
+                    itemBinding.btnKirimJawaban.setOnClickListener {
+                        val newAnswer = itemBinding.etReaderAnswer.text.toString().trim()
+                        if (newAnswer.isEmpty()) {
+                            Toast.makeText(requireContext(), "Tulis jawaban dulu!", Toast.LENGTH_SHORT).show()
+                            return@setOnClickListener
+                        }
+                        try {
+                            db.execSQL(
+                                "UPDATE bookings SET answer = ? WHERE id = ?",
+                                arrayOf(newAnswer, bookingId.toString())
+                            )
+                            Toast.makeText(requireContext(), "Jawaban disimpan ✅", Toast.LENGTH_SHORT).show()
+                            itemBinding.tvReaderItemAnswer.text = "A: $newAnswer"
+                        } catch (e: Exception) {
+                            Toast.makeText(requireContext(), "Gagal: ${e.message}", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+
+                    // Tombol Tandai Selesai
+                    itemBinding.btnTandaiSelesai.setOnClickListener {
+                        val newAnswer = itemBinding.etReaderAnswer.text.toString().trim()
+                        if (newAnswer.isEmpty()) {
+                            Toast.makeText(requireContext(), "Isi jawaban sebelum menyelesaikan sesi!", Toast.LENGTH_SHORT).show()
+                            return@setOnClickListener
+                        }
+                        try {
+                            db.execSQL(
+                                "UPDATE bookings SET status = 'completed', answer = ? WHERE id = ?",
+                                arrayOf(newAnswer, bookingId.toString())
+                            )
+                            Toast.makeText(requireContext(), "Sesi selesai! 🔮", Toast.LENGTH_SHORT).show()
+                            // Refresh list
+                            loadEarnings()
+                            loadStats()
+                            loadHistory()
+                        } catch (e: Exception) {
+                            Toast.makeText(requireContext(), "Gagal: ${e.message}", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                } else {
+                    itemBinding.layoutInputJawaban.visibility = View.GONE
+                }
+
+                container.addView(itemBinding.root)
+
             } while (cursor.moveToNext())
 
             cursor.close()

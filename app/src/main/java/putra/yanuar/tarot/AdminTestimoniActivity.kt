@@ -12,12 +12,12 @@ import android.widget.AdapterView
 import android.widget.BaseAdapter
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import putra.yanuar.tarot.databinding.ActivityTestimoniBinding
+import putra.yanuar.tarot.databinding.ActivityAdminTestimoniBinding
 import putra.yanuar.tarot.databinding.ItemAdminTestimoniBinding
 
 class AdminTestimoniActivity : AppCompatActivity() {
 
-    lateinit var b: ActivityTestimoniBinding
+    lateinit var b: ActivityAdminTestimoniBinding
     lateinit var db: SQLiteDatabase
     val listData = ArrayList<TestimoniItem>()
 
@@ -34,7 +34,7 @@ class AdminTestimoniActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        b = ActivityTestimoniBinding.inflate(layoutInflater)
+        b = ActivityAdminTestimoniBinding.inflate(layoutInflater)
         setContentView(b.root)
 
         db = DBOpenHelper(this).writableDatabase

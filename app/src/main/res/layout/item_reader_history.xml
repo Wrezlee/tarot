@@ -1,6 +1,247 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="16dp"
+    android:layout_marginVertical="8dp"
+    app:cardBackgroundColor="#FFFFFF"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="2dp"
+    app:strokeColor="#AD88C6"
+    app:strokeWidth="1dp">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- ── Baris 1: Badge "READER" + badge status ── -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_status_rounded"
+                android:backgroundTint="#7469B6"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="3dp"
+                android:text="SESI READER"
+                android:textColor="#FFFFFF"
+                android:textSize="9sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvReaderItemStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:background="@drawable/bg_status_rounded"
+                android:backgroundTint="#E8F5E9"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="3dp"
+                android:text="COMPLETED"
+                android:textColor="#388E3C"
+                android:textSize="10sp"
+                android:textStyle="bold" />
+        </RelativeLayout>
+
+        <!-- Nama paket -->
+        <TextView
+            android:id="@+id/tvReaderItemPackage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="9 Kartu Deep Reading"
+            android:textColor="#251819"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+
+        <!-- Info customer -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="👤 "
+                android:textSize="13sp" />
+
+            <TextView
+                android:id="@+id/tvReaderItemCustomerName"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Nama Customer"
+                android:textColor="#7469B6"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <!-- Tanggal & waktu -->
+        <TextView
+            android:id="@+id/tvReaderItemDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="📅 12 April 2026   ⏰ 20:00"
+            android:textColor="#80251819"
+            android:textSize="11sp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginVertical="12dp"
+            android:background="#F3E5F5" />
+
+        <!-- Pertanyaan dari customer -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="PERTANYAAN CLIENT"
+            android:textColor="#AD88C6"
+            android:textSize="9sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.1" />
+
+        <TextView
+            android:id="@+id/tvReaderItemQuestion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:background="@drawable/bg_status_rounded"
+            android:backgroundTint="#FFF8F7"
+            android:padding="10dp"
+            android:text="Q: Bagaimana karir saya ke depan?"
+            android:textColor="#251819"
+            android:textSize="12sp"
+            android:textStyle="italic"
+            android:lineSpacingExtra="2dp" />
+
+        <!-- Jawaban reader -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="JAWABAN READER"
+            android:textColor="#AD88C6"
+            android:textSize="9sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.1" />
+
+        <TextView
+            android:id="@+id/tvReaderItemAnswer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:background="@drawable/bg_status_rounded"
+            android:backgroundTint="#F3E5F5"
+            android:padding="10dp"
+            android:text="A: Belum ada jawaban."
+            android:textColor="#7469B6"
+            android:textSize="12sp"
+            android:lineSpacingExtra="2dp" />
+
+        <!-- Input jawaban baru (hanya tampil saat status PROCESSING) -->
+        <LinearLayout
+            android:id="@+id/layoutInputJawaban"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColorHint="#AD88C6"
+                app:boxStrokeColor="#7469B6"
+                app:hintTextColor="#7469B6">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etReaderAnswer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="top"
+                    android:hint="Tulis jawaban ramalan di sini..."
+                    android:inputType="textMultiLine"
+                    android:lines="4"
+                    android:textColor="#251819"
+                    android:textSize="13sp" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Tombol kirim jawaban & tandai selesai -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:orientation="horizontal"
+                android:weightSum="2">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnKirimJawaban"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_marginEnd="6dp"
+                    android:layout_weight="1"
+                    android:text="💾 Simpan Jawaban"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    app:backgroundTint="#AD88C6"
+                    app:cornerRadius="10dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnTandaiSelesai"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_marginStart="6dp"
+                    android:layout_weight="1"
+                    android:text="✅ Tandai Selesai"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    app:backgroundTint="#7469B6"
+                    app:cornerRadius="10dp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Info pendapatan dari sesi ini -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Pendapatan sesi ini"
+                android:textColor="#AD88C6"
+                android:textSize="11sp" />
+
+            <TextView
+                android:id="@+id/tvReaderItemEarning"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_status_rounded"
+                android:backgroundTint="#F3E5F5"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="4dp"
+                android:text="Rp0"
+                android:textColor="#7469B6"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

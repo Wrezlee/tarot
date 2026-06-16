@@ -1,9 +1,16 @@
 package putra.yanuar.tarot
 
+import android.Manifest
 import android.app.AlertDialog
+import android.content.ContentValues
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.database.sqlite.SQLiteDatabase
+import android.graphics.Bitmap
+import android.os.Build
 import android.os.Bundle
+import android.os.Environment
+import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,12 +21,15 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
-import putra.yanuar.tarot.databinding.ActivityReaderHistoryBinding
+import androidx.core.content.ContextCompat
+import putra.yanuar.tarot.databinding.ActivityCustomerHistoryBinding
 import putra.yanuar.tarot.databinding.ItemCustomerHistoryBinding
+import java.io.File
+import java.io.FileOutputStream
 
-class ReaderHistoryActivity : AppCompatActivity() {
+class CustomerHistoryActivity : AppCompatActivity() {
 
-    lateinit var b: ActivityReaderHistoryBinding
+    lateinit var b: ActivityCustomerHistoryBinding
     lateinit var db: SQLiteDatabase
     lateinit var userEmail: String
 
@@ -29,6 +39,10 @@ class ReaderHistoryActivity : AppCompatActivity() {
     var currentQuery  = ""
     var currentStatus = "Semua"
 
+    // Untuk menyimpan QR sementara saat menunggu izin storage
+    private var pendingQrBitmap:  Bitmap? = null
+    private var pendingBookingId: String  = ""
+
     data class HistoryItem(
         val id: Int,
         val pkg: String,
@@ -37,6 +51,7 @@ class ReaderHistoryActivity : AppCompatActivity() {
         val status: String,
         val notes: String,
         val readerName: String,
+        val answer: String,
         val userId: Int,
         val hasTestimoni: Boolean,
         val isiUlasan: String,
@@ -45,7 +60,7 @@ class ReaderHistoryActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        b = ActivityReaderHistoryBinding.inflate(layoutInflater)
+        b = ActivityCustomerHistoryBinding.inflate(layoutInflater)
         setContentView(b.root)
 
         db = DBOpenHelper(this).writableDatabase
@@ -65,7 +80,8 @@ class ReaderHistoryActivity : AppCompatActivity() {
 
         try {
             val cursor = db.rawQuery(
-                """SELECT b.id, b.package_name, b.booking_date, b.status, b.notes, b.reader_name, b.booking_time
+                """SELECT b.id, b.package_name, b.booking_date, b.status,
+                          b.notes, b.reader_name, b.booking_time, b.answer
                    FROM bookings b
                    WHERE b.email = ?
                    ORDER BY b.id DESC""",
@@ -96,6 +112,7 @@ class ReaderHistoryActivity : AppCompatActivity() {
                     status       = status,
                     notes        = cursor.getString(4) ?: "",
                     readerName   = cursor.getString(5) ?: "-",
+                    answer       = cursor.getString(7) ?: "",
                     userId       = userId,
                     hasTestimoni = hasTestimoni,
                     isiUlasan    = isiUlasan,
@@ -116,6 +133,65 @@ class ReaderHistoryActivity : AppCompatActivity() {
             e.printStackTrace()
         }
     }
+
+    // ── Simpan QR ke galeri ───────────────────────────────────────────────────
+
+    fun saveQrToGallery(bitmap: Bitmap, bookingId: String) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q &&
+            ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            != PackageManager.PERMISSION_GRANTED
+        ) {
+            pendingQrBitmap  = bitmap
+            pendingBookingId = bookingId
+            requestPermissions(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), REQ_STORAGE)
+            return
+        }
+        doSaveQr(bitmap, bookingId)
+    }
+
+    private fun doSaveQr(bitmap: Bitmap, bookingId: String) {
+        val filename = "TarotMeow_$bookingId.png"
+        try {
+            val fos = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                val cv = ContentValues().apply {
+                    put(MediaStore.Images.Media.DISPLAY_NAME, filename)
+                    put(MediaStore.Images.Media.MIME_TYPE, "image/png")
+                    put(MediaStore.Images.Media.RELATIVE_PATH,
+                        Environment.DIRECTORY_PICTURES + "/TarotMeow")
+                }
+                val uri = contentResolver.insert(
+                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI, cv
+                ) ?: throw Exception("Gagal membuat URI")
+                contentResolver.openOutputStream(uri)
+            } else {
+                val dir = File(
+                    Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
+                    "TarotMeow"
+                )
+                dir.mkdirs()
+                FileOutputStream(File(dir, filename))
+            }
+            fos?.use { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }
+            Toast.makeText(this, "QR Tiket disimpan ke Galeri 📸", Toast.LENGTH_SHORT).show()
+        } catch (e: Exception) {
+            Toast.makeText(this, "Gagal menyimpan: ${e.message}", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int, permissions: Array<out String>, grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == REQ_STORAGE &&
+            grantResults.firstOrNull() == PackageManager.PERMISSION_GRANTED
+        ) {
+            pendingQrBitmap?.let { doSaveQr(it, pendingBookingId) }
+        } else {
+            Toast.makeText(this, "Izin storage ditolak", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    // ── Filter ────────────────────────────────────────────────────────────────
 
     fun setupFilter() {
         val statusList = arrayOf("Semua", "PENDING", "PAID", "PROCESSING", "DONE", "COMPLETED", "CANCELLED")
@@ -148,6 +224,8 @@ class ReaderHistoryActivity : AppCompatActivity() {
         (b.lvHistory.adapter as? HistoryAdapter)?.notifyDataSetChanged()
     }
 
+    // ── Dialog batal pesanan ──────────────────────────────────────────────────
+
     fun cancelOrder(bookingId: Int) {
         AlertDialog.Builder(this)
             .setTitle("Batalkan Pesanan")
@@ -164,6 +242,8 @@ class ReaderHistoryActivity : AppCompatActivity() {
             .setNegativeButton("Tidak", null)
             .show()
     }
+
+    // ── Dialog tulis ulasan ───────────────────────────────────────────────────
 
     fun showTestimoniDialog(bookingId: Int, packageName: String, userId: Int) {
         var selectedRating = 0
@@ -188,7 +268,6 @@ class ReaderHistoryActivity : AppCompatActivity() {
             gravity = android.view.Gravity.CENTER
             setPadding(0, 0, 0, p / 2)
         }
-
         val stars = Array(5) { _ ->
             TextView(this).apply {
                 text = "☆"; textSize = 36f
@@ -241,6 +320,8 @@ class ReaderHistoryActivity : AppCompatActivity() {
             .show()
     }
 
+    // ── Share ramalan ─────────────────────────────────────────────────────────
+
     fun shareRamalan(item: HistoryItem) {
         val teks = buildString {
             appendLine("🔮 *Tarot Meow — Hasil Ramalan*")
@@ -249,7 +330,8 @@ class ReaderHistoryActivity : AppCompatActivity() {
             appendLine("📅 Tanggal: ${item.date}")
             appendLine("👁 Reader: ${item.readerName}")
             appendLine()
-            if (item.notes.isNotEmpty()) appendLine("Q: ${item.notes}")
+            if (item.notes.isNotEmpty())  appendLine("Q: ${item.notes}")
+            if (item.answer.isNotEmpty()) appendLine("A: ${item.answer}")
             appendLine()
             appendLine("✨ Temukan ramalanmu di Tarot Meow!")
             appendLine("📞 +62 856-4947-1086 | TikTok: @tarotmeow111")
@@ -261,30 +343,33 @@ class ReaderHistoryActivity : AppCompatActivity() {
                 when (which) {
                     0 -> {
                         try {
-                            val intent = Intent(Intent.ACTION_SEND).apply {
+                            startActivity(Intent(Intent.ACTION_SEND).apply {
                                 type = "text/plain"; setPackage("com.whatsapp")
                                 putExtra(Intent.EXTRA_TEXT, teks)
-                            }
-                            startActivity(intent)
+                            })
                         } catch (_: Exception) {
-                            val intent = Intent(Intent.ACTION_SEND).apply {
-                                type = "text/plain"; putExtra(Intent.EXTRA_TEXT, teks)
-                                putExtra(Intent.EXTRA_SUBJECT, "Hasil Ramalan Tarot Meow")
-                            }
-                            startActivity(Intent.createChooser(intent, "Bagikan via..."))
+                            startActivity(Intent.createChooser(
+                                Intent(Intent.ACTION_SEND).apply {
+                                    type = "text/plain"
+                                    putExtra(Intent.EXTRA_TEXT, teks)
+                                    putExtra(Intent.EXTRA_SUBJECT, "Hasil Ramalan Tarot Meow")
+                                }, "Bagikan via..."
+                            ))
                         }
                     }
-                    1 -> {
-                        val intent = Intent(Intent.ACTION_SEND).apply {
-                            type = "text/plain"; putExtra(Intent.EXTRA_TEXT, teks)
+                    1 -> startActivity(Intent.createChooser(
+                        Intent(Intent.ACTION_SEND).apply {
+                            type = "text/plain"
+                            putExtra(Intent.EXTRA_TEXT, teks)
                             putExtra(Intent.EXTRA_SUBJECT, "Hasil Ramalan Tarot Meow")
-                        }
-                        startActivity(Intent.createChooser(intent, "Bagikan via..."))
-                    }
+                        }, "Bagikan via..."
+                    ))
                 }
             }
             .show()
     }
+
+    // ── Adapter ───────────────────────────────────────────────────────────────
 
     inner class HistoryAdapter : android.widget.BaseAdapter() {
         override fun getCount(): Int = listData.size
@@ -298,7 +383,7 @@ class ReaderHistoryActivity : AppCompatActivity() {
 
             if (convertView == null) {
                 binding = ItemCustomerHistoryBinding.inflate(
-                    LayoutInflater.from(this@ReaderHistoryActivity), parent, false
+                    LayoutInflater.from(this@CustomerHistoryActivity), parent, false
                 )
                 view = binding.root
                 view.tag = binding
@@ -311,8 +396,16 @@ class ReaderHistoryActivity : AppCompatActivity() {
             binding.tvItemDate.text     = "📅 ${item.date}  ⏰ ${item.time}"
             binding.tvItemStatus.text   = item.status
             binding.tvItemQuestion.text = if (item.notes.isNotEmpty()) "Q: ${item.notes}" else "Q: -"
-            binding.tvItemAnswer.text   = "A: Lihat di riwayat lengkap"
+            binding.tvItemAnswer.text   = if (item.answer.isNotEmpty()) "A: ${item.answer}" else "A: Belum ada jawaban dari Reader."
             binding.tvItemReader.text   = "Reader: ${item.readerName}"
+
+            val statusColor = when (item.status) {
+                "COMPLETED", "DONE" -> 0xFF388E3C.toInt()
+                "PROCESSING"        -> 0xFF1565C0.toInt()
+                "CANCELLED"         -> 0xFFD32F2F.toInt()
+                else                -> 0xFFAD88C6.toInt()
+            }
+            binding.tvItemStatus.setTextColor(statusColor)
 
             val canCancel = item.status in listOf("PENDING", "PAID")
             binding.btnCancelOrder.visibility = if (canCancel) View.VISIBLE else View.GONE
@@ -320,10 +413,7 @@ class ReaderHistoryActivity : AppCompatActivity() {
 
             val isDone = item.status in listOf("DONE", "COMPLETED")
 
-            binding.btnTulisUlasan.visibility = when {
-                isDone && !item.hasTestimoni -> View.VISIBLE
-                else -> View.GONE
-            }
+            binding.btnTulisUlasan.visibility = if (isDone && !item.hasTestimoni) View.VISIBLE else View.GONE
             if (isDone && !item.hasTestimoni) {
                 binding.btnTulisUlasan.setOnClickListener {
                     showTestimoniDialog(item.id, item.pkg, item.userId)
@@ -341,11 +431,14 @@ class ReaderHistoryActivity : AppCompatActivity() {
                 binding.layoutUlasanTerkirim.visibility = View.GONE
             }
 
-            // QR Ticket
+            // ── QR Ticket ────────────────────────────────────────────────────
             binding.layoutQrTicket.visibility = View.GONE
-            if (item.status !in listOf("CANCELLED")) {
+            if (item.status != "CANCELLED") {
                 try {
-                    val c = db.rawQuery("SELECT qr_content FROM bookings WHERE id = ?", arrayOf(item.id.toString()))
+                    val c = db.rawQuery(
+                        "SELECT qr_content FROM bookings WHERE id = ?",
+                        arrayOf(item.id.toString())
+                    )
                     var qrContent = if (c.moveToFirst()) c.getString(0) ?: "" else ""
                     c.close()
 
@@ -359,21 +452,29 @@ class ReaderHistoryActivity : AppCompatActivity() {
                             time         = item.time
                         )
                         try { db.execSQL("ALTER TABLE bookings ADD COLUMN qr_content TEXT DEFAULT ''") } catch (_: Exception) {}
-                        db.execSQL("UPDATE bookings SET qr_content = ? WHERE id = ?", arrayOf(qrContent, item.id.toString()))
+                        db.execSQL(
+                            "UPDATE bookings SET qr_content = ? WHERE id = ?",
+                            arrayOf(qrContent, item.id.toString())
+                        )
                     }
 
-                    binding.layoutQrTicket.visibility = View.VISIBLE
                     val bmp = QrHelper.generateQr(qrContent, sizePx = 300)
+                    binding.layoutQrTicket.visibility = View.VISIBLE
                     binding.imgQrCode.setImageBitmap(bmp)
                     binding.tvQrBookingId.text = "Booking #${item.id}"
+
                     binding.btnSaveQr.setOnClickListener {
-                        // simpan QR — delegasi ke activity
-                        Toast.makeText(this@ReaderHistoryActivity, "Fungsi simpan QR tersedia di riwayat booking", Toast.LENGTH_SHORT).show()
+                        saveQrToGallery(bmp, item.id.toString())
                     }
+
                 } catch (_: Exception) {}
             }
 
             return view
         }
+    }
+
+    companion object {
+        private const val REQ_STORAGE = 202
     }
 }

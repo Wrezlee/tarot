@@ -45,7 +45,7 @@
         <activity android:name=".AdminActivity" />
         <activity android:name=".ReaderActivity" />
         <activity android:name=".CustomerActivity" />
-        <activity android:name=".ReaderHistoryActivity" />
+        <activity android:name=".CustomerHistoryActivity" />
         <activity android:name=".CustomerEditProfileActivity" />
         <activity android:name=".ReaderEditProfileActivity" android:exported="false" />
         <activity android:name=".CustomerOrderActivity" />
