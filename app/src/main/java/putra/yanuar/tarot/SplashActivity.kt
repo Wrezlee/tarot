@@ -13,9 +13,21 @@ class SplashActivity : AppCompatActivity() {
         supportActionBar?.hide()
         setContentView(R.layout.activity_splash)
 
+        MusicManager.start(this)
+
         Handler(Looper.getMainLooper()).postDelayed({
             startActivity(Intent(this, MainActivity::class.java))
             finish()
         }, 1000)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        MusicManager.resume()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        MusicManager.pause()
     }
 }

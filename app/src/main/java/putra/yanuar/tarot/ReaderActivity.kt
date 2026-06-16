@@ -24,10 +24,8 @@ class ReaderActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedList
     private lateinit var b: ActivityReaderBinding
     private lateinit var db: SQLiteDatabase
     private lateinit var ft: FragmentTransaction
-
     private lateinit var fragHistory: ReaderHistoryFragment
     private lateinit var fragProfile: ReaderProfileFragment
-
     private var userEmail: String = ""
     private var readerId: Int = 0
     private var readerName: String = ""
@@ -42,9 +40,7 @@ class ReaderActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedList
         super.onCreate(savedInstanceState)
         b = ActivityReaderBinding.inflate(layoutInflater)
         setContentView(b.root)
-
         userEmail = intent.getStringExtra("USER_EMAIL") ?: ""
-
         try {
             db = DBOpenHelper(this).writableDatabase
         } catch (e: Exception) {
@@ -52,19 +48,12 @@ class ReaderActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedList
             finish()
             return
         }
-
-        // Init fragments
         fragHistory = ReaderHistoryFragment()
         fragProfile = ReaderProfileFragment()
-
-        // Load reader info
         try {
-            val c = db.rawQuery(
-                "SELECT id, name, is_online FROM users WHERE email = ?",
-                arrayOf(userEmail)
-            )
+            val c = db.rawQuery("SELECT id, name, is_online FROM users WHERE email = ?", arrayOf(userEmail))
             if (c.moveToFirst()) {
-                readerId  = c.getInt(0)
+                readerId = c.getInt(0)
                 readerName = c.getString(1) ?: "Reader"
                 val isOnline = c.getInt(2) == 1
                 b.switchStatus.isChecked = isOnline
@@ -74,47 +63,45 @@ class ReaderActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedList
         } catch (e: Exception) {
             Toast.makeText(this, "Error baca data reader: ${e.message}", Toast.LENGTH_LONG).show()
         }
-
         setSupportActionBar(b.toolbarReader)
         supportActionBar?.setDisplayShowTitleEnabled(true)
         supportActionBar?.title = "Tarot Meow"
-
         b.navbarReader.setOnItemSelectedListener(this)
         b.btnStartReading.setOnClickListener {
             if (isProcessing) showReadingOptions() else startReading()
         }
-
         b.switchStatus.setOnCheckedChangeListener { _, isChecked ->
             try {
                 val statusVal = if (isChecked) 1 else 0
-                val statusText = if (isChecked) "Online & Active" else "Offline / Sibuk"
-                b.tvStatusLabel.text = statusText
-                db.execSQL("UPDATE users SET is_online = ? WHERE id = ?",
-                    arrayOf(statusVal.toString(), readerId.toString()))
+                b.tvStatusLabel.text = if (isChecked) "Online & Active" else "Offline / Sibuk"
+                db.execSQL("UPDATE users SET is_online = ? WHERE id = ?", arrayOf(statusVal.toString(), readerId.toString()))
                 Toast.makeText(this, "Status Reader: ${if (isChecked) "Online" else "Offline"}", Toast.LENGTH_SHORT).show()
             } catch (e: Exception) {
                 Toast.makeText(this, "Gagal update status: ${e.message}", Toast.LENGTH_SHORT).show()
             }
         }
-
-        // Update greeting
         b.tvReaderGreeting.text = "Halo, $readerName"
-
         loadStats()
         loadNextBooking()
         loadCalendarBookings()
     }
 
-    // ── Toolbar ────────────────────────────────────────────────────────────
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.reader_menu_option, menu)
+        menu?.findItem(R.id.menu_music)?.title =
+            if (MusicManager.isMuted()) " Musik OFF" else " Musik ON"
         return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
-            R.id.menu_about  -> { showAboutDialog(); true }
+            R.id.menu_about -> { showAboutDialog(); true }
             R.id.menu_logout -> { logout(); true }
+            R.id.menu_music -> {
+                val nowMuted = MusicManager.toggleMute()
+                item.title = if (nowMuted) " Musik OFF" else " Musik ON"
+                true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }
@@ -150,31 +137,29 @@ class ReaderActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedList
         finish()
     }
 
-    // ── Bottom Nav ─────────────────────────────────────────────────────────
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         ft = supportFragmentManager.beginTransaction()
         when (item.itemId) {
             R.id.readerHome -> {
                 b.scrollReaderHome.visibility = View.VISIBLE
-                b.containerReader.visibility  = View.GONE
+                b.containerReader.visibility = View.GONE
             }
             R.id.readerHistory -> {
                 ft.replace(R.id.containerReader, fragHistory)
                 ft.commit()
                 b.scrollReaderHome.visibility = View.GONE
-                b.containerReader.visibility  = View.VISIBLE
+                b.containerReader.visibility = View.VISIBLE
             }
             R.id.readerProfile -> {
                 ft.replace(R.id.containerReader, fragProfile)
                 ft.commit()
                 b.scrollReaderHome.visibility = View.GONE
-                b.containerReader.visibility  = View.VISIBLE
+                b.containerReader.visibility = View.VISIBLE
             }
         }
         return true
     }
 
-    // ── Stats (home) ───────────────────────────────────────────────────────
     fun loadStats() {
         try {
             val cPending = db.rawQuery(
@@ -183,7 +168,6 @@ class ReaderActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedList
             )
             if (cPending.moveToFirst()) b.tvPendingCount.text = cPending.getInt(0).toString()
             cPending.close()
-
             val cDone = db.rawQuery(
                 "SELECT COUNT(*) FROM bookings WHERE status IN ('completed','COMPLETED','done','DONE') AND reader_id = ?",
                 arrayOf(readerId.toString())
@@ -191,12 +175,11 @@ class ReaderActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedList
             if (cDone.moveToFirst()) b.tvCompletedCount.text = cDone.getInt(0).toString()
             cDone.close()
         } catch (e: Exception) {
-            b.tvPendingCount.text   = "0"
+            b.tvPendingCount.text = "0"
             b.tvCompletedCount.text = "0"
         }
     }
 
-    // ── Next Booking ───────────────────────────────────────────────────────
     fun loadNextBooking() {
         try {
             val sql = """
@@ -208,15 +191,14 @@ class ReaderActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedList
                 ORDER BY b.booking_date ASC, b.booking_time ASC
                 LIMIT 1
             """.trimIndent()
-
             val c = db.rawQuery(sql, arrayOf(readerId.toString()))
             if (c.moveToFirst()) {
                 currentBookingId = c.getInt(0)
                 val customerName = c.getString(1)?.takeIf { it.isNotEmpty() } ?: c.getString(5) ?: "-"
                 b.tvNextCustomerName.text = customerName
-                b.tvNextBookingDate.text  = "📅 ${c.getString(2)?.takeIf { it.isNotEmpty() } ?: "-"}"
-                b.tvNextBookingTime.text  = c.getString(3)?.takeIf { it.isNotEmpty() } ?: "--:--"
-                b.tvNextPackageName.text  = "Paket: ${c.getString(4) ?: "-"}"
+                b.tvNextBookingDate.text = " ${c.getString(2)?.takeIf { it.isNotEmpty() } ?: "-"}"
+                b.tvNextBookingTime.text = c.getString(3)?.takeIf { it.isNotEmpty() } ?: "--:--"
+                b.tvNextPackageName.text = "Paket: ${c.getString(4) ?: "-"}"
                 b.btnStartReading.visibility = View.VISIBLE
                 b.btnStartReading.text = "Mulai Ramalan"
                 b.btnStartReading.setBackgroundColor(0xFF7469B6.toInt())
@@ -225,9 +207,9 @@ class ReaderActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedList
                 currentBookingId = 0
                 isProcessing = false
                 b.tvNextCustomerName.text = "Belum Ada Antrean"
-                b.tvNextBookingDate.text  = ""
-                b.tvNextBookingTime.text  = "--:--"
-                b.tvNextPackageName.text  = "Siap melayani sesi baru"
+                b.tvNextBookingDate.text = ""
+                b.tvNextBookingTime.text = "--:--"
+                b.tvNextPackageName.text = "Siap melayani sesi baru"
                 b.btnStartReading.visibility = View.GONE
             }
             c.close()
@@ -238,24 +220,19 @@ class ReaderActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedList
         }
     }
 
-    // ── Calendar ───────────────────────────────────────────────────────────
     fun loadCalendarBookings() {
         try {
             val container = b.containerCalendar
             container.removeAllViews()
-
-            val cal      = Calendar.getInstance()
+            val cal = Calendar.getInstance()
             val dayOfWeek = cal.get(Calendar.DAY_OF_WEEK)
-
             val calStart = Calendar.getInstance()
             calStart.add(Calendar.DAY_OF_MONTH, -(dayOfWeek - Calendar.MONDAY))
             val calEnd = Calendar.getInstance()
             calEnd.add(Calendar.DAY_OF_MONTH, (Calendar.SUNDAY - dayOfWeek + 7) % 7)
-
-            val sdf       = SimpleDateFormat("d/M/yyyy", Locale.getDefault())
-            val startStr  = sdf.format(calStart.time)
-            val endStr    = sdf.format(calEnd.time)
-
+            val sdf = SimpleDateFormat("d/M/yyyy", Locale.getDefault())
+            val startStr = sdf.format(calStart.time)
+            val endStr = sdf.format(calEnd.time)
             val cursor = db.rawQuery(
                 """SELECT b.id, u.name, b.email, b.package_name, b.booking_date, b.booking_time, b.status
                    FROM bookings b
@@ -265,14 +242,13 @@ class ReaderActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedList
                    ORDER BY b.booking_date ASC, b.booking_time ASC""",
                 arrayOf(readerId.toString())
             )
-
             val bookingsThisWeek = ArrayList<Array<String>>()
             while (cursor.moveToNext()) {
                 val dateStr = cursor.getString(4) ?: ""
                 try {
-                    val bookDate  = sdf.parse(dateStr) ?: continue
+                    val bookDate = sdf.parse(dateStr) ?: continue
                     val startDate = sdf.parse(startStr) ?: continue
-                    val endDate   = sdf.parse(endStr) ?: continue
+                    val endDate = sdf.parse(endStr) ?: continue
                     if (!bookDate.before(startDate) && !bookDate.after(endDate)) {
                         bookingsThisWeek.add(arrayOf(
                             cursor.getInt(0).toString(),
@@ -286,7 +262,6 @@ class ReaderActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedList
                 } catch (ex: Exception) { ex.printStackTrace() }
             }
             cursor.close()
-
             if (bookingsThisWeek.isEmpty()) {
                 val tv = TextView(this).apply {
                     text = "Tidak ada booking minggu ini"
@@ -297,22 +272,19 @@ class ReaderActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedList
                 container.addView(tv)
                 return
             }
-
             val monthNames = arrayOf("","Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des")
-
             for (booking in bookingsThisWeek) {
-                val bookingId    = booking[0]
+                val bookingId = booking[0]
                 val customerName = booking[1]
-                val packageName  = booking[2]
-                val dateStr      = booking[3]
-                val timeStr      = booking[4]
-                val status       = booking[5]
-                val statusColor  = when (status) {
-                    "PAID"       -> 0xFF4CAF50.toInt()
+                val packageName = booking[2]
+                val dateStr = booking[3]
+                val timeStr = booking[4]
+                val status = booking[5]
+                val statusColor = when (status) {
+                    "PAID" -> 0xFF4CAF50.toInt()
                     "PROCESSING" -> 0xFFFF9800.toInt()
-                    else         -> 0xFFAD88C6.toInt()
+                    else -> 0xFFAD88C6.toInt()
                 }
-
                 val card = com.google.android.material.card.MaterialCardView(this).apply {
                     layoutParams = LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.MATCH_PARENT,
@@ -324,15 +296,13 @@ class ReaderActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedList
                     strokeWidth = 1
                     setCardBackgroundColor(0xFFFFFFFF.toInt())
                 }
-
                 val row = LinearLayout(this).apply {
                     orientation = LinearLayout.HORIZONTAL
                     setPadding(16.dpToPx(), 12.dpToPx(), 16.dpToPx(), 12.dpToPx())
                     gravity = android.view.Gravity.CENTER_VERTICAL
                 }
-
-                val parts    = dateStr.split("/")
-                val colDate  = LinearLayout(this).apply {
+                val parts = dateStr.split("/")
+                val colDate = LinearLayout(this).apply {
                     orientation = LinearLayout.VERTICAL
                     gravity = android.view.Gravity.CENTER
                     layoutParams = LinearLayout.LayoutParams(60.dpToPx(), LinearLayout.LayoutParams.WRAP_CONTENT)
@@ -340,7 +310,6 @@ class ReaderActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedList
                     setPadding(8.dpToPx(), 8.dpToPx(), 8.dpToPx(), 8.dpToPx())
                     (layoutParams as LinearLayout.LayoutParams).marginEnd = 12.dpToPx()
                 }
-
                 colDate.addView(TextView(this).apply {
                     text = parts.getOrElse(0) { "-" }
                     textSize = 20f
@@ -355,7 +324,6 @@ class ReaderActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedList
                     setTextColor(0xFFAD88C6.toInt())
                     gravity = android.view.Gravity.CENTER
                 })
-
                 val colInfo = LinearLayout(this).apply {
                     orientation = LinearLayout.VERTICAL
                     layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
@@ -369,10 +337,9 @@ class ReaderActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedList
                     text = packageName; textSize = 11f; setTextColor(0xFFAD88C6.toInt())
                 })
                 colInfo.addView(TextView(this).apply {
-                    text = "⏰ $timeStr"; textSize = 11f; setTextColor(0xFF7469B6.toInt())
+                    text = " $timeStr"; textSize = 11f; setTextColor(0xFF7469B6.toInt())
                     setPadding(0, 4.dpToPx(), 0, 0)
                 })
-
                 val tvStatus = TextView(this).apply {
                     text = status; textSize = 9f
                     setTypeface(null, android.graphics.Typeface.BOLD)
@@ -382,13 +349,11 @@ class ReaderActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedList
                         setColor(statusColor); cornerRadius = 100f
                     }
                 }
-
                 val colNote = TextView(this).apply {
-                    text = "📝"; textSize = 20f
+                    text = ""; textSize = 20f
                     setPadding(12.dpToPx(), 0, 0, 0)
                     setOnClickListener { showNoteDialog(bookingId.toInt(), customerName) }
                 }
-
                 row.addView(colDate)
                 row.addView(colInfo)
                 row.addView(tvStatus)
@@ -399,7 +364,6 @@ class ReaderActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedList
         } catch (e: Exception) { e.printStackTrace() }
     }
 
-    // ── Note Dialog ────────────────────────────────────────────────────────
     private fun showNoteDialog(bookingId: Int, customerName: String) {
         var existingNote = ""
         var noteId = -1
@@ -412,7 +376,6 @@ class ReaderActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedList
             existingNote = cNote.getString(1) ?: ""
         }
         cNote.close()
-
         val layout = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             setPadding(16.dpToPx(), 8.dpToPx(), 16.dpToPx(), 0)
@@ -431,7 +394,6 @@ class ReaderActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedList
         }
         layout.addView(tvInfo)
         layout.addView(etNote)
-
         AlertDialog.Builder(this)
             .setTitle("📝 Catatan Reader")
             .setView(layout)
@@ -448,8 +410,7 @@ class ReaderActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedList
                             arrayOf(readerId.toString(), bookingId.toString(), teks)
                         )
                     } else {
-                        db.execSQL("UPDATE reader_notes SET note = ? WHERE id = ?",
-                            arrayOf(teks, noteId.toString()))
+                        db.execSQL("UPDATE reader_notes SET note = ? WHERE id = ?", arrayOf(teks, noteId.toString()))
                     }
                     Toast.makeText(this, "Catatan tersimpan", Toast.LENGTH_SHORT).show()
                 } catch (e: Exception) {
@@ -466,7 +427,6 @@ class ReaderActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedList
             .show()
     }
 
-    // ── Reading Session ────────────────────────────────────────────────────
     private fun startReading() {
         if (currentBookingId <= 0) {
             Toast.makeText(this, "Tidak ada booking untuk diproses", Toast.LENGTH_SHORT).show()
@@ -501,18 +461,14 @@ class ReaderActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedList
             }
             cQ.close()
         } catch (e: Exception) { e.printStackTrace() }
-
         val finalQuestionId = questionId
-        val finalQuestion   = customerQuestion
-
+        val finalQuestion = customerQuestion
         AlertDialog.Builder(this)
             .setTitle("Sesi Ramalan Aktif")
             .setMessage("Pertanyaan Customer:\n\n\"$finalQuestion\"")
-            .setPositiveButton("✍️ Jawab Pertanyaan") { _, _ ->
-                showAnswerDialog(finalQuestionId, finalQuestion)
-            }
-            .setNeutralButton("✅ Selesaikan") { _, _ -> completeReading() }
-            .setNegativeButton("❌ Batalkan Sesi") { _, _ -> cancelReading() }
+            .setPositiveButton("✍ Jawab Pertanyaan") { _, _ -> showAnswerDialog(finalQuestionId, finalQuestion) }
+            .setNeutralButton(" Selesaikan") { _, _ -> completeReading() }
+            .setNegativeButton(" Batalkan Sesi") { _, _ -> cancelReading() }
             .show()
     }
 
@@ -533,7 +489,6 @@ class ReaderActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedList
         }
         layout.addView(tvQ)
         layout.addView(etAnswer)
-
         AlertDialog.Builder(this)
             .setTitle("💬 Jawab Pertanyaan")
             .setView(layout)
@@ -545,11 +500,9 @@ class ReaderActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedList
                 }
                 try {
                     if (questionId > 0) {
-                        db.execSQL("UPDATE questions SET answer = ? WHERE id = ?",
-                            arrayOf(jawaban, questionId.toString()))
+                        db.execSQL("UPDATE questions SET answer = ? WHERE id = ?", arrayOf(jawaban, questionId.toString()))
                     } else {
-                        db.execSQL("INSERT INTO questions (booking_id, answer) VALUES (?, ?)",
-                            arrayOf(currentBookingId.toString(), jawaban))
+                        db.execSQL("INSERT INTO questions (booking_id, answer) VALUES (?, ?)", arrayOf(currentBookingId.toString(), jawaban))
                     }
                     Toast.makeText(this, "Jawaban berhasil dikirim!", Toast.LENGTH_SHORT).show()
                 } catch (e: Exception) {
@@ -567,8 +520,7 @@ class ReaderActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedList
             .setMessage("Yakin ingin menyelesaikan sesi ramalan ini?")
             .setPositiveButton("Ya, Selesai") { _, _ ->
                 try {
-                    db.execSQL("UPDATE bookings SET status = 'completed' WHERE id = ?",
-                        arrayOf(currentBookingId.toString()))
+                    db.execSQL("UPDATE bookings SET status = 'completed' WHERE id = ?", arrayOf(currentBookingId.toString()))
                     isProcessing = false
                     currentBookingId = 0
                     b.btnStartReading.text = "Mulai Ramalan"
@@ -592,8 +544,7 @@ class ReaderActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedList
             .setMessage("Yakin ingin membatalkan sesi ini?")
             .setPositiveButton("Ya, Batalkan") { _, _ ->
                 try {
-                    db.execSQL("UPDATE bookings SET status = 'paid', reader_id = 0, reader_name = '' WHERE id = ?",
-                        arrayOf(currentBookingId.toString()))
+                    db.execSQL("UPDATE bookings SET status = 'paid', reader_id = 0, reader_name = '' WHERE id = ?", arrayOf(currentBookingId.toString()))
                     isProcessing = false
                     currentBookingId = 0
                     b.btnStartReading.text = "Mulai Ramalan"
@@ -610,7 +561,6 @@ class ReaderActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedList
             .show()
     }
 
-    // ── Extension helpers ──────────────────────────────────────────────────
     private fun Int.dpToPx(): Int = (this * resources.displayMetrics.density).toInt()
     private fun Float.dpToFloat(): Float = this * resources.displayMetrics.density
 
@@ -619,5 +569,11 @@ class ReaderActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedList
         loadStats()
         loadNextBooking()
         loadCalendarBookings()
+        MusicManager.resume()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        MusicManager.pause()
     }
 }

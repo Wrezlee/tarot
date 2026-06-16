@@ -19,33 +19,36 @@ class AdminActivity : AppCompatActivity(), View.OnClickListener {
         super.onCreate(savedInstanceState)
         b = ActivityAdminBinding.inflate(layoutInflater)
         setContentView(b.root)
-
         db = DBOpenHelper(this).writableDatabase
-
         setSupportActionBar(b.toolbarAdmin)
         supportActionBar?.setDisplayShowTitleEnabled(true)
         supportActionBar?.title = "Tarot Meow"
-
         b.btnMenuUser.setOnClickListener(this)
         b.btnMenuPackages.setOnClickListener(this)
         b.btnMenuTestimony.setOnClickListener(this)
         b.btnMenuReport.setOnClickListener(this)
         b.btnMenuBooking.setOnClickListener(this)
-
         loadStats()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.admin_menu_option, menu)
+        menu?.findItem(R.id.menu_music)?.title =
+            if (MusicManager.isMuted()) " Musik OFF" else " Musik ON"
         return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.menu_about  -> showAboutDialog()
-            R.id.menu_logout -> logout()
+        return when (item.itemId) {
+            R.id.menu_about -> { showAboutDialog(); true }
+            R.id.menu_logout -> { logout(); true }
+            R.id.menu_music -> {
+                val nowMuted = MusicManager.toggleMute()
+                item.title = if (nowMuted) " Musik OFF" else " Musik ON"
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
         }
-        return super.onOptionsItemSelected(item)
     }
 
     private fun showAboutDialog() {
@@ -95,11 +98,9 @@ class AdminActivity : AppCompatActivity(), View.OnClickListener {
                 "SELECT SUM(total_price) FROM bookings WHERE status IN ('done','DONE','completed','COMPLETED')", null)
             if (cursorRev.moveToFirst()) b.tvTotalRevenue.text = "Rp ${cursorRev.getInt(0)}"
             cursorRev.close()
-
             val cursorUser = db.rawQuery("SELECT COUNT(*) FROM users WHERE role = 'customer'", null)
             if (cursorUser.moveToFirst()) b.tvActiveSeekers.text = cursorUser.getInt(0).toString()
             cursorUser.close()
-
             val cursorReader = db.rawQuery("SELECT COUNT(*) FROM users WHERE role = 'reader'", null)
             if (cursorReader.moveToFirst()) b.tvVerifiedReaders.text = cursorReader.getInt(0).toString()
             cursorReader.close()
@@ -113,5 +114,10 @@ class AdminActivity : AppCompatActivity(), View.OnClickListener {
     override fun onResume() {
         super.onResume()
         loadStats()
+        MusicManager.resume()
     }
+
+    override fun onPause() {
+        super.onPause()
+        MusicManager.pause()}
 }

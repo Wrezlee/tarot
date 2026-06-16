@@ -78,4 +78,14 @@ class MainActivity : AppCompatActivity() {
         }
         cursor.close()
     }
+
+    override fun onResume() {
+        super.onResume()
+        MusicManager.resume()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        MusicManager.pause()
+    }
 }

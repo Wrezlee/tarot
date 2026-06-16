@@ -17,8 +17,7 @@ import com.google.android.material.navigation.NavigationBarView
 import putra.yanuar.tarot.databinding.ActivityCustomerBinding
 import java.util.Calendar
 
-class CustomerActivity : AppCompatActivity(),
-    NavigationBarView.OnItemSelectedListener {
+class CustomerActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListener {
 
     lateinit var b: ActivityCustomerBinding
     lateinit var db: SQLiteDatabase
@@ -31,22 +30,16 @@ class CustomerActivity : AppCompatActivity(),
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         b = ActivityCustomerBinding.inflate(layoutInflater)
         setContentView(b.root)
-
         userEmail = intent.getStringExtra("USER_EMAIL") ?: ""
-
         fragBooking = CustomerBookingFragment()
         fragProfile = CustomerProfileFragment()
         db = DBOpenHelper(this).writableDatabase
-
         setSupportActionBar(b.toolbarCustomer)
         supportActionBar?.setDisplayShowTitleEnabled(true)
         supportActionBar?.title = "Tarot Meow"
-
         b.navbarCustomer.setOnItemSelectedListener(this)
-
         setupDates()
         loadReaders()
         updateBookingBadge()
@@ -54,6 +47,8 @@ class CustomerActivity : AppCompatActivity(),
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_cust_profil, menu)
+        menu?.findItem(R.id.menu_music)?.title =
+            if (MusicManager.isMuted()) " Musik OFF" else " Musik ON"
         return true
     }
 
@@ -61,6 +56,11 @@ class CustomerActivity : AppCompatActivity(),
         return when (item.itemId) {
             R.id.menu_cust_about -> { showAboutDialog(); true }
             R.id.menu_cust_logout -> { logout(); true }
+            R.id.menu_music -> {
+                val nowMuted = MusicManager.toggleMute()
+                item.title = if (nowMuted) " Musik OFF" else " Musik ON"
+                true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }
@@ -104,7 +104,6 @@ class CustomerActivity : AppCompatActivity(),
             val c = db.rawQuery("SELECT id FROM users WHERE email = ?", arrayOf(userEmail))
             if (c.moveToFirst()) userId = c.getInt(0)
             c.close()
-
             val cursor = db.rawQuery(
                 "SELECT COUNT(*) FROM bookings WHERE user_id = ? AND status IN ('paid','PAID','pending','PENDING','processing','PROCESSING')",
                 arrayOf(userId.toString())
@@ -112,7 +111,6 @@ class CustomerActivity : AppCompatActivity(),
             var count = 0
             if (cursor.moveToFirst()) count = cursor.getInt(0)
             cursor.close()
-
             val badge = b.navbarCustomer.getOrCreateBadge(R.id.itemBooking)
             if (count > 0) {
                 badge.isVisible = true
@@ -128,26 +126,21 @@ class CustomerActivity : AppCompatActivity(),
     private fun setupDates() {
         val cal = Calendar.getInstance()
         val monthNames = arrayOf("Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des")
-
         b.tvDay0.text   = cal.get(Calendar.DAY_OF_MONTH).toString()
         b.tvMonth0.text = monthNames[cal.get(Calendar.MONTH)]
         b.tvLabel0.text = "HARI INI"
-
         val cal1 = Calendar.getInstance().apply { add(Calendar.DAY_OF_MONTH, 1) }
         b.tvDay1.text   = cal1.get(Calendar.DAY_OF_MONTH).toString()
         b.tvMonth1.text = monthNames[cal1.get(Calendar.MONTH)]
         b.tvLabel1.text = "BESOK"
-
         val cal2 = Calendar.getInstance().apply { add(Calendar.DAY_OF_MONTH, 2) }
         b.tvDay2.text   = cal2.get(Calendar.DAY_OF_MONTH).toString()
         b.tvMonth2.text = monthNames[cal2.get(Calendar.MONTH)]
         b.tvLabel2.text = "LUSA"
-
         val dateCards  = listOf(b.cardDate0, b.cardDate1, b.cardDate2)
         val dateDays   = listOf(cal.get(Calendar.DAY_OF_MONTH), cal1.get(Calendar.DAY_OF_MONTH), cal2.get(Calendar.DAY_OF_MONTH))
         val dateMonths = listOf(cal.get(Calendar.MONTH) + 1, cal1.get(Calendar.MONTH) + 1, cal2.get(Calendar.MONTH) + 1)
         val dateYears  = listOf(cal.get(Calendar.YEAR), cal1.get(Calendar.YEAR), cal2.get(Calendar.YEAR))
-
         dateCards.forEachIndexed { i, card ->
             card.setOnClickListener {
                 val dateStr = "${dateDays[i]}/${dateMonths[i]}/${dateYears[i]}"
@@ -162,12 +155,10 @@ class CustomerActivity : AppCompatActivity(),
     private fun loadReaders() {
         val container = b.containerReaders
         container.removeAllViews()
-
         try {
             val cursor = db.rawQuery(
                 "SELECT id, name, email, is_online FROM users WHERE role = 'reader'", null
             )
-
             if (!cursor.moveToFirst()) {
                 cursor.close()
                 val tv = TextView(this)
@@ -177,13 +168,10 @@ class CustomerActivity : AppCompatActivity(),
                 container.addView(tv)
                 return
             }
-
             do {
-                val readerId    = cursor.getInt(0)
-                val readerName  = cursor.getString(1)
-                val readerEmail = cursor.getString(2)
-                val isOnline    = cursor.getInt(3) == 1
-
+                val readerId   = cursor.getInt(0)
+                val readerName = cursor.getString(1)
+                val isOnline   = cursor.getInt(3) == 1
                 val card = MaterialCardView(this).apply {
                     layoutParams = LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.MATCH_PARENT,
@@ -203,13 +191,11 @@ class CustomerActivity : AppCompatActivity(),
                         foreground = rippleDrawable
                     }
                 }
-
                 val row = LinearLayout(this).apply {
                     orientation = LinearLayout.HORIZONTAL
                     setPadding(20.dpToPx(), 20.dpToPx(), 20.dpToPx(), 20.dpToPx())
                     alpha = if (isOnline) 1.0f else 0.5f
                 }
-
                 val avatar = ShapeableImageView(this).apply {
                     layoutParams = LinearLayout.LayoutParams(90.dpToPx(), 90.dpToPx())
                     setImageResource(R.drawable.meow)
@@ -218,7 +204,6 @@ class CustomerActivity : AppCompatActivity(),
                         .setAllCornerSizes(20f.dpToFloat())
                         .build()
                 }
-
                 val infoCol = LinearLayout(this).apply {
                     orientation = LinearLayout.VERTICAL
                     layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f).also {
@@ -227,21 +212,18 @@ class CustomerActivity : AppCompatActivity(),
                     }
                     gravity = android.view.Gravity.CENTER_VERTICAL
                 }
-
                 val tvName = TextView(this).apply {
                     text = readerName
                     setTextColor(if (isOnline) 0xFF7469B6.toInt() else 0xFF999999.toInt())
                     textSize = 18f
                     setTypeface(null, android.graphics.Typeface.BOLD)
                 }
-
                 val tvRole = TextView(this).apply {
                     text = "MYSTIC READER"
                     setTextColor(if (isOnline) 0xFFAD88C6.toInt() else 0xFFBBBBBB.toInt())
                     textSize = 10f
                     letterSpacing = 0.1f
                 }
-
                 val bookingCursor = db.rawQuery(
                     "SELECT COUNT(*) FROM bookings WHERE reader_id = ? AND status IN ('completed','COMPLETED','done','DONE')",
                     arrayOf(readerId.toString())
@@ -249,14 +231,12 @@ class CustomerActivity : AppCompatActivity(),
                 var totalDone = 0
                 if (bookingCursor.moveToFirst()) totalDone = bookingCursor.getInt(0)
                 bookingCursor.close()
-
                 val tvStats = TextView(this).apply {
-                    text = "✨ $totalDone reading selesai"
+                    text = " $totalDone reading selesai"
                     setTextColor(if (isOnline) 0xFFAD88C6.toInt() else 0xFFBBBBBB.toInt())
                     textSize = 11f
                     setPadding(0, 4.dpToPx(), 0, 0)
                 }
-
                 val tvStatus = TextView(this).apply {
                     text = if (isOnline) "ONLINE" else "OFFLINE"
                     setTextColor(0xFFFFFFFF.toInt())
@@ -272,7 +252,6 @@ class CustomerActivity : AppCompatActivity(),
                         cornerRadius = 100f
                     }
                 }
-
                 infoCol.addView(tvName)
                 infoCol.addView(tvRole)
                 infoCol.addView(tvStats)
@@ -281,7 +260,6 @@ class CustomerActivity : AppCompatActivity(),
                 row.addView(infoCol)
                 card.addView(row)
                 container.addView(card)
-
                 if (isOnline) {
                     card.setOnClickListener {
                         val intent = Intent(this, CustomerOrderActivity::class.java)
@@ -291,10 +269,8 @@ class CustomerActivity : AppCompatActivity(),
                         startActivity(intent)
                     }
                 }
-
             } while (cursor.moveToNext())
             cursor.close()
-
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -330,5 +306,11 @@ class CustomerActivity : AppCompatActivity(),
         super.onResume()
         loadReaders()
         updateBookingBadge()
+        MusicManager.resume()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        MusicManager.pause()
     }
 }
