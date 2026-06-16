@@ -55,6 +55,8 @@ dependencies {
     implementation("com.google.android.material:material:1.13.0")
     implementation("com.journeyapps:zxing-android-embedded:4.3.0")
     implementation("com.google.zxing:core:3.5.2")
+    implementation("com.github.mumayank:AirLocation:2.5.2")
+    implementation("org.osmdroid:osmdroid-android:6.1.10")
 
 
     testImplementation(libs.junit)

@@ -4,14 +4,15 @@ import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 
-class DBOpenHelper(context: Context) : SQLiteOpenHelper(context, "tarot_meow_db", null, 8) {
+class DBOpenHelper(context: Context) : SQLiteOpenHelper(context, "tarot_meow_db", null, 9) {
 
     override fun onCreate(db: SQLiteDatabase) {
         db.execSQL("""
             CREATE TABLE IF NOT EXISTS users (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 name TEXT, email TEXT, password TEXT, role TEXT,
-                is_online INTEGER DEFAULT 0, foto TEXT DEFAULT ''
+                is_online INTEGER DEFAULT 0, foto TEXT DEFAULT '',
+                lat REAL DEFAULT 0, lng REAL DEFAULT 0
             )
         """)
 
@@ -93,6 +94,10 @@ class DBOpenHelper(context: Context) : SQLiteOpenHelper(context, "tarot_meow_db"
         }
         if (oldVersion < 8) {
             try { db.execSQL("ALTER TABLE bookings ADD COLUMN answer TEXT DEFAULT ''") } catch (_: Exception) {}
+        }
+        if (oldVersion < 9) {
+            try { db.execSQL("ALTER TABLE users ADD COLUMN lat REAL DEFAULT 0") } catch (_: Exception) {}
+            try { db.execSQL("ALTER TABLE users ADD COLUMN lng REAL DEFAULT 0") } catch (_: Exception) {}
         }
     }
 

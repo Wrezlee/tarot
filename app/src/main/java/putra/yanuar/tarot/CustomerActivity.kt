@@ -8,6 +8,7 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentTransaction
@@ -157,7 +158,7 @@ class CustomerActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedLi
         container.removeAllViews()
         try {
             val cursor = db.rawQuery(
-                "SELECT id, name, email, is_online FROM users WHERE role = 'reader'", null
+                "SELECT id, name, email, is_online, lat, lng FROM users WHERE role = 'reader'", null
             )
             if (!cursor.moveToFirst()) {
                 cursor.close()
@@ -172,6 +173,8 @@ class CustomerActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedLi
                 val readerId   = cursor.getInt(0)
                 val readerName = cursor.getString(1)
                 val isOnline   = cursor.getInt(3) == 1
+                val readerLat  = if (!cursor.isNull(4)) cursor.getDouble(4) else 0.0
+                val readerLng  = if (!cursor.isNull(5)) cursor.getDouble(5) else 0.0
                 val card = MaterialCardView(this).apply {
                     layoutParams = LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.MATCH_PARENT,
@@ -252,10 +255,32 @@ class CustomerActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedLi
                         cornerRadius = 100f
                     }
                 }
+                // ── Tombol "Lihat Lokasi" — GPS reader ──
+                val tvLihatLokasi = TextView(this).apply {
+                    text = "📍 Lihat Lokasi"
+                    setTextColor(0xFF7469B6.toInt())
+                    textSize = 10f
+                    setTypeface(null, android.graphics.Typeface.BOLD)
+                    setPadding(0, 8.dpToPx(), 0, 0)
+                    isClickable = true
+                    isFocusable = true
+                    setOnClickListener {
+                        if (readerLat == 0.0 && readerLng == 0.0) {
+                            Toast.makeText(this@CustomerActivity, "Reader belum membagikan lokasi", Toast.LENGTH_SHORT).show()
+                        } else {
+                            val i = Intent(this@CustomerActivity, ReaderLocationActivity::class.java)
+                            i.putExtra("READER_NAME", readerName)
+                            i.putExtra("LAT", readerLat)
+                            i.putExtra("LNG", readerLng)
+                            startActivity(i)
+                        }
+                    }
+                }
                 infoCol.addView(tvName)
                 infoCol.addView(tvRole)
                 infoCol.addView(tvStats)
                 infoCol.addView(tvStatus)
+                infoCol.addView(tvLihatLokasi)
                 row.addView(avatar)
                 row.addView(infoCol)
                 card.addView(row)

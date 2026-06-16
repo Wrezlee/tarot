@@ -2,6 +2,7 @@ package putra.yanuar.tarot
 
 import android.Manifest
 import android.content.ContentValues
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.database.sqlite.SQLiteDatabase
 import android.graphics.Bitmap
@@ -36,7 +37,8 @@ class CustomerOrderActivity : AppCompatActivity() {
         val id: String,
         val name: String,
         val category: String,
-        val price: Int
+        val price: Int,
+        val isOffline: Boolean
     )
 
     private var packageList: List<TarotPackageLocal> = emptyList()
@@ -75,18 +77,23 @@ class CustomerOrderActivity : AppCompatActivity() {
         setupPackageSpinner()
         setupDateTimePicker()
         setupConfirmButton()
+
+        binding.btnLihatLokasiReader.setOnClickListener {
+            openReaderLocation()
+        }
     }
 
     private fun setupPackageSpinner() {
         val list = mutableListOf<TarotPackageLocal>()
         try {
-            val c = db.rawQuery("SELECT id, name, category, price FROM tarot_packages ORDER BY name ASC", null)
+            val c = db.rawQuery("SELECT id, name, category, price, is_offline FROM tarot_packages ORDER BY name ASC", null)
             while (c.moveToNext()) {
                 list.add(TarotPackageLocal(
-                    id       = c.getInt(0).toString(),
-                    name     = c.getString(1) ?: "",
-                    category = c.getString(2) ?: "",
-                    price    = c.getInt(3)
+                    id        = c.getInt(0).toString(),
+                    name      = c.getString(1) ?: "",
+                    category  = c.getString(2) ?: "",
+                    price     = c.getInt(3),
+                    isOffline = c.getInt(4) == 1
                 ))
             }
             c.close()
@@ -99,6 +106,47 @@ class CustomerOrderActivity : AppCompatActivity() {
         val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, names)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         binding.spPaket.adapter = adapter
+
+        binding.spPaket.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                updateLokasiButtonVisibility(position)
+            }
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
+        }
+
+        if (list.isNotEmpty()) updateLokasiButtonVisibility(0)
+    }
+
+    private fun updateLokasiButtonVisibility(position: Int) {
+        val pkg = packageList.getOrNull(position)
+        val show = pkg?.isOffline == true && selectedReaderId.isNotEmpty()
+        binding.btnLihatLokasiReader.visibility = if (show) View.VISIBLE else View.GONE
+    }
+
+    private fun openReaderLocation() {
+        if (selectedReaderId.isEmpty()) {
+            Toast.makeText(this, "Pilih reader terlebih dahulu", Toast.LENGTH_SHORT).show()
+            return
+        }
+        val c = db.rawQuery("SELECT name, lat, lng FROM users WHERE id = ?", arrayOf(selectedReaderId))
+        if (c.moveToFirst()) {
+            val name = c.getString(0) ?: selectedReaderName
+            val lat  = c.getDouble(1)
+            val lng  = c.getDouble(2)
+            c.close()
+            if (lat == 0.0 && lng == 0.0) {
+                Toast.makeText(this, "Reader belum membagikan lokasi", Toast.LENGTH_SHORT).show()
+            } else {
+                val i = Intent(this, ReaderLocationActivity::class.java)
+                i.putExtra("READER_NAME", name)
+                i.putExtra("LAT", lat)
+                i.putExtra("LNG", lng)
+                startActivity(i)
+            }
+        } else {
+            c.close()
+            Toast.makeText(this, "Data reader tidak ditemukan", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun setupDateTimePicker() {
